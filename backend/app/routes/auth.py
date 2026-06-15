@@ -17,7 +17,7 @@ auth = Blueprint("auth", __name__)
 #This is called a decorator. A decorator modifies a function.
 @auth.route("/login", methods = ["POST"])
 def login():
-    
+
     data = request.get_json()
     email = data.get("email")
     password = data.get("password")
@@ -43,7 +43,7 @@ def register():
     name = data.get("name")
     email = data.get("email")
     password = data.get("password")
-    institution = data.get("institution")
+    institute = data.get("institute")
 
     if not email:
         return jsonify({"error": "email is required"}), 400
@@ -68,7 +68,7 @@ def register():
         name=name,
         email=email,
         password=hashed_password,
-        institution=institution
+        institute=institute
     )
 
     db.session.add(new_user)
