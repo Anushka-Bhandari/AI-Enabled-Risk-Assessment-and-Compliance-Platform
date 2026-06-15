@@ -1,3 +1,4 @@
+from flask import request
 import flask
 from flask import Blueprint , request, jsonify
 from werkzeug.security import generate_password_hash , check_password_hash
@@ -13,8 +14,10 @@ from app.models import User
 
 auth = Blueprint("auth", __name__)
 
-@auth.route("/login") #This is called a decorator. A decorator modifies a function.
+#This is called a decorator. A decorator modifies a function.
+@auth.route("/login", methods = ["POST"])
 def login():
+    
     data = request.get_json()
     email = data.get("email")
     password = data.get("password")
@@ -33,26 +36,42 @@ def login():
         "name": user.name
     }), 200
 
-@auth.route("/register" , methods=["POST"])
+@auth.route("/register", methods=["POST"])
 def register():
     data = request.get_json()
+
     name = data.get("name")
     email = data.get("email")
     password = data.get("password")
     institution = data.get("institution")
 
+    if not email:
+        return jsonify({"error": "email is required"}), 400
+
+    if '@' not in email:
+        return jsonify({"error": "@ is required"}), 400
+
+    if not name:
+        return jsonify({"error": "name is required"}), 400
+
+    if not password or len(password) < 6:
+        return jsonify({"error": "password must be at least 6 characters"}), 400
+
     existing_user = User.query.filter_by(email=email).first()
 
     if existing_user:
         return jsonify({"message": "User already exists"}), 400
-    
+
     hashed_password = generate_password_hash(password)
 
-    new_user = User(name=name, 
-                    email=email, 
-                    password=hashed_password, 
-                institution=institution)
-    
+    new_user = User(
+        name=name,
+        email=email,
+        password=hashed_password,
+        institution=institution
+    )
+
     db.session.add(new_user)
     db.session.commit()
-    return jsonify({"message": "User registered successfully"}), 201   
+
+    return jsonify({"message": "User registered successfully"}), 201

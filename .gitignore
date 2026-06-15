@@ -52,3 +52,4 @@ htmlcov/
 # Uncomment if you don't want to push trained models
 # *.pkl
 # *.joblib
+backend/app/templates/login.html
