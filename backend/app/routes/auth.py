@@ -1,16 +1,58 @@
 import flask
+from flask import Blueprint , request, jsonify
+from werkzeug.security import generate_password_hash , check_password_hash
+
+from app.database import db
+from app.models import User
+
 
 #Blueprint is a Flask feature used to organize routes.
 #Blueprint() is a constructor.  
 
 #__name__  Flask uses this to locate files and templates.s
 
-auth = flask.Blueprint("auth", __name__)
+auth = Blueprint("auth", __name__)
 
 @auth.route("/login") #This is called a decorator. A decorator modifies a function.
 def login():
-    return "login successfull"
+    data = request.get_json()
+    email = data.get("email")
+    password = data.get("password")
 
-@auth.route("/register")
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+    
+    if check_password_hash(user.password, password):
+        return jsonify({"message": "Login successful"}), 200
+    
+    return jsonify({
+        "message": "Login successful",
+        "user_id": user.id,
+        "name": user.name
+    }), 200
+
+@auth.route("/register" , methods=["POST"])
 def register():
-    return "user registered successfully"
+    data = request.get_json()
+    name = data.get("name")
+    email = data.get("email")
+    password = data.get("password")
+    institution = data.get("institution")
+
+    existing_user = User.query.filter_by(email=email).first()
+
+    if existing_user:
+        return jsonify({"message": "User already exists"}), 400
+    
+    hashed_password = generate_password_hash(password)
+
+    new_user = User(name=name, 
+                    email=email, 
+                    password=hashed_password, 
+                institution=institution)
+    
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({"message": "User registered successfully"}), 201   
