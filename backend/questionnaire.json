@@ -1,0 +1,151 @@
+{
+  "Privacy Notice": [
+    {
+      "id": "Q1",
+      "question": "Does the university provide a privacy notice to students and staff?"
+    },
+    {
+      "id": "Q2",
+      "question": "Does the privacy notice explain what personal data is collected?"
+    },
+    {
+      "id": "Q3",
+      "question": "Does the privacy notice explain why personal data is collected?"
+    }
+  ],
+
+  "Consent Management": [
+    {
+      "id": "Q4",
+      "question": "Is consent obtained before collecting personal data?"
+    },
+    {
+      "id": "Q5",
+      "question": "Can users withdraw their consent?"
+    },
+    {
+      "id": "Q6",
+      "question": "Is consent recorded and maintained?"
+    }
+  ],
+
+  "Data Retention": [
+    {
+      "id": "Q7",
+      "question": "Does the university have a documented data retention policy?"
+    },
+    {
+      "id": "Q8",
+      "question": "Are retention periods defined for student records?"
+    },
+    {
+      "id": "Q9",
+      "question": "Is personal data deleted after the retention period expires?"
+    }
+  ],
+
+  "User Rights Handling": [
+    {
+      "id": "Q10",
+      "question": "Can users request access to their personal data?"
+    },
+    {
+      "id": "Q11",
+      "question": "Can users request correction of inaccurate personal data?"
+    },
+    {
+      "id": "Q12",
+      "question": "Can users request deletion of their personal data?"
+    }
+  ],
+
+  "Access Control": [
+    {
+      "id": "Q13",
+      "question": "Do staff members use individual user accounts?"
+    },
+    {
+      "id": "Q14",
+      "question": "Is access granted based on job responsibilities?"
+    },
+    {
+      "id": "Q15",
+      "question": "Are access permissions reviewed periodically?"
+    }
+  ],
+
+  "Password Security": [
+    {
+      "id": "Q16",
+      "question": "Does the university enforce password complexity requirements?"
+    },
+    {
+      "id": "Q17",
+      "question": "Are default passwords changed before use?"
+    },
+    {
+      "id": "Q18",
+      "question": "Is multi-factor authentication enabled for administrators?"
+    }
+  ],
+
+  "Incident Response": [
+    {
+      "id": "Q19",
+      "question": "Does the university have a documented incident response plan?"
+    },
+    {
+      "id": "Q20",
+      "question": "Are cybersecurity incidents formally recorded?"
+    },
+    {
+      "id": "Q21",
+      "question": "Are responsibilities assigned for incident handling?"
+    }
+  ],
+
+  "Breach Notification": [
+    {
+      "id": "Q22",
+      "question": "Does the university have a procedure for reporting data breaches?"
+    },
+    {
+      "id": "Q23",
+      "question": "Is there a process to notify management about breaches?"
+    },
+    {
+      "id": "Q24",
+      "question": "Can affected individuals be notified in case of a breach?"
+    }
+  ],
+
+  "Backup and Recovery": [
+    {
+      "id": "Q25",
+      "question": "Are regular backups performed?"
+    },
+    {
+      "id": "Q26",
+      "question": "Are backup restoration procedures tested periodically?"
+    },
+    {
+      "id": "Q27",
+      "question": "Can critical systems be restored from backups?"
+    }
+  ],
+
+  "Vendor Management": [
+    {
+      "id": "Q28",
+      "question": "Are third-party vendors assessed before handling university data?"
+    },
+    {
+      "id": "Q29",
+      "question": "Do vendor agreements include data protection requirements?"
+    },
+    {
+      "id": "Q30",
+      "question": "Are vendor security risks reviewed periodically?"
+    }
+  ]
+}
