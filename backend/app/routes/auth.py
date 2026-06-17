@@ -1,5 +1,7 @@
-from flask import request
 import flask
+from flask import request
+from flask_jwt_extended import create_access_token
+
 from flask import Blueprint , request, jsonify
 from werkzeug.security import generate_password_hash , check_password_hash
 
@@ -27,11 +29,16 @@ def login():
     if not user:
         return jsonify({"message": "User not found"}), 404
     
-    if check_password_hash(user.password, password):
-        return jsonify({"message": "Login successful"}), 200
+    if not check_password_hash(user.password, password):
+        return jsonify({"message": "Invalid credentials"}), 401
     
+    token = create_access_token(
+        identity=user.id
+    )
+
     return jsonify({
         "message": "Login successful",
+        "token": token,
         "user_id": user.id,
         "name": user.name
     }), 200
@@ -74,4 +81,11 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({"message": "User registered successfully"}), 201
+    token = create_access_token(
+    identity=new_user.id
+)
+
+    return jsonify({
+        "message": "User registered successfully",
+        "token": token
+    }), 201
