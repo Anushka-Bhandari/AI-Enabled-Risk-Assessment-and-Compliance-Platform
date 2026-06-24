@@ -1,287 +1,357 @@
-# AI-Enabled-Risk-Assessment-and-Compliance-Platform
-AI-powered Risk Assessment and Compliance Platform that ingests enterprise data through APIs and webhooks, analyzes risks, monitors compliance, detects anomalies, and provides role-based dashboards, alerts, reports, and AI-driven insights.
+# AI-Enabled Governance, Risk Assessment and Compliance Platform for Indian Universities
 
-# AI-Enabled Risk Assessment and Compliance Platform
+An AI-powered Governance, Risk, and Compliance (GRC) platform designed to help Indian universities assess cybersecurity risks, evaluate privacy compliance, measure security maturity, and improve regulatory readiness through intelligent automation.
 
-An enterprise-grade Governance, Risk, and Compliance (GRC) platform that helps organizations identify operational risks, monitor compliance requirements, detect anomalies, and gain actionable insights through AI-powered analytics.
-
-The platform integrates with organizational systems through APIs and webhooks, collects operational and security-related data, evaluates risk levels, checks compliance against predefined policies, and provides role-based dashboards, alerts, reports, and AI-driven recommendations.
+The platform integrates risk assessment, compliance evaluation, document analysis, policy generation, machine learning-based risk prediction, and AI-powered assistance into a unified system aligned with major cybersecurity and privacy frameworks.
 
 ---
 
 ## Problem Statement
 
-Organizations use multiple systems for authentication, employee management, file storage, security monitoring, and vendor management. Monitoring risks and ensuring compliance across these systems manually is time-consuming, error-prone, and difficult to scale.
+Indian universities process large volumes of personal, academic, financial, and administrative data belonging to students, faculty, staff, researchers, and external stakeholders.
 
-This project aims to provide a centralized platform that continuously monitors organizational activities, identifies risks, validates compliance requirements, and enables proactive decision-making through automation and artificial intelligence.
+Ensuring compliance with privacy regulations, cybersecurity standards, accreditation requirements, and institutional governance policies is often fragmented, manual, and difficult to scale.
+
+Many institutions face challenges in:
+
+* Identifying cybersecurity and privacy risks
+* Measuring security maturity
+* Maintaining compliance documentation
+* Preparing for audits and assessments
+* Tracking policy implementation
+* Monitoring governance controls
+* Generating actionable compliance insights
+
+This project aims to provide a centralized AI-enabled platform that automates risk assessment, compliance evaluation, policy analysis, and governance monitoring for higher education institutions.
 
 ---
 
-## Key Features
+## Objectives
+
+* Automate cybersecurity and privacy risk assessments.
+* Evaluate compliance against regulatory and industry frameworks.
+* Identify compliance gaps and missing controls.
+* Generate compliance and maturity scores.
+* Analyze uploaded governance and policy documents.
+* Predict organizational risk levels using machine learning.
+* Generate AI-powered recommendations.
+* Automatically generate compliance-related policies and documents.
+* Improve audit readiness and governance visibility.
+
+---
+
+## Compliance Frameworks & Standards Supported
+
+### Digital Personal Data Protection (DPDP) Act, 2023
+
+Assessment of:
+
+* Notice and Consent Management
+* Data Principal Rights
+* Purpose Limitation
+* Data Retention Practices
+* Security Safeguards
+* Grievance Redressal Mechanisms
+* Data Processing Responsibilities
+
+### ISO/IEC 27001
+
+Evaluation of information security controls including:
+
+* Access Control
+* Asset Management
+* Incident Management
+* Information Security Policies
+* Business Continuity Controls
+* Risk Management Processes
+
+### ISO/IEC 27701
+
+Assessment of privacy information management practices including:
+
+* Privacy Governance
+* Personal Data Processing
+* Data Subject Rights
+* Privacy Risk Management
+* Privacy Impact Controls
+
+### NIST Cybersecurity Framework (CSF)
+
+Alignment with:
+
+* Identify
+* Protect
+* Detect
+* Respond
+* Recover
+
+### Higher Education Governance Requirements
+
+Alignment with:
+
+* UGC Digital Governance Guidelines
+* Institutional Security Policies
+* Accreditation Readiness Requirements
+
+---
+
+## Core Modules
+
+### University Authentication & Access Management
+
+* University registration and login
+* JWT-based authentication
+* Institution-specific assessment management
+* Secure access control
+
+---
 
 ### Risk Assessment Engine
 
-- Risk score calculation
-- Risk categorization (Low, Medium, High, Critical)
-- Department-level risk analysis
-- Historical risk tracking
+Conduct structured risk assessments through intelligent questionnaires covering:
 
-### Compliance Monitoring
+* Data Protection
+* Privacy Management
+* Cybersecurity Governance
+* Access Control
+* Incident Response
+* Vendor Risk Management
+* Security Awareness
+* Data Retention Practices
 
-- Multi-factor authentication (MFA) checks
-- Password policy validation
-- Security training compliance
-- Vendor certification monitoring
+Outputs:
 
-### Anomaly Detection
-
-- Unusual login detection
-- Suspicious user activity monitoring
-- Excessive file access detection
-- Failed login pattern analysis
-
-### Alert Management
-
-- Critical alerts
-- High-priority alerts
-- Compliance violation alerts
-- Alert status tracking
-
-### Role-Based Dashboards
-
-#### Admin Dashboard
-
-- User management
-- Department management
-- System overview
-- Platform health monitoring
-
-#### Compliance Officer Dashboard
-
-- Compliance score
-- Violations tracking
-- Policy monitoring
-- Compliance recommendations
-
-#### Auditor Dashboard
-
-- Audit history
-- Compliance evidence
-- Historical trends
-- Report generation
-
-#### Executive Dashboard
-
-- Organization-wide risk overview
-- Compliance percentage
-- Risk heatmaps
-- Executive summaries
-- AI-powered insights
-
-### Reporting Module
-
-- Risk assessment reports
-- Compliance reports
-- Audit reports
-- PDF export
-- CSV export
-
-### AI-Powered Features
-
-#### Policy Document Analysis
-
-Upload and analyze:
-
-- PDF documents
-- DOCX documents
-
-Extract:
-
-- Compliance requirements
-- Security controls
-- Organizational policies
-- Actionable obligations
-
-#### AI Recommendations
-
-Examples:
-
-- Enable MFA for non-compliant users
-- Identify departments with increasing risk
-- Highlight upcoming vendor certification expirations
-
-#### AI Chatbot
-
-Natural language queries such as:
-
-- Which department has the highest risk score?
-- Show all critical alerts.
-- Generate a compliance summary.
-- List unresolved violations.
+* Risk Scores
+* Risk Categories
+* Security Maturity Levels
 
 ---
 
-## Data Sources
+### Compliance Assessment Engine
 
-The platform is designed to ingest data from enterprise systems through APIs and webhooks.
+Evaluate organizational practices against predefined compliance controls.
 
-### Authentication Systems
+Outputs:
 
-- User login events
-- Failed login attempts
-- Device information
-- Access locations
-
-### HR Systems
-
-- Employee records
-- Department assignments
-- Training completion status
-
-### File Access Systems
-
-- File downloads
-- File uploads
-- Access frequency
-
-### Vendor Systems
-
-- Vendor details
-- Contract expiry information
-- Certification status
-
-### Policy Documents
-
-- Security policies
-- Compliance documents
-- Audit reports
+* Implemented Controls
+* Missing Controls
+* Compliance Gaps
+* Compliance Readiness Score
 
 ---
 
-## System Architecture
+### Document Management & Analysis
+
+Upload and analyze organizational documents such as:
+
+* Privacy Policies
+* Information Security Policies
+* Data Retention Policies
+* Incident Response Plans
+* Governance Documents
+
+Supported Formats:
+
+* PDF
+* DOCX
+
+Capabilities:
+
+* Text Extraction
+* Policy Review
+* Compliance Evidence Identification
+* Control Mapping
+
+---
+
+### Compliance Scoring System
+
+Calculate:
+
+* DPDP Compliance Score
+* ISO 27001 Readiness Score
+* ISO 27701 Readiness Score
+* NIST Alignment Score
+* Overall Compliance Percentage
+
+---
+
+### Machine Learning-Based Risk Prediction
+
+Predict organizational risk levels using assessment responses and compliance indicators.
+
+Risk Categories:
+
+* Low
+* Medium
+* High
+* Critical
+
+---
+
+## AI-Powered Features
+
+### AI Recommendations Engine
+
+Generate actionable recommendations such as:
+
+* Missing compliance controls
+* Security improvement suggestions
+* Privacy enhancement recommendations
+* Governance improvement actions
+
+---
+
+### AI Policy Generation
+
+Automatically generate governance and compliance documentation including:
+
+* Privacy Policy
+* Information Security Policy
+* Data Retention Policy
+* Incident Response Policy
+* Consent Management Policy
+
+---
+
+### AI Compliance Assistant (Chatbot)
+
+Natural language interaction with the platform.
+
+Example Queries:
+
+* What are our highest risk areas?
+* Show missing compliance controls.
+* Generate a compliance summary.
+* Which controls are not implemented?
+* What DPDP requirements are currently unmet?
+
+---
+
+## Reporting & Analytics
+
+Generate:
+
+* Risk Assessment Reports
+* Compliance Reports
+* Audit Readiness Reports
+* Executive Summaries
+* Governance Insights
+
+Reports include:
+
+* Compliance Scores
+* Risk Levels
+* Gap Analysis
+* Recommendations
+* Historical Assessment Results
+
+---
+
+## System Workflow
 
 ```text
-Enterprise Systems
-(Authentication, HR, Vendors, File Access)
-                    │
-                    ▼
-           APIs + Webhooks
-                    │
-                    ▼
-          Data Ingestion Layer
-                    │
-                    ▼
-             FastAPI Backend
-                    │
-        ┌───────────┼───────────┐
-        ▼           ▼           ▼
-   PostgreSQL     Redis     AI Engine
+University Login
         │
         ▼
-Risk & Compliance Processing
+Risk Assessment Questionnaire
         │
         ▼
- Dashboards • Alerts • Reports
+Document Upload & Analysis
         │
         ▼
-      End Users
+Compliance Evaluation Engine
+        │
+        ▼
+Risk Prediction Model
+        │
+        ▼
+AI Recommendations & Policy Generation
+        │
+        ▼
+Reports, Dashboards & Compliance Insights
 ```
 
 ---
 
 ## Technology Stack
 
-### Frontend
-
-- React
-- TypeScript
-- Tailwind CSS
-- Recharts
-
 ### Backend
 
-- FastAPI
-- Python
+* Flask
+* Python
 
 ### Database
 
-- PostgreSQL
-- Redis
+* MySQL
+* SQLAlchemy
 
-### AI & Machine Learning
+### Authentication
 
-- Scikit-learn
-- OpenAI API
+* JWT Authentication
 
-### Infrastructure
+### Machine Learning
 
-- Docker
-- AWS
+* Scikit-learn
+* Joblib
 
----
+### Database Migration
 
-## Project Modules
+* Flask-Migrate
+* Alembic
 
-- Authentication & RBAC
-- Data Ingestion Layer
-- User Management
-- Risk Assessment Engine
-- Compliance Monitoring Engine
-- Anomaly Detection
-- Alert Management
-- Admin Dashboard
-- Compliance Dashboard
-- Auditor Dashboard
-- Executive Dashboard
-- Reporting Module
-- Policy Analysis Engine
-- AI Recommendation Engine
-- AI Chatbot
-- Audit Trail
+### Development Tools
+
+* Git
+* GitHub
+* Postman
 
 ---
 
-## User Roles
+## Project Architecture
 
-| Role | Responsibilities |
-|--------|------------------|
-| Admin | Platform management and user administration |
-| Compliance Officer | Compliance monitoring and policy enforcement |
-| Auditor | Audit reviews, evidence collection, and reporting |
-| Executive | Strategic oversight and decision-making |
-
----
-
-## Risk Categories
-
-| Score Range | Category |
-|------------|-----------|
-| 0 – 30 | Low |
-| 31 – 60 | Medium |
-| 61 – 80 | High |
-| 81 – 100 | Critical |
-
----
-
-## Future Scope
-
-- Real enterprise integrations
-- Event streaming using Kafka
-- Mobile application
-- Advanced predictive analytics
-- SIEM integrations
-- Multi-tenant SaaS architecture
+```text
+Universities
+      │
+      ▼
+Authentication Layer
+      │
+      ▼
+Assessment & Document Layer
+      │
+      ▼
+Compliance Evaluation Engine
+      │
+      ▼
+Risk Prediction Engine
+      │
+      ▼
+AI Services Layer
+(Recommendations • Policy Generation • Chatbot)
+      │
+      ▼
+Reporting & Analytics
+      │
+      ▼
+Compliance Insights
+```
 
 ---
 
-## Project Goal
+## Future Enhancements
 
-To build a centralized AI-powered platform that transforms organizational operational data into actionable risk intelligence, compliance insights, and executive-level decision support.
+* Real-time compliance monitoring
+* Advanced analytics dashboard
+* Multi-tenant SaaS architecture
+* Automated audit preparation
+* Continuous compliance assessment
+* Integration with institutional systems
+* Advanced AI-driven governance insights
 
 ---
 
 ## Internship Project
 
-Developed as part of my internship at STPI Jaipur, focusing on the design and development of an AI-powered Governance, Risk, and Compliance (GRC) platform for enterprise environments.
+Developed as part of an internship at **STPI Jaipur**.
 
-The project aims to provide real-time risk assessment, compliance monitoring, anomaly detection, intelligent reporting, and AI-driven insights through a scalable and modern software architecture.
+This project focuses on building an AI-enabled Governance, Risk, and Compliance (GRC) platform that helps Indian universities automate cybersecurity risk assessment, privacy compliance evaluation, governance monitoring, policy management, and security maturity analysis through artificial intelligence and machine learning.
