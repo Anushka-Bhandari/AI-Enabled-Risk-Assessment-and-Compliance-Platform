@@ -31,3 +31,13 @@ class AssessmentAnswer(db.Model):
     assessment_id = db.Column(db.Integer, db.ForeignKey('assessments.id'), nullable=False)
     question_id = db.Column(db.String(20), nullable=False)
     answer = db.Column(db.Boolean, nullable=False)
+
+class Document(db.Model):
+    __tablename__ = 'documents'
+    id = db.Column(db.Integer, primary_key=True)
+    university_id = db.Column(db.Integer, db.ForeignKey('university.id'), nullable=False)
+    original_filename = db.Column(db.String(255), nullable=False)
+    stored_filename = db.Column(db.String(255), nullable=False)
+    uploaded_at = db.Column(db.DateTime, default = db.func.current_timestamp())
+    document_type = db.Column(db.String(100), nullable=True)
+    source = db.Column(db.String(20), nullable=False)
