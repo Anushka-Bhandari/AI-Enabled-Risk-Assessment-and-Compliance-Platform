@@ -3,6 +3,8 @@ from flask import Blueprint, request, jsonify
 from app.database import db
 from app.models import Assessment, AssessmentAnswer
 
+from sqlalchemy.exc import IntegrityError
+
 assessment = Blueprint("assessment", __name__)
 
 
@@ -48,20 +50,33 @@ def submit_assessment():
         university_id=data["university_id"]
     )
 
-    db.session.add(assessment_record)
-    db.session.commit()
+    try :
+        db.session.add(assessment_record)
+        db.session.flush()
 
-    for question_id, answer in answers.items():
+        for question_id, answer in answers.items():
+            answer_record = AssessmentAnswer(
+                assessment_id=assessment_record.id,
+                question_id=question_id,
+                answer=answer
+            )
+            db.session.add(answer_record)
 
-        answer_record = AssessmentAnswer(
-            assessment_id=assessment_record.id,
-            question_id=question_id,
-            answer=answer
-        )
+        db.session.commit()
 
-        db.session.add(answer_record)
+    except IntegrityError as e:
+        db.session.rollback()
+        print(e)
+        return jsonify({
+            "error": "Database integrity error."
+        }), 400
 
-    db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print(e)
+        return jsonify({
+            "error": "Unable to save assessment."
+        }), 500
 
     return jsonify({
         "message": "Assessment stored successfully",

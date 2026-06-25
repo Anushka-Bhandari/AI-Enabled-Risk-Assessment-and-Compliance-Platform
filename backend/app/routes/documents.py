@@ -4,6 +4,7 @@ from datetime import datetime
 from app.database import db
 from app.models import Document
 from app.services.document_extractor import extract_text
+from sqlalchemy.exc import IntegrityError
 
 documents = Blueprint(
     "documents",
@@ -16,6 +17,12 @@ ALLOWED_EXTENSIONS = {
     "pdf",
     "docx"
 }
+
+def cleanup_uploaded_files(saved_filepaths):
+    for filepath in saved_filepaths:
+        if os.path.exists(filepath):
+            os.remove(filepath)
+            
 
 def allowed_file(filename):
     if "." not in filename:
@@ -123,16 +130,32 @@ def upload_documents():
     if failed_files:
         db.session.rollback()
 
-        for filepath in saved_filepaths:
-            if os.path.exists(filepath):
-                os.remove(filepath)
+        cleanup_uploaded_files(saved_filepaths)
 
         return jsonify({
             "error": "Unable to extract text from one or more files.",
             "failed_files": failed_files
         }), 400
           
-    db.session.commit()
+    try:
+        db.session.commit()
+    except IntegrityError as e:
+        db.session.rollback()
+        print(e)
+        cleanup_uploaded_files(saved_filepaths)
+        
+        return jsonify({
+            "error": "Database integrity error."
+        }), 400
+
+    except Exception as e:
+        db.session.rollback()
+        print(e)
+        cleanup_uploaded_files(saved_filepaths)
+
+        return jsonify({
+            "error": "Unable to save uploaded documents."
+        }), 500
     
     return jsonify({
         "message": "Files uploaded successfully",
