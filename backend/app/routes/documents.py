@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 from app.database import db
 from app.models import Document
+from app.services.document_extractor import extract_text
 
 documents = Blueprint(
     "documents",
@@ -39,6 +40,7 @@ def upload_documents():
         }), 400
 
     university_id = 1   # TEMPORARY
+    assessment_id = 2   #temporary
 
     university_folder = os.path.join(
         UPLOAD_FOLDER,
@@ -76,6 +78,9 @@ def upload_documents():
                 "error": f"Invalid file type: {file.filename}"
             }), 400
 
+    failed_files = []
+    saved_filepaths = []
+
     for file in files:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
@@ -89,17 +94,44 @@ def upload_documents():
         )
 
         file.save(filepath)
+        saved_filepaths.append(filepath)
 
-        document = Document(
-            university_id = university_id,
-            original_filename = file.filename,
-            stored_filename = stored_filename,
-            document_type = None,
-            source = "uploaded"
-        )
+        try:
+            extracted_text = extract_text(filepath)
 
-        db.session.add(document)
+            if not extracted_text.strip():
+                raise ValueError("No readable text found in the document.")
 
+            document = Document(
+                university_id = university_id,
+                assessment_id = assessment_id,
+                original_filename = file.filename,
+                stored_filename = stored_filename,
+                document_type = None,
+                source = "uploaded",
+                extracted_text = extracted_text
+            )
+            db.session.add(document)
+
+        except Exception as e:
+            print(e)
+            failed_files.append({
+                "filename": file.filename,
+                "reason": str(e)
+            })
+    
+    if failed_files:
+        db.session.rollback()
+
+        for filepath in saved_filepaths:
+            if os.path.exists(filepath):
+                os.remove(filepath)
+
+        return jsonify({
+            "error": "Unable to extract text from one or more files.",
+            "failed_files": failed_files
+        }), 400
+          
     db.session.commit()
     
     return jsonify({
