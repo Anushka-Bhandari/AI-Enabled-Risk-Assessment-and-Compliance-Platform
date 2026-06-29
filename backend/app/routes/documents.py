@@ -22,7 +22,7 @@ def cleanup_uploaded_files(saved_filepaths):
     for filepath in saved_filepaths:
         if os.path.exists(filepath):
             os.remove(filepath)
-            
+
 
 def allowed_file(filename):
     if "." not in filename:
@@ -114,7 +114,6 @@ def upload_documents():
                 assessment_id = assessment_id,
                 original_filename = file.filename,
                 stored_filename = stored_filename,
-                document_type = None,
                 source = "uploaded",
                 extracted_text = extracted_text
             )

@@ -192,11 +192,6 @@ class Document(db.Model):
         nullable=False
     )
 
-    document_type = db.Column(
-        db.String(100),
-        nullable=True
-    )
-
     source = db.Column(
         db.String(20),
         nullable=False
