@@ -2,9 +2,10 @@ from flask import Blueprint, request, jsonify
 import os
 from datetime import datetime
 from app.database import db
-from app.models import Document
+from app.models import Document, User
 from app.services.document_extractor import extract_text
 from sqlalchemy.exc import IntegrityError
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 documents = Blueprint(
     "documents",
@@ -34,6 +35,7 @@ def allowed_file(filename):
     "/documents/upload",
     methods=["POST"]
 )
+@jwt_required()
 
 def upload_documents():
 
@@ -41,13 +43,19 @@ def upload_documents():
         "documents"
     )
 
-    if len(files) == 0:
+    if not files:
         return jsonify({
             "error": "No files uploaded"
         }), 400
 
-    university_id = 1   # TEMPORARY
-    assessment_id = 2   #temporary
+    current_user = db.session.get(User, get_jwt_identity())
+
+    if not current_user:
+        return jsonify({
+            "error": "User not found."
+        }), 404
+
+    university_id = current_user.university_id
 
     university_folder = os.path.join(
         UPLOAD_FOLDER,
@@ -110,12 +118,11 @@ def upload_documents():
                 raise ValueError("No readable text found in the document.")
 
             document = Document(
-                university_id = university_id,
-                assessment_id = assessment_id,
-                original_filename = file.filename,
-                stored_filename = stored_filename,
-                source = "uploaded",
-                extracted_text = extracted_text
+                university_id=university_id,
+                original_filename=file.filename,
+                stored_filename=stored_filename,
+                source="uploaded",
+                extracted_text=extracted_text
             )
             db.session.add(document)
 

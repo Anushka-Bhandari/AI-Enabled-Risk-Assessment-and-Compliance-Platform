@@ -96,11 +96,6 @@ class Assessment(db.Model):
         primary_key=True
     )
 
-    assessment_name = db.Column(
-        db.String(200),
-        nullable=False
-    )
-
     user_id = db.Column(
         db.Integer,
         db.ForeignKey("users.id"),
@@ -180,12 +175,6 @@ class Document(db.Model):
     )
 
     university_id = db.Column(db.Integer, db.ForeignKey("university.id"), nullable=False)
-
-    assessment_id = db.Column(
-        db.Integer,
-        db.ForeignKey("assessments.id"),
-        nullable=False
-    )
 
     original_filename = db.Column(
         db.String(255),
