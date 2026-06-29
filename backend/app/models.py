@@ -12,7 +12,11 @@ class User(db.Model):
 
     password_hash = db.Column(db.String(255), nullable=False)
 
-    institute = db.Column(db.String(120), nullable=False)
+    university_id = db.Column(
+        db.Integer,
+        db.ForeignKey("university.id"),
+        nullable=False
+    )
 
     role = db.Column(
         db.String(20),
@@ -73,6 +77,12 @@ class University(db.Model):
 
     documents = db.relationship(
         "Document",
+        backref="university",
+        lazy=True
+    )
+
+    users = db.relationship(
+        "User",
         backref="university",
         lazy=True
     )
