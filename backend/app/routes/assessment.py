@@ -1,14 +1,32 @@
+import json
+from pathlib import Path
 from flask import Blueprint, request, jsonify
-
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.database import db
-from app.models import Assessment, AssessmentAnswer
-
 from sqlalchemy.exc import IntegrityError
+from app.models import Assessment, AssessmentAnswer, User
 
 assessment = Blueprint("assessment", __name__)
 
+QUESTIONNAIRE_PATH = Path(__file__).resolve().parent.parent / "questionnaire.json"
+
+with open(QUESTIONNAIRE_PATH, "r", encoding="utf-8") as file:
+    QUESTIONNAIRE = json.load(file)
+    
+VALID_QUESTION_IDS = {
+    str(question["id"])
+    for question in QUESTIONNAIRE["questions"]
+}
+
+VALID_ANSWERS = {
+    "Implemented",
+    "Partially Implemented",
+    "Not Implemented",
+    "Not Applicable",
+}
 
 @assessment.route("/assessment", methods=["POST"])
+@jwt_required()
 def submit_assessment():
 
     data = request.get_json()
@@ -16,11 +34,6 @@ def submit_assessment():
     if not data:
         return jsonify({
             "error": "No data provided"
-        }), 400
-
-    if "university_id" not in data:
-        return jsonify({
-            "error": "university_id is required"
         }), 400
 
     if "answers" not in data:
@@ -35,28 +48,44 @@ def submit_assessment():
             "error": "answers must be a dictionary"
         }), 400
 
-    for question_id, answer in answers.items():
+    if len(answers) != len(VALID_QUESTION_IDS):
+        return jsonify({
+            "error": "All questionnaire items must be answered."
+        }), 400
 
-        if not isinstance(answer, bool):
+    for question_id, answer in answers.items():
+        if question_id not in VALID_QUESTION_IDS:
             return jsonify({
-                "error": f"{question_id} must be true or false"
+                "error": f"Invalid question ID: {question_id}"
             }), 400
 
-    # TODO: Replace with authenticated user's ID after JWT authentication
-    current_user_id = 1
+        if answer not in VALID_ANSWERS:
+            return jsonify({
+                "error": f"Invalid answer for question {question_id}"
+            }), 400
 
-    assessment_record = Assessment(
-        user_id=current_user_id,
-        university_id=data["university_id"]
+    current_user_id = get_jwt_identity()
+    current_user = db.session.get(User, current_user_id)
+
+    if not current_user:
+        return jsonify({
+            "error": "User not found."
+        }), 404
+
+    assessment = Assessment(
+        user_id=current_user.id,
+        university_id=current_user.university_id,
+        assessment_mode="QUESTIONNAIRE"
     )
 
-    try :
-        db.session.add(assessment_record)
+
+    try:
+        db.session.add(assessment)
         db.session.flush()
 
         for question_id, answer in answers.items():
             answer_record = AssessmentAnswer(
-                assessment_id=assessment_record.id,
+                assessment_id=assessment.id,
                 question_id=question_id,
                 answer=answer
             )
@@ -64,21 +93,19 @@ def submit_assessment():
 
         db.session.commit()
 
-    except IntegrityError as e:
+    except IntegrityError:
         db.session.rollback()
-        print(e)
         return jsonify({
             "error": "Database integrity error."
         }), 400
 
-    except Exception as e:
+    except Exception:
         db.session.rollback()
-        print(e)
         return jsonify({
             "error": "Unable to save assessment."
         }), 500
 
     return jsonify({
         "message": "Assessment stored successfully",
-        "assessment_id": assessment_record.id
+        "assessment_id": assessment.id
     }), 201

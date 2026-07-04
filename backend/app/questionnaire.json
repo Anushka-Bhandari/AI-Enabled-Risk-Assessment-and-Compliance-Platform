@@ -1,151 +1,359 @@
 {
-  "Privacy Notice": [
-    {
-      "id": "Q1",
-      "question": "Does the university provide a privacy notice to students and staff?"
-    },
-    {
-      "id": "Q2",
-      "question": "Does the privacy notice explain what personal data is collected?"
-    },
-    {
-      "id": "Q3",
-      "question": "Does the privacy notice explain why personal data is collected?"
-    }
-  ],
+    "version": "1.0",
+    "title": "University Security & Privacy Assessment Questionnaire",
+    "description": "Assessment questionnaire for evaluating cybersecurity, privacy, and regulatory compliance of Indian universities.",
+    "total_questions": 50,
 
-  "Consent Management": [
-    {
-      "id": "Q4",
-      "question": "Is consent obtained before collecting personal data?"
-    },
-    {
-      "id": "Q5",
-      "question": "Can users withdraw their consent?"
-    },
-    {
-      "id": "Q6",
-      "question": "Is consent recorded and maintained?"
-    }
-  ],
-
-  "Data Retention": [
-    {
-      "id": "Q7",
-      "question": "Does the university have a documented data retention policy?"
-    },
-    {
-      "id": "Q8",
-      "question": "Are retention periods defined for student records?"
-    },
-    {
-      "id": "Q9",
-      "question": "Is personal data deleted after the retention period expires?"
-    }
-  ],
-
-  "User Rights Handling": [
-    {
-      "id": "Q10",
-      "question": "Can users request access to their personal data?"
-    },
-    {
-      "id": "Q11",
-      "question": "Can users request correction of inaccurate personal data?"
-    },
-    {
-      "id": "Q12",
-      "question": "Can users request deletion of their personal data?"
-    }
-  ],
-
-  "Access Control": [
-    {
-      "id": "Q13",
-      "question": "Do staff members use individual user accounts?"
-    },
-    {
-      "id": "Q14",
-      "question": "Is access granted based on job responsibilities?"
-    },
-    {
-      "id": "Q15",
-      "question": "Are access permissions reviewed periodically?"
-    }
-  ],
-
-  "Password Security": [
-    {
-      "id": "Q16",
-      "question": "Does the university enforce password complexity requirements?"
-    },
-    {
-      "id": "Q17",
-      "question": "Are default passwords changed before use?"
-    },
-    {
-      "id": "Q18",
-      "question": "Is multi-factor authentication enabled for administrators?"
-    }
-  ],
-
-  "Incident Response": [
-    {
-      "id": "Q19",
-      "question": "Does the university have a documented incident response plan?"
-    },
-    {
-      "id": "Q20",
-      "question": "Are cybersecurity incidents formally recorded?"
-    },
-    {
-      "id": "Q21",
-      "question": "Are responsibilities assigned for incident handling?"
-    }
-  ],
-
-  "Breach Notification": [
-    {
-      "id": "Q22",
-      "question": "Does the university have a procedure for reporting data breaches?"
-    },
-    {
-      "id": "Q23",
-      "question": "Is there a process to notify management about breaches?"
-    },
-    {
-      "id": "Q24",
-      "question": "Can affected individuals be notified in case of a breach?"
-    }
-  ],
-
-  "Backup and Recovery": [
-    {
-      "id": "Q25",
-      "question": "Are regular backups performed?"
-    },
-    {
-      "id": "Q26",
-      "question": "Are backup restoration procedures tested periodically?"
-    },
-    {
-      "id": "Q27",
-      "question": "Can critical systems be restored from backups?"
-    }
-  ],
-
-  "Vendor Management": [
-    {
-      "id": "Q28",
-      "question": "Are third-party vendors assessed before handling university data?"
-    },
-    {
-      "id": "Q29",
-      "question": "Do vendor agreements include data protection requirements?"
-    },
-    {
-      "id": "Q30",
-      "question": "Are vendor security risks reviewed periodically?"
-    }
-  ]
+    "questions": [
+        {
+            "id": 1,
+            "category": "Privacy & Data Governance",
+            "question": "Does your institution publish a privacy notice that clearly explains how personal data is collected, used, stored, shared, and protected?",
+            "control": "Privacy Notice",
+            "weight": 3
+        },
+        {
+            "id": 2,
+            "category": "Privacy & Data Governance",
+            "question": "Before collecting personal data, does your institution obtain valid consent or rely on another documented lawful basis for processing where applicable?",
+            "control": "Consent Management",
+            "weight": 5
+        },
+        {
+            "id": 3,
+            "category": "Privacy & Data Governance",
+            "question": "Does your institution maintain an up-to-date inventory of personal and institutional data, including where it is stored and processed?",
+            "control": "Data Inventory",
+            "weight": 4
+        },
+        {
+            "id": 4,
+            "category": "Privacy & Data Governance",
+            "question": "Is institutional data classified according to its sensitivity (for example, public, internal, confidential, or restricted) and handled accordingly?",
+            "control": "Data Classification",
+            "weight": 4
+        },
+        {
+            "id": 5,
+            "category": "Privacy & Data Governance",
+            "question": "Does your institution define and follow documented retention periods for different categories of personal and institutional data?",
+            "control": "Data Retention",
+            "weight": 4
+        },
+        {
+            "id": 6,
+            "category": "Privacy & Data Governance",
+            "question": "When data is no longer required, does your institution securely delete, destroy, or anonymize it using documented procedures?",
+            "control": "Data Disposal",
+            "weight": 4
+        },
+        {
+            "id": 7,
+            "category": "Privacy & Data Governance",
+            "question": "Does your institution collect only the minimum amount of personal data necessary to achieve a specific and legitimate purpose?",
+            "control": "Data Minimization",
+            "weight": 5
+        },
+        {
+            "id": 8,
+            "category": "Privacy & Data Governance",
+            "question": "Is every category of personal data collected and processed only for clearly defined, documented, and legitimate institutional purposes?",
+            "control": "Purpose Limitation",
+            "weight": 5
+        },
+        {
+            "id": 9,
+            "category": "Privacy & Data Governance",
+            "question": "Does your institution have documented procedures to receive, verify, process, and respond to requests from individuals regarding their personal data?",
+            "control": "Data Subject Rights Management",
+            "weight": 5
+        },
+        {
+            "id": 10,
+            "category": "Privacy & Data Governance",
+            "question": "Are sensitive categories of personal data protected using additional technical and organizational safeguards beyond standard security measures?",
+            "control": "Sensitive Personal Data Protection",
+            "weight": 5
+        },        
+        {
+            "id": 11,
+            "category": "Identity & Access Management",
+            "question": "Are users granted access only to the systems, applications, and information necessary to perform their assigned responsibilities, following the principle of least privilege?",
+            "control": "Access Control",
+            "weight": 5
+        },
+        {
+            "id": 12,
+            "category": "Identity & Access Management",
+            "question": "Are user roles and permissions formally defined so that access rights are assigned based on job responsibilities rather than individual requests?",
+            "control": "Role-Based Access Control (RBAC)",
+            "weight": 5
+        },
+        {
+            "id": 13,
+            "category": "Identity & Access Management",
+            "question": "Is an additional authentication factor required for privileged, administrative, or remote access to institutional systems and applications?",
+            "control": "Multi-Factor Authentication (MFA)",
+            "weight": 5
+        },
+        {
+            "id": 14,
+            "category": "Identity & Access Management",
+            "question": "Does your institution enforce password requirements such as minimum length, complexity, password history, secure storage, and protection against default or weak passwords?",
+            "control": "Password Security",
+            "weight": 4
+        },
+        {
+            "id": 15,
+            "category": "Identity & Access Management",
+            "question": "Are privileged or administrator accounts separately managed, monitored, and restricted to authorized personnel with additional oversight?",
+            "control": "Privileged Access Management",
+            "weight": 5
+        },
+        {
+            "id": 16,
+            "category": "Identity & Access Management",
+            "question": "Are user accounts promptly created, modified, reviewed, disabled, or removed in response to events such as onboarding, role changes, transfers, or employee separation?",
+            "control": "User Account Lifecycle Management",
+            "weight": 4
+        },        
+        {
+            "id": 17,
+            "category": "Information Security",
+            "question": "Has your institution established, approved, communicated, and periodically reviewed an information security policy that defines security objectives, responsibilities, and acceptable use of institutional resources?",
+            "control": "Information Security Policy",
+            "weight": 5
+        },
+        {
+            "id": 18,
+            "category": "Information Security",
+            "question": "Does your institution maintain a complete inventory of hardware, software, databases, cloud services, and other information assets, including ownership and accountability?",
+            "control": "Asset Management",
+            "weight": 4
+        },
+        {
+            "id": 19,
+            "category": "Information Security",
+            "question": "Is sensitive institutional and personal data protected using appropriate encryption or equivalent safeguards when stored on servers, databases, backup media, laptops, or portable devices?",
+            "control": "Encryption at Rest",
+            "weight": 5
+        },
+        {
+            "id": 20,
+            "category": "Information Security",
+            "question": "Is sensitive information protected during transmission between users, applications, systems, or external parties using secure communication protocols and encryption mechanisms?",
+            "control": "Encryption in Transit",
+            "weight": 5
+        },
+        {
+            "id": 21,
+            "category": "Information Security",
+            "question": "Are operating systems, applications, databases, and network devices configured according to documented security baselines and periodically reviewed to prevent insecure configurations?",
+            "control": "Secure Configuration Management",
+            "weight": 4
+        },
+        {
+            "id": 22,
+            "category": "Information Security",
+            "question": "Does your institution have a documented process to identify, test, approve, and deploy security patches and updates within defined timelines based on their criticality?",
+            "control": "Patch Management",
+            "weight": 5
+        },
+        {
+            "id": 23,
+            "category": "Information Security",
+            "question": "Are regular vulnerability assessments, security scans, or penetration testing activities conducted to identify and remediate security weaknesses in institutional systems?",
+            "control": "Vulnerability Management",
+            "weight": 5
+        },
+        {
+            "id": 24,
+            "category": "Information Security",
+            "question": "Are institution-owned systems protected by centrally managed anti-malware or endpoint protection solutions that are regularly updated and monitored?",
+            "control": "Malware Protection",
+            "weight": 4
+        },
+        {
+            "id": 25,
+            "category": "Information Security",
+            "question": "Are desktops, laptops, workstations, and other endpoint devices secured through centralized policies, security monitoring, and device protection controls?",
+            "control": "Endpoint Security",
+            "weight": 4
+        },
+        {
+            "id": 26,
+            "category": "Information Security",
+            "question": "Are institution-owned or authorized mobile devices protected through security measures such as device encryption, screen locks, remote wipe capabilities, and mobile device management where appropriate?",
+            "control": "Mobile Device Security",
+            "weight": 3
+        },        
+        {
+            "id": 27,
+            "category": "Network & Infrastructure Security",
+            "question": "Are institutional networks designed, configured, and maintained with appropriate security controls to protect systems, users, and sensitive information from unauthorized access and cyber threats?",
+            "control": "Network Security",
+            "weight": 5
+        },
+        {
+            "id": 28,
+            "category": "Network & Infrastructure Security",
+            "question": "Are firewalls configured according to documented security policies, regularly reviewed, and monitored to restrict unauthorized inbound and outbound network traffic?",
+            "control": "Firewall Management",
+            "weight": 5
+        },
+        {
+            "id": 29,
+            "category": "Network & Infrastructure Security",
+            "question": "Are critical systems, administrative networks, and sensitive institutional data isolated from general-purpose networks using logical or physical segmentation where appropriate?",
+            "control": "Network Segmentation",
+            "weight": 4
+        },
+        {
+            "id": 30,
+            "category": "Network & Infrastructure Security",
+            "question": "Are remote connections to institutional systems protected using secure authentication methods, encrypted communication channels, and controlled access mechanisms?",
+            "control": "Secure Remote Access",
+            "weight": 5
+        },
+        {
+            "id": 31,
+            "category": "Network & Infrastructure Security",
+            "question": "If your institution uses cloud services, are cloud-hosted systems and data configured, monitored, and managed in accordance with documented security requirements and best practices?",
+            "control": "Cloud Security",
+            "weight": 4
+        },
+        {
+            "id": 32,
+            "category": "Network & Infrastructure Security",
+            "question": "Are servers hosting institutional applications, databases, or other critical services securely configured, regularly updated, continuously monitored, and protected against unauthorized access?",
+            "control": "Server Security",
+            "weight": 5
+        },        
+        {
+            "id": 33,
+            "category": "Monitoring & Incident Management",
+            "question": "Are security-related activities, including user logins, privileged operations, system configuration changes, and access to sensitive information, recorded through audit logs that are protected from unauthorized modification and retained for investigation purposes?",
+            "control": "Audit Logging",
+            "weight": 5
+        },
+        {
+            "id": 34,
+            "category": "Monitoring & Incident Management",
+            "question": "Does your institution continuously monitor networks, systems, applications, and security events to detect suspicious activities, policy violations, or potential cybersecurity threats in a timely manner?",
+            "control": "Security Monitoring",
+            "weight": 5
+        },
+        {
+            "id": 35,
+            "category": "Monitoring & Incident Management",
+            "question": "Does your institution maintain a documented incident response plan that clearly defines roles, responsibilities, communication procedures, containment, recovery, and post-incident review activities?",
+            "control": "Incident Response Plan",
+            "weight": 5
+        },
+        {
+            "id": 36,
+            "category": "Monitoring & Incident Management",
+            "question": "Are faculty, staff, and other authorized users provided with documented procedures to identify, report, and escalate suspected cybersecurity or privacy incidents through approved reporting channels?",
+            "control": "Security Incident Reporting",
+            "weight": 4
+        },
+        {
+            "id": 37,
+            "category": "Monitoring & Incident Management",
+            "question": "Does your institution have documented procedures to assess, document, and notify the appropriate authorities or affected individuals when a reportable data breach or security incident occurs?",
+            "control": "Breach Notification",
+            "weight": 5
+        },
+        {
+            "id": 38,
+            "category": "Monitoring & Incident Management",
+            "question": "Are backups of critical systems, applications, databases, and institutional data created regularly, securely protected, periodically tested, and capable of being successfully restored when required?",
+            "control": "Backup and Recovery",
+            "weight": 5
+        },
+        {
+            "id": 39,
+            "category": "Monitoring & Incident Management",
+            "question": "Has your institution established, documented, and periodically tested disaster recovery procedures to restore critical IT services within defined recovery objectives following major disruptions?",
+            "control": "Disaster Recovery",
+            "weight": 5
+        },
+        {
+            "id": 40,
+            "category": "Monitoring & Incident Management",
+            "question": "Does your institution maintain and periodically test a business continuity plan to ensure that essential academic, administrative, and operational activities can continue during significant disruptions or emergencies?",
+            "control": "Business Continuity Planning",
+            "weight": 4
+        },        
+        {
+            "id": 41,
+            "category": "Governance & Compliance",
+            "question": "Does your institution perform documented cybersecurity and privacy risk assessments at planned intervals and whenever significant organizational, technological, or regulatory changes occur?",
+            "control": "Risk Assessment Process",
+            "weight": 5
+        },
+        {
+            "id": 42,
+            "category": "Governance & Compliance",
+            "question": "Before engaging third-party vendors or service providers that access, process, or store institutional or personal data, does your institution evaluate their security, privacy, and compliance capabilities?",
+            "control": "Vendor Management",
+            "weight": 4
+        },
+        {
+            "id": 43,
+            "category": "Governance & Compliance",
+            "question": "Does your institution periodically reassess third-party vendors throughout the duration of their engagement to ensure continued compliance with contractual security and privacy requirements?",
+            "control": "Third-Party Risk Assessment",
+            "weight": 4
+        },
+        {
+            "id": 44,
+            "category": "Governance & Compliance",
+            "question": "Are students, faculty, staff, and other authorized users provided with regular cybersecurity and privacy awareness training appropriate to their roles, responsibilities, and emerging security threats?",
+            "control": "Security Awareness Training",
+            "weight": 3
+        },
+        {
+            "id": 45,
+            "category": "Governance & Compliance",
+            "question": "Does your institution follow a documented change management process that evaluates, approves, tests, documents, and reviews significant changes before they are deployed into production environments?",
+            "control": "Change Management",
+            "weight": 4
+        },
+        {
+            "id": 46,
+            "category": "Governance & Compliance",
+            "question": "Are internal security and compliance audits conducted periodically to verify adherence to institutional policies, regulatory obligations, and security controls, with identified findings tracked until remediation is complete?",
+            "control": "Internal Security Audits",
+            "weight": 4
+        },        
+        {
+            "id": 47,
+            "category": "University-Specific Controls",
+            "question": "Are student records, examination data, academic information, and other student-related personal data protected throughout their lifecycle using appropriate technical, administrative, and organizational security measures?",
+            "control": "Student Data Protection",
+            "weight": 5
+        },
+        {
+            "id": 48,
+            "category": "University-Specific Controls",
+            "question": "Are personal records of faculty and staff securely collected, processed, stored, accessed, retained, and disposed of in accordance with institutional policies and applicable legal requirements?",
+            "control": "Faculty & Staff Data Protection",
+            "weight": 5
+        },
+        {
+            "id": 49,
+            "category": "University-Specific Controls",
+            "question": "If your institution conducts research involving digital research data or personal information, are appropriate security, privacy, access control, and backup measures implemented to protect research assets throughout their lifecycle?",
+            "control": "Research Data Protection",
+            "weight": 4
+        },
+        {
+            "id": 50,
+            "category": "University-Specific Controls",
+            "question": "Are the institution's Enterprise Resource Planning (ERP), Learning Management System (LMS), Student Information System (SIS), and other academic platforms securely configured, regularly updated, protected by appropriate access controls, and continuously monitored against security threats?",
+            "control": "ERP/LMS Security",
+            "weight": 5
+        }
+    ]
 }
