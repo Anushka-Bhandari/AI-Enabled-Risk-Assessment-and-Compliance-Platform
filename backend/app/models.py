@@ -128,6 +128,8 @@ class Assessment(db.Model):
         default=db.func.current_timestamp()
     )
 
+    assessment_mode = db.Column(db.String(20), nullable=False)
+
     answers = db.relationship(
         "AssessmentAnswer",
         backref="assessment",
@@ -136,8 +138,8 @@ class Assessment(db.Model):
 
     documents = db.relationship(
         "Document",
-        backref="assessment",
-        lazy=True
+        secondary="assessment_documents",
+        back_populates="assessments"
     )
 
 
@@ -160,10 +162,7 @@ class AssessmentAnswer(db.Model):
         nullable=False
     )
 
-    answer = db.Column(
-        db.Boolean,
-        nullable=False
-    )
+    answer = db.Column(db.String(30), nullable=False)
 
 
 class Document(db.Model):
@@ -199,4 +198,25 @@ class Document(db.Model):
     uploaded_at = db.Column(
         db.DateTime,
         default=db.func.current_timestamp()
+    )
+
+    assessments = db.relationship(
+        "Assessment",
+        secondary="assessment_documents",
+        back_populates="documents"
+    )
+
+class AssessmentDocument(db.Model):
+    __tablename__ = "assessment_documents"
+
+    assessment_id = db.Column(
+        db.Integer,
+        db.ForeignKey("assessments.id"),
+        primary_key=True
+    )
+
+    document_id = db.Column(
+        db.Integer,
+        db.ForeignKey("documents.id"),
+        primary_key=True
     )

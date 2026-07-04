@@ -95,6 +95,7 @@ def upload_documents():
 
     failed_files = []
     saved_filepaths = []
+    uploaded_documents = []
 
     for file in files:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -125,6 +126,7 @@ def upload_documents():
                 extracted_text=extracted_text
             )
             db.session.add(document)
+            uploaded_documents.append(document)
 
         except Exception as e:
             print(e)
@@ -145,6 +147,7 @@ def upload_documents():
           
     try:
         db.session.commit()
+
     except IntegrityError as e:
         db.session.rollback()
         print(e)
@@ -162,10 +165,16 @@ def upload_documents():
         return jsonify({
             "error": "Unable to save uploaded documents."
         }), 500
+
+    document_ids = [
+        document.id
+        for document in uploaded_documents
+    ]
     
     return jsonify({
         "message": "Files uploaded successfully",
-        "files_received": len(files)
+        "files_received": len(files),
+        "document_ids": document_ids
     }), 200
 
 

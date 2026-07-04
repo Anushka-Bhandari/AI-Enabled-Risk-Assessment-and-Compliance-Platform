@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.database import db
@@ -6,6 +8,22 @@ from app.models import Assessment, AssessmentAnswer, User
 
 assessment = Blueprint("assessment", __name__)
 
+QUESTIONNAIRE_PATH = Path(__file__).resolve().parent.parent / "questionnaire.json"
+
+with open(QUESTIONNAIRE_PATH, "r", encoding="utf-8") as file:
+    QUESTIONNAIRE = json.load(file)
+    
+VALID_QUESTION_IDS = {
+    str(question["id"])
+    for question in QUESTIONNAIRE["questions"]
+}
+
+VALID_ANSWERS = {
+    "Implemented",
+    "Partially Implemented",
+    "Not Implemented",
+    "Not Applicable",
+}
 
 @assessment.route("/assessment", methods=["POST"])
 @jwt_required()
@@ -30,11 +48,20 @@ def submit_assessment():
             "error": "answers must be a dictionary"
         }), 400
 
-    for question_id, answer in answers.items():
+    if len(answers) != len(VALID_QUESTION_IDS):
+        return jsonify({
+            "error": "All questionnaire items must be answered."
+        }), 400
 
-        if not isinstance(answer, bool):
+    for question_id, answer in answers.items():
+        if question_id not in VALID_QUESTION_IDS:
             return jsonify({
-                "error": f"{question_id} must be true or false"
+                "error": f"Invalid question ID: {question_id}"
+            }), 400
+
+        if answer not in VALID_ANSWERS:
+            return jsonify({
+                "error": f"Invalid answer for question {question_id}"
             }), 400
 
     current_user_id = get_jwt_identity()
@@ -47,7 +74,8 @@ def submit_assessment():
 
     assessment = Assessment(
         user_id=current_user.id,
-        university_id=current_user.university_id
+        university_id=current_user.university_id,
+        assessment_mode="QUESTIONNAIRE"
     )
 
 
