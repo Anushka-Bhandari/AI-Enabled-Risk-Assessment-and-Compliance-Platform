@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "../services/authService";
+import securityImage from "../assets/university-security.png";
+
 
 export default function Register() {
     const navigate = useNavigate();
@@ -8,7 +10,7 @@ export default function Register() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [institute, setInstitute] = useState("");
+    const [universityId, setUniversityId] = useState("");
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -26,19 +28,13 @@ export default function Register() {
                 name,
                 email,
                 password,
-                institute,
+                university_id: universityId
             });
 
             console.log(response.data);
 
-            if (response.data.token) {
-                localStorage.setItem(
-                    "token",
-                    response.data.token
-                );
-            }
-
-            navigate("/dashboard");
+            localStorage.setItem("email", email);
+            navigate("/verify-otp");
 
         } catch (error) {
             console.error(error);
@@ -52,124 +48,231 @@ export default function Register() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
-            <div className="w-full max-w-md bg-slate-900 p-8 rounded-2xl border border-slate-800">
+    <div className="min-h-screen bg-slate-200 flex items-center justify-center p-8">
 
-                <h1 className="text-3xl font-bold text-white text-center">
-                    Create Account
-                </h1>
+        <div className="w-full max-w-screen-2xl min-h-[90vh] bg-white rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.1)] grid lg:grid-cols-[45%_55%]">
 
-                <p className="text-slate-400 text-center mt-2">
-                    Register to continue
-                </p>
+            {/* LEFT PANEL */}
+            <div className="bg-linear-to-br from-[#002B6B] via-[#01255D] to-[#001A45] text-white p-14 flex flex-col justify-between">
 
-                <form
-                    onSubmit={handleSubmit}
-                    className="mt-8 space-y-4"
-                >
+                <div>
+                    <div className="flex items-center gap-4">
+
+                        <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-3xl">
+                            🛡️
+                        </div>
+
+                        <div>
+                            <h2 className="text-4xl font-bold">
+                                University Risk
+                            </h2>
+
+                            <p className="text-2xl text-blue-100">
+                                Assessment Platform
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div className="mt-20">
+
+                        <h1 className="text-6xl font-bold leading-tight">
+                            Build.
+                            <br />
+                            Secure.
+                            <br />
+                            Comply.
+                        </h1>
+
+                        <p className="mt-8 text-xl text-blue-100 leading-relaxed max-w-xl">
+                            Join your university's cybersecurity and
+                            compliance platform and start assessing
+                            risks with confidence.
+                        </p>
+
+                    </div>
+                </div>
+
+                {/* IMAGE */}
+                <div className="flex justify-center my-10">
+
+                    <img
+                        src={securityImage}
+                        alt="University Security"
+                        className="w-full max-w-md object-contain"
+                    />
+
+                </div>
+
+                {/* FEATURES */}
+                <div className="grid grid-cols-3 gap-6 text-center">
 
                     <div>
-                        <label
-                            htmlFor="name"
-                            className="block text-slate-300 mb-2"
-                        >
-                            Full Name
-                        </label>
-
-                        <input
-                            id="name"
-                            name="name"
-                            type="text"
-                            autoComplete="name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="Full Name"
-                            className="w-full p-3 rounded-xl bg-slate-800 text-white border border-slate-700 outline-none focus:border-blue-500"
-                            required
-                        />
+                        <div className="text-3xl mb-2">🛡️</div>
+                        <p className="font-medium">
+                            Risk Assessment
+                        </p>
                     </div>
 
                     <div>
-                        <label
-                            htmlFor="email"
-                            className="block text-slate-300 mb-2"
-                        >
-                            Email
-                        </label>
-
-                        <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            autoComplete="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="Email"
-                            className="w-full p-3 rounded-xl bg-slate-800 text-white border border-slate-700 outline-none focus:border-blue-500"
-                            required
-                        />
+                        <div className="text-3xl mb-2">📋</div>
+                        <p className="font-medium">
+                            Compliance
+                        </p>
                     </div>
 
                     <div>
-                        <label
-                            htmlFor="password"
-                            className="block text-slate-300 mb-2"
-                        >
-                            Password
-                        </label>
-
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            autoComplete="new-password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Password"
-                            className="w-full p-3 rounded-xl bg-slate-800 text-white border border-slate-700 outline-none focus:border-blue-500"
-                            required
-                        />
+                        <div className="text-3xl mb-2">📊</div>
+                        <p className="font-medium">
+                            Insights
+                        </p>
                     </div>
 
-                    <div>
-                        <label
-                            htmlFor="institute"
-                            className="block text-slate-300 mb-2"
-                        >
-                            Institute
-                        </label>
+                </div>
 
-                        <input
-                            id="institute"
-                            name="institute"
-                            type="text"
-                            value={institute}
-                            onChange={(e) => setInstitute(e.target.value)}
-                            placeholder="Institute"
-                            className="w-full p-3 rounded-xl bg-slate-800 text-white border border-slate-700 outline-none focus:border-blue-500"
-                            required
-                        />
-                    </div>
+            </div>
 
-                    <button
-                        type="submit"
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold"
-                    >
-                        Register
-                    </button>
+            {/* RIGHT PANEL */}
+            <div className="bg-slate-50 flex items-center justify-center p-12">
 
-                    <p className="text-center text-slate-400 mt-4">
-                        Already have an account?{" "}
-                        <Link
-                            to="/login"
-                            className="text-blue-400 hover:text-blue-300"
-                        >
-                            Login
-                        </Link>
+                <div className="w-full max-w-xl bg-white rounded-3xl p-12 shadow-lg">
+
+                    <h1 className="text-5xl font-bold text-center text-slate-900">
+                        Create Account
+                    </h1>
+
+                    <p className="text-center text-slate-500 text-lg mt-4">
+                        Register to continue
                     </p>
 
-                </form>
+                    <form
+                        onSubmit={handleSubmit}
+                        className="mt-10 space-y-6"
+                    >
+
+                        {/* Name */}
+                        <div>
+
+                            <label className="block text-slate-700 font-semibold mb-3">
+                                Full Name
+                            </label>
+
+                            <input
+                                type="text"
+                                value={name}
+                                onChange={(e) =>
+                                    setName(e.target.value)
+                                }
+                                placeholder="Enter your full name"
+                                className="w-full h-14 px-5 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+                                required
+                            />
+
+                        </div>
+
+                        {/* Email */}
+                        <div>
+
+                            <label className="block text-slate-700 font-semibold mb-3">
+                                Email Address
+                            </label>
+
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) =>
+                                    setEmail(e.target.value)
+                                }
+                                placeholder="Enter your email"
+                                className="w-full h-14 px-5 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+                                required
+                            />
+
+                        </div>
+
+                        {/* Password */}
+                        <div>
+
+                            <label className="block text-slate-700 font-semibold mb-3">
+                                Password
+                            </label>
+
+                            <input
+                                type="password"
+                                value={password}
+                                onChange={(e) =>
+                                    setPassword(e.target.value)
+                                }
+                                placeholder="Create password"
+                                className="w-full h-14 px-5 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+                                required
+                            />
+
+                        </div>
+
+                        {/* University */}
+                        <div>
+
+                            <label className="block text-slate-700 font-semibold mb-3">
+                                University
+                            </label>
+
+                            <select
+                                value={universityId}
+                                onChange={(e) =>
+                                    setUniversityId(e.target.value)
+                                }
+                                className="w-full h-14 px-5 border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+                                required
+                            >
+                                <option value="">
+                                    Select University
+                                </option>
+
+                                <option value="1">
+                                    Malaviya National Institute of Technology Jaipur
+                                </option>
+
+                                <option value="2">
+                                    IIT Delhi
+                                </option>
+
+                                <option value="3">
+                                    IIT Bombay
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <button
+                            type="submit"
+                            className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-lg transition"
+                        >
+                            Create Account
+                        </button>
+
+                        <p className="text-center text-slate-500">
+
+                            Already have an account?{" "}
+
+                            <Link
+                                to="/login"
+                                className="text-blue-600 font-semibold"
+                            >
+                                Sign In
+                            </Link>
+
+                        </p>
+
+                    </form>
+
+                </div>
+
             </div>
+
         </div>
-    );
+
+    </div>
+);
 }

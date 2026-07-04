@@ -46,6 +46,7 @@ def get_analytics():
     user_id = get_jwt_identity()
 
     user = User.query.get(user_id)
+
     if not user:
         return jsonify({"error": "User not found"}), 404
 
@@ -58,20 +59,7 @@ def get_analytics():
 
     total = len(assessments)
 
-    if not assessments:
-        return jsonify({"message": "No assessments found for this user"}), 404
-
-    # Future analytics
-    # low = sum(1 for a in assessments if a.risk_level == "Low")
-    # medium = sum(1 for a in assessments if a.risk_level == "Medium")
-    # high = sum(1 for a in assessments if a.risk_level == "High")
-
     return jsonify({
         "user": user.name,
-        "total_assessments": total,
-        # "risk_distribution": {
-        #     "Low": low,
-        #     "Medium": medium,
-        #     "High": high
-        # }
+        "total_assessments": total
     }), 200
