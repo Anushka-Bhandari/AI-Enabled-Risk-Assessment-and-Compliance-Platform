@@ -28,7 +28,7 @@ NIST        : NIST Cybersecurity Framework (CSF 2.0)
 
 from typing import Final
 
-from app.services.control_library import CONTROL_LIBRARY
+from app.services.control_library import CONTROL_BY_ID
 
 # ==========================================================
 # Framework Constants
@@ -64,18 +64,18 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
     # PRIVACY & DATA GOVERNANCE
     # ==========================================================
 
-    "Privacy Notice": [
+    "C001": [
         DPDP,
         ISO27701,
         UGC,
     ],
 
-    "Consent Management": [
+    "C002": [
         DPDP,
         ISO27701,
     ],
 
-    "Data Inventory": [
+    "C003": [
         DPDP,
         ISO27001,
         ISO27701,
@@ -83,7 +83,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         UGC,
     ],
 
-    "Data Classification": [
+    "C004": [
         DPDP,
         IT_ACT,
         ISO27001,
@@ -92,7 +92,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         UGC,
     ],
 
-    "Data Retention": [
+    "C005": [
         DPDP,
         IT_ACT,
         ISO27001,
@@ -100,29 +100,29 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         UGC,
     ],
 
-    "Data Disposal": [
+    "C006": [
         DPDP,
         IT_ACT,
         ISO27001,
         ISO27701,
     ],
 
-    "Data Minimization": [
+    "C007": [
         DPDP,
         ISO27701,
     ],
 
-    "Purpose Limitation": [
+    "C008": [
         DPDP,
         ISO27701,
     ],
 
-    "Data Subject Rights Management": [
+    "C009": [
         DPDP,
         ISO27701,
     ],
 
-    "Sensitive Personal Data Protection": [
+    "C010": [
         DPDP,
         IT_ACT,
         ISO27001,
@@ -136,7 +136,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
     # IDENTITY & ACCESS MANAGEMENT
     # ==========================================================
 
-    "Access Control": [
+    "C011": [
         IT_ACT,
         UGC,
         NAAC,
@@ -146,7 +146,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         NIST,
     ],
 
-    "Role-Based Access Control (RBAC)": [
+    "C012": [
         IT_ACT,
         UGC,
         NAAC,
@@ -156,7 +156,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         NIST,
     ],
 
-    "Multi-Factor Authentication (MFA)": [
+    "C013": [
         IT_ACT,
         UGC,
         ISO27001,
@@ -164,20 +164,20 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         NIST,
     ],
 
-    "Password Security": [
+    "C014": [
         IT_ACT,
         ISO27001,
         ISO27701,
         NIST,
     ],
 
-    "Privileged Access Management": [
+    "C015": [
         ISO27001,
         ISO27701,
         NIST,
     ],
 
-    "User Account Lifecycle Management": [
+    "C016": [
         UGC,
         ISO27001,
         ISO27701,
@@ -188,7 +188,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
     # INFORMATION SECURITY
     # ==========================================================
 
-    "Information Security Policy": [
+    "C017": [
         IT_ACT,
         UGC,
         NAAC,
@@ -198,7 +198,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         NIST,
     ],
 
-    "Asset Management": [
+    "C018": [
         UGC,
         NAAC,
         ISO27001,
@@ -206,7 +206,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         NIST,
     ],
 
-    "Encryption at Rest": [
+    "C019": [
         DPDP,
         IT_ACT,
         UGC,
@@ -215,7 +215,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         NIST,
     ],
 
-    "Encryption in Transit": [
+    "C020": [
         DPDP,
         IT_ACT,
         UGC,
@@ -224,36 +224,21 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         NIST,
     ],
 
-    "Secure Configuration Management": [
+    "C021": [
         IT_ACT,
         UGC,
         ISO27001,
         NIST,
     ],
 
-    "Patch Management": [
+    "C022": [
         IT_ACT,
         UGC,
         ISO27001,
         NIST,
     ],
 
-    "Vulnerability Management": [
-        IT_ACT,
-        UGC,
-        NAAC,
-        ISO27001,
-        NIST,
-    ],
-
-    "Malware Protection": [
-        IT_ACT,
-        UGC,
-        ISO27001,
-        NIST,
-    ],
-
-    "Endpoint Security": [
+    "C023": [
         IT_ACT,
         UGC,
         NAAC,
@@ -261,7 +246,22 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         NIST,
     ],
 
-    "Mobile Device Security": [
+    "C024": [
+        IT_ACT,
+        UGC,
+        ISO27001,
+        NIST,
+    ],
+
+    "C025": [
+        IT_ACT,
+        UGC,
+        NAAC,
+        ISO27001,
+        NIST,
+    ],    
+    
+    "C026": [
         IT_ACT,
         ISO27001,
         NIST,
@@ -271,7 +271,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
     # NETWORK & INFRASTRUCTURE SECURITY
     # ==========================================================
 
-    "Network Security": [
+    "C027": [
         IT_ACT,
         UGC,
         NAAC,
@@ -280,24 +280,24 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         NIST,
     ],
 
-    "Firewall Management": [
+    "C028": [
         IT_ACT,
         ISO27001,
         NIST,
     ],
 
-    "Network Segmentation": [
+    "C029": [
         ISO27001,
         NIST,
     ],
 
-    "Secure Remote Access": [
+    "C030": [
         IT_ACT,
         ISO27001,
         NIST,
     ],
 
-    "Cloud Security": [
+    "C031": [
         UGC,
         NAAC,
         NBA,
@@ -306,7 +306,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         NIST,
     ],
 
-    "Server Security": [
+    "C032": [
         IT_ACT,
         ISO27001,
         NIST,
@@ -316,7 +316,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
     # MONITORING & INCIDENT MANAGEMENT
     # ==========================================================
 
-    "Audit Logging": [
+    "C033": [
         IT_ACT,
         UGC,
         NAAC,
@@ -326,7 +326,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         NIST,
     ],
 
-    "Security Monitoring": [
+    "C034": [
         IT_ACT,
         UGC,
         ISO27001,
@@ -334,7 +334,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         NIST,
     ],
 
-    "Incident Response Plan": [
+    "C035": [
         DPDP,
         IT_ACT,
         UGC,
@@ -344,7 +344,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         NIST,
     ],
 
-    "Security Incident Reporting": [
+    "C036": [
         DPDP,
         IT_ACT,
         ISO27001,
@@ -352,7 +352,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         NIST,
     ],
 
-    "Breach Notification": [
+    "C037": [
         DPDP,
         IT_ACT,
         UGC,
@@ -361,17 +361,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         NIST,
     ],
 
-    "Backup and Recovery": [
-        IT_ACT,
-        UGC,
-        NAAC,
-        NBA,
-        ISO27001,
-        ISO27701,
-        NIST,
-    ],
-
-    "Disaster Recovery": [
+    "C038": [
         IT_ACT,
         UGC,
         NAAC,
@@ -381,7 +371,17 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         NIST,
     ],
 
-    "Business Continuity Planning": [
+    "C039": [
+        IT_ACT,
+        UGC,
+        NAAC,
+        NBA,
+        ISO27001,
+        ISO27701,
+        NIST,
+    ],
+
+    "C040": [
         UGC,
         NAAC,
         NBA,
@@ -394,7 +394,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
     # GOVERNANCE & COMPLIANCE
     # ==========================================================
 
-    "Risk Assessment Process": [
+    "C041": [
         DPDP,
         IT_ACT,
         UGC,
@@ -405,7 +405,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         NIST,
     ],
 
-    "Vendor Management": [
+    "C042": [
         DPDP,
         IT_ACT,
         UGC,
@@ -414,7 +414,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         NIST,
     ],
 
-    "Third-Party Risk Assessment": [
+    "C043": [
         DPDP,
         IT_ACT,
         UGC,
@@ -423,7 +423,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         NIST,
     ],
 
-    "Security Awareness Training": [
+    "C044": [
         UGC,
         NAAC,
         NBA,
@@ -432,13 +432,13 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         NIST,
     ],
 
-    "Change Management": [
+    "C045": [
         UGC,
         ISO27001,
         NIST,
     ],
 
-    "Internal Security Audits": [
+    "C046": [
         UGC,
         NAAC,
         NBA,
@@ -451,7 +451,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
     # UNIVERSITY-SPECIFIC CONTROLS
     # ==========================================================
 
-    "Student Data Protection": [
+    "C047": [
         DPDP,
         IT_ACT,
         UGC,
@@ -461,7 +461,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         ISO27701,
     ],
 
-    "Faculty & Staff Data Protection": [
+    "C048": [
         DPDP,
         IT_ACT,
         UGC,
@@ -469,7 +469,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         ISO27701,
     ],
 
-    "Research Data Protection": [
+    "C049": [
         DPDP,
         IT_ACT,
         UGC,
@@ -479,7 +479,7 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         ISO27701,
     ],
 
-    "ERP/LMS Security": [
+    "C050": [
         IT_ACT,
         UGC,
         NAAC,
@@ -495,15 +495,15 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
 # Helper Functions
 # ==========================================================
 
-def get_frameworks(control: str) -> list[str]:
+def get_frameworks(control_id: str) -> list[str]:
     """
     Return all frameworks mapped to a control.
 
     Raises:
         KeyError:
-            If the control does not exist.
+            If the control ID does not exist.
     """
-    return CONTROL_FRAMEWORKS[control]
+    return CONTROL_FRAMEWORKS[control_id]
 
 
 def is_supported_framework(framework: str) -> bool:
@@ -512,12 +512,15 @@ def is_supported_framework(framework: str) -> bool:
     """
     return framework in SUPPORTED_FRAMEWORKS
 
+
 # ==========================================================
 # Validation
 # ==========================================================
 
+library_ids = set(CONTROL_BY_ID.keys())
+mapping_ids = set(CONTROL_FRAMEWORKS.keys())
 
-missing_controls = set(CONTROL_LIBRARY) - set(CONTROL_FRAMEWORKS)
+missing_controls = library_ids - mapping_ids
 
 if missing_controls:
     raise RuntimeError(
@@ -525,7 +528,7 @@ if missing_controls:
         + "\n".join(sorted(missing_controls))
     )
 
-extra_controls = set(CONTROL_FRAMEWORKS) - set(CONTROL_LIBRARY)
+extra_controls = mapping_ids - library_ids
 
 if extra_controls:
     raise RuntimeError(
