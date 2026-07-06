@@ -142,6 +142,13 @@ class Assessment(db.Model):
         back_populates="assessments"
     )
 
+    control_results = db.relationship(
+        "AssessmentControlResult",
+        back_populates="assessment",
+        cascade="all, delete-orphan",
+        lazy=True
+    )
+
 
 class AssessmentAnswer(db.Model):
     __tablename__ = "assessment_answers"
@@ -219,4 +226,58 @@ class AssessmentDocument(db.Model):
         db.Integer,
         db.ForeignKey("documents.id"),
         primary_key=True
+    )
+
+class AssessmentControlResult(db.Model):
+    __tablename__ = "assessment_control_results"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    assessment_id = db.Column(
+        db.Integer,
+        db.ForeignKey("assessments.id"),
+        nullable=False
+    )
+
+    control_name = db.Column(
+        db.String(255),
+        nullable=False
+    )
+
+    status = db.Column(
+        db.String(50),
+        nullable=False
+    )
+
+    evidence_source = db.Column(
+        db.String(50),
+        nullable=False
+    )
+
+    affected_frameworks = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    implemented_requirements = db.Column(
+        db.Text,
+        nullable=True
+    )
+
+    missing_requirements = db.Column(
+        db.Text,
+        nullable=True
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=db.func.current_timestamp()
+    )
+
+    assessment = db.relationship(
+        "Assessment",
+        back_populates="control_results"
     )

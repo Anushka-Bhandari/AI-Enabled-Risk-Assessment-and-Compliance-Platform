@@ -1,3 +1,4 @@
+from app.services.compliance_engine import ComplianceEngine
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy.exc import IntegrityError
@@ -138,15 +139,12 @@ def run_assessment_route():
         # -----------------------------
         # Compliance Engine
         # -----------------------------
-        #
-        # Your teammate's function will be
-        # called here later.
-        #
-        # Example:
-        #
-        # result = run_compliance(
-        #     assessment.id
-        # )
+
+        compliance_engine = ComplianceEngine(
+            assessment.id
+        )
+
+        compliance_result = compliance_engine.run()
 
         db.session.commit()
 
@@ -165,6 +163,13 @@ def run_assessment_route():
         }), 500
 
     return jsonify({
-        "message": "Assessment started successfully.",
-        "assessment_id": assessment.id
+
+        "message": "Assessment completed successfully.",
+
+        "assessment_id": assessment.id,
+
+        "assessment_mode": assessment.assessment_mode,
+
+        "compliance": compliance_result
+
     }), 200
