@@ -1,273 +1,354 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useRef, useCallback } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
+import {
+  UploadCloud,
+  FileText,
+  FileCheck2,
+  X,
+  Loader2,
+  AlertCircle,
+  Sparkles,
+  ListChecks,
+  ShieldAlert,
+  ArrowRight,
+} from "lucide-react";
+
+const API_BASE_URL = import.meta.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+const ACCEPTED_TYPES = [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".csv"];
+const MAX_FILE_SIZE_MB = 25;
 
 export default function UploadAssessment() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const assessmentId = location.state?.assessmentId;
 
-    const navigate = useNavigate();
+  const [files, setFiles] = useState([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const [processingStep, setProcessingStep] = useState(0);
 
-    const [file, setFile] = useState(null);
-    const [dragging, setDragging] = useState(false);
+  const fileInputRef = useRef(null);
 
-    const handleDragOver = (e) => {
-        e.preventDefault();
-        setDragging(true);
-    };
+  const PROCESSING_STEPS = [
+    "Uploading evidentiary documents…",
+    "Extracting Controls via AI LLM Models…",
+    "Cross-referencing control mappings…",
+    "Finalizing document ingestion…",
+  ];
 
-    const handleDragLeave = () => {
-        setDragging(false);
-    };
+  const validateAndAddFiles = (incoming) => {
+    setUploadError("");
+    const validFiles = [];
 
-    const handleDrop = (e) => {
-        e.preventDefault();
-        setDragging(false);
+    Array.from(incoming).forEach((file) => {
+      const extension = "." + file.name.split(".").pop().toLowerCase();
+      const sizeMb = file.size / (1024 * 1024);
 
-        const uploadedFile = e.dataTransfer.files[0];
+      if (!ACCEPTED_TYPES.includes(extension)) {
+        setUploadError(`Unsupported file type: ${file.name}`);
+        return;
+      }
+      if (sizeMb > MAX_FILE_SIZE_MB) {
+        setUploadError(`${file.name} exceeds ${MAX_FILE_SIZE_MB}MB limit.`);
+        return;
+      }
+      validFiles.push(file);
+    });
 
-        if (uploadedFile) {
-            setFile(uploadedFile);
+    if (validFiles.length) {
+      setFiles((prev) => [...prev, ...validFiles]);
+    }
+  };
+
+  const handleDrop = useCallback((e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files?.length) {
+      validateAndAddFiles(e.dataTransfer.files);
+    }
+  }, []);
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleBrowse = (e) => {
+    if (e.target.files?.length) {
+      validateAndAddFiles(e.target.files);
+    }
+    e.target.value = "";
+  };
+
+  const removeFile = (index) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const formatSize = (bytes) => {
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  const handleUpload = async () => {
+    if (!files.length) return;
+
+    setIsProcessing(true);
+    setUploadError("");
+    setProcessingStep(0);
+
+    const stepTimer = setInterval(() => {
+      setProcessingStep((prev) =>
+        prev < PROCESSING_STEPS.length - 1 ? prev + 1 : prev
+      );
+    }, 1400);
+
+    try {
+      const token = localStorage.getItem("access_token");
+      const formData = new FormData();
+
+      files.forEach((file) => {
+        formData.append("documents", file);
+      });
+      if (assessmentId) {
+        formData.append("assessment_id", assessmentId);
+      }
+
+      const response = await axios.post(
+        `${API_BASE_URL}/api/assessment/upload`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
         }
-    };
+      );
 
-    const handleBrowse = (e) => {
-        const uploadedFile = e.target.files[0];
+      clearInterval(stepTimer);
+      const resultAssessmentId = response?.data?.assessment_id || assessmentId;
+      navigate("/assessment/result", {
+        state: { assessmentId: resultAssessmentId },
+      });
+    } catch (err) {
+      clearInterval(stepTimer);
+      const message =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        "Document processing failed. Please try again.";
+      setUploadError(message);
+      setIsProcessing(false);
+    }
+  };
 
-        if (uploadedFile) {
-            setFile(uploadedFile);
-        }
-    };
-
-    const handleUpload = async () => {
-
-        if (!file) {
-            alert("Please select a file first.");
-            return;
-        }
-
-        console.log("Uploading:", file);
-
-        // Backend API call will come here later
-
-        navigate("/assessment-result", {
-            state: {
-                assessment_id: 101,
-                risk_level: "Medium",
-                compliance_score: 76,
-                implemented_controls: [
-                    "Access Control",
-                    "Password Policy",
-                    "Data Retention Policy"
-                ],
-                missing_controls: [
-                    "Incident Response Plan",
-                    "Vendor Risk Assessment"
-                ]
-            }
-        });
-    };
-
-    return (
-        <div className="min-h-screen bg-slate-100">
-
-            {/* Header */}
-            <div className="bg-white shadow-sm border-b">
-
-                <div className="max-w-7xl mx-auto px-8 py-6">
-
-                    <h1 className="text-4xl font-bold text-[#0B2A66]">
-                        Document Assessment
-                    </h1>
-
-                    <p className="text-slate-500 mt-2">
-                        Upload university policies and compliance
-                        documents for AI-powered risk analysis.
-                    </p>
-
-                </div>
-
+  return (
+    <div className="min-h-screen bg-slate-50 pb-16">
+      <div className="bg-[#0B2A66] text-white">
+        <div className="max-w-4xl mx-auto px-6 pt-10 pb-10">
+          <div className="flex items-center gap-2.5 mb-4">
+            <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-emerald-400" />
             </div>
-
-            <div className="max-w-6xl mx-auto p-8">
-
-                {/* Upload Card */}
-                <div className="bg-white rounded-3xl p-10 shadow-sm">
-
-                    <div
-                        onDragOver={handleDragOver}
-                        onDragLeave={handleDragLeave}
-                        onDrop={handleDrop}
-                        className={`
-                            border-2 border-dashed rounded-3xl
-                            p-12 text-center transition-all duration-300
-                            ${
-                                dragging
-                                    ? "border-[#0B2A66] bg-blue-50"
-                                    : "border-slate-300"
-                            }
-                        `}
-                    >
-
-                        <div className="text-6xl mb-4">
-                            📄
-                        </div>
-
-                        <h2 className="text-2xl font-bold text-slate-900">
-                            Drag & Drop Files Here
-                        </h2>
-
-                        <p className="text-slate-500 mt-3">
-                            Upload PDF, DOCX, Security Policies,
-                            Compliance Reports
-                        </p>
-
-                        <div className="mt-8">
-
-                            <label
-                                htmlFor="file-upload"
-                                className="
-                                    inline-block
-                                    bg-[#0B2A66]
-                                    hover:bg-[#081F4D]
-                                    text-white
-                                    px-6
-                                    py-3
-                                    rounded-xl
-                                    cursor-pointer
-                                "
-                            >
-                                Browse Files
-                            </label>
-
-                            <input
-                                id="file-upload"
-                                type="file"
-                                accept=".pdf,.doc,.docx"
-                                onChange={handleBrowse}
-                                className="hidden"
-                            />
-
-                        </div>
-
-                    </div>
-
-                    {/* Selected File */}
-                    {file && (
-
-                        <div className="mt-8 bg-slate-50 border rounded-2xl p-5">
-
-                            <h3 className="font-semibold text-slate-900">
-                                Selected Document
-                            </h3>
-
-                            <p className="mt-2 text-slate-700">
-                                📄 {file.name}
-                            </p>
-
-                            <p className="text-slate-500 text-sm mt-1">
-                                {(file.size / 1024 / 1024).toFixed(2)} MB
-                            </p>
-
-                            <p className="text-green-600 font-medium mt-2">
-                                ✓ Ready for AI Analysis
-                            </p>
-
-                        </div>
-
-                    )}
-
-                    <button
-                        onClick={handleUpload}
-                        className="
-                            mt-8
-                            bg-[#0B2A66]
-                            hover:bg-[#081F4D]
-                            text-white
-                            px-8
-                            py-4
-                            rounded-2xl
-                            font-semibold
-                        "
-                    >
-                        Start AI Analysis
-                    </button>
-
-                </div>
-
-                {/* Statistics */}
-                <div className="grid md:grid-cols-3 gap-6 mt-8">
-
-                    <div className="bg-white p-6 rounded-3xl shadow-sm">
-
-                        <h3 className="text-slate-500">
-                            Supported Formats
-                        </h3>
-
-                        <p className="text-4xl font-bold text-[#0B2A66] mt-3">
-                            PDF
-                        </p>
-
-                    </div>
-
-                    <div className="bg-white p-6 rounded-3xl shadow-sm">
-
-                        <h3 className="text-slate-500">
-                            AI Controls Checked
-                        </h3>
-
-                        <p className="text-4xl font-bold text-green-600 mt-3">
-                            30+
-                        </p>
-
-                    </div>
-
-                    <div className="bg-white p-6 rounded-3xl shadow-sm">
-
-                        <h3 className="text-slate-500">
-                            Risk Categories
-                        </h3>
-
-                        <p className="text-4xl font-bold text-red-600 mt-3">
-                            8
-                        </p>
-
-                    </div>
-
-                </div>
-
-                {/* Information Section */}
-                <div className="bg-white rounded-3xl p-8 shadow-sm mt-8">
-
-                    <h2 className="text-2xl font-bold text-[#0B2A66] mb-6">
-                        How AI Analysis Works
-                    </h2>
-
-                    <ul className="space-y-4 text-slate-600">
-
-                        <li>
-                            ✅ Upload university cybersecurity and compliance documents.
-                        </li>
-
-                        <li>
-                            ✅ AI extracts security controls and compliance information.
-                        </li>
-
-                        <li>
-                            ✅ Missing controls are automatically detected.
-                        </li>
-
-                        <li>
-                            ✅ Compliance score and risk level are generated.
-                        </li>
-
-                        <li>
-                            ✅ Recommendations are provided for improvement.
-                        </li>
-
-                    </ul>
-
-                </div>
-
-            </div>
-
+            <span className="text-xs font-semibold tracking-[0.2em] uppercase text-blue-200/80">
+              Evidentiary Documentation
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold">
+            Upload compliance evidence
+          </h1>
+          <p className="text-blue-100/70 text-sm mt-2 max-w-xl">
+            Provide policy documents, control registers, or audit reports.
+            Our AI models will extract and map controls automatically.
+          </p>
         </div>
-    );
+      </div>
+
+      <div className="max-w-4xl mx-auto px-6 -mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Drop Zone */}
+        <div className="lg:col-span-2">
+          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200/70 p-6 sm:p-8">
+            {!isProcessing ? (
+              <>
+                <div
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`relative rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-300 flex flex-col items-center justify-center text-center px-6 py-14 group ${
+                    isDragging
+                      ? "border-[#0B2A66] bg-blue-50 scale-[1.01]"
+                      : "border-slate-300 hover:border-blue-400 hover:bg-slate-50"
+                  }`}
+                >
+                  {isDragging && (
+                    <span className="absolute inset-0 rounded-2xl bg-blue-500/5 animate-pulse" />
+                  )}
+
+                  <div
+                    className={`w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110 ${
+                      isDragging ? "scale-110" : ""
+                    }`}
+                  >
+                    <UploadCloud className="w-8 h-8 text-[#0B2A66]" strokeWidth={1.75} />
+                  </div>
+
+                  <p className="font-semibold text-slate-800">
+                    Drag &amp; drop documents here
+                  </p>
+                  <p className="text-sm text-slate-500 mt-1">
+                    or click to browse from your device
+                  </p>
+                  <p className="text-xs text-slate-400 mt-3 font-mono">
+                    PDF · DOC · DOCX · XLS · XLSX · CSV — max {MAX_FILE_SIZE_MB}MB
+                  </p>
+
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept={ACCEPTED_TYPES.join(",")}
+                    onChange={handleBrowse}
+                    className="hidden"
+                  />
+                </div>
+
+                {uploadError && (
+                  <div className="mt-4 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3">
+                    <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+                    <p className="text-sm text-red-700">{uploadError}</p>
+                  </div>
+                )}
+
+                {files.length > 0 && (
+                  <div className="mt-6 space-y-2.5">
+                    {files.map((file, index) => (
+                      <div
+                        key={`${file.name}-${index}`}
+                        className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3 transition-all duration-300 hover:shadow-md"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <FileText className="w-5 h-5 text-[#0B2A66] shrink-0" />
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-slate-800 truncate">
+                              {file.name}
+                            </p>
+                            <p className="text-xs text-slate-400 font-mono">
+                              {formatSize(file.size)}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => removeFile(index)}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200 shrink-0"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <button
+                  onClick={handleUpload}
+                  disabled={!files.length}
+                  className="w-full mt-7 flex items-center justify-center gap-2 bg-[#0B2A66] text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-blue-900/20 transition-all duration-300 hover:bg-slate-900 hover:scale-[1.01] hover:shadow-xl disabled:opacity-40 disabled:hover:scale-100 disabled:cursor-not-allowed"
+                >
+                  <FileCheck2 className="w-4 h-4" />
+                  Process {files.length || ""} Document{files.length === 1 ? "" : "s"}
+                </button>
+              </>
+            ) : (
+              <div className="py-14 flex flex-col items-center text-center">
+                <div className="relative w-20 h-20 mb-7">
+                  <div className="absolute inset-0 rounded-full border-4 border-blue-100" />
+                  <div className="absolute inset-0 rounded-full border-4 border-t-[#0B2A66] border-r-[#0B2A66] border-b-transparent border-l-transparent animate-spin" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Sparkles className="w-7 h-7 text-[#0B2A66] animate-pulse" />
+                  </div>
+                </div>
+
+                <p className="font-mono text-sm font-semibold text-slate-800 tracking-wide">
+                  {PROCESSING_STEPS[processingStep]}
+                </p>
+                <p className="text-xs text-slate-400 mt-2">
+                  This can take up to a minute for larger documents.
+                </p>
+
+                <div className="w-full max-w-sm mt-8 space-y-3">
+                  {[0, 1, 2].map((row) => (
+                    <div
+                      key={row}
+                      className="h-3 rounded-full bg-slate-100 overflow-hidden relative"
+                    >
+                      <div
+                        className="absolute inset-y-0 left-0 bg-linear-to-r from-blue-100 via-blue-300 to-blue-100 animate-pulse rounded-full"
+                        style={{ width: `${85 - row * 15}%` }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Guide Panel */}
+        <div className="lg:col-span-1">
+          <div className="bg-white rounded-3xl shadow-xl border border-slate-200/70 p-6 sticky top-6">
+            <div className="flex items-center gap-2 mb-4">
+              <ListChecks className="w-5 h-5 text-[#0B2A66]" />
+              <h3 className="font-semibold text-slate-800">
+                Document Guidelines
+              </h3>
+            </div>
+
+            <ul className="space-y-3 text-sm text-slate-600">
+              <li className="flex items-start gap-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                Upload the most recent version of each policy document.
+              </li>
+              <li className="flex items-start gap-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                Include control registers, audit reports, or SOC attestations.
+              </li>
+              <li className="flex items-start gap-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                Redact personally identifiable information where possible.
+              </li>
+              <li className="flex items-start gap-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                Ensure scanned PDFs are text-searchable for accurate extraction.
+              </li>
+              <li className="flex items-start gap-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                Files remain encrypted and tenant-isolated after upload.
+              </li>
+            </ul>
+
+            <div className="mt-6 rounded-2xl bg-amber-50 border border-amber-200 px-4 py-3 flex items-start gap-2.5">
+              <ShieldAlert className="w-4.5 h-4.5 text-amber-600 shrink-0 mt-0.5" />
+              <p className="text-xs text-amber-800 leading-relaxed">
+                AI-extracted controls are advisory. A compliance reviewer will
+                validate flagged gaps before final reporting.
+              </p>
+            </div>
+
+            <button
+              onClick={() => navigate("/assessment/result", { state: { assessmentId } })}
+              className="w-full mt-6 flex items-center justify-center gap-2 text-sm font-semibold text-[#0B2A66] border border-blue-100 rounded-xl py-2.5 transition-all duration-300 hover:bg-blue-50 hover:scale-[1.01]"
+            >
+              Skip for now
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
