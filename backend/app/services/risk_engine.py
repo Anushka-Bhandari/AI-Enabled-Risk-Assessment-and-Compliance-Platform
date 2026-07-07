@@ -20,48 +20,45 @@ def run_risk_engine(assessment_id):
         assessment_id=assessment_id
     ).all()
 
-    if not compliance_results:
-        raise ValueError(
-            "Compliance Engine did not produce any results."
-        )
-
-    # -----------------------------
-    # Control Risk Calculation
-    # -----------------------------
     for result in compliance_results:
-
         control = get_control(result.control_id)
 
-        if result.compliance_status == "IMPLEMENTED":
-            risk_score = 0
+        if result.compliance_status in (
+            "IMPLEMENTED",
+            "NOT_APPLICABLE"
+        ):
+            continue
+
+        # Remaining controls:
+        # PARTIALLY_IMPLEMENTED
+        # NOT_IMPLEMENTED
+
+        weight = control["weight"]
+        status = result.compliance_status
+
+        # Calculate risk score
+        # Calculate risk level
+
+        if status == "PARTIALLY_IMPLEMENTED":
+            multiplier = 0.5
+        else:
+            multiplier = 1.0
+
+        raw_risk = weight * multiplier
+
+        risk_score = (raw_risk / MAX_CONTROL_WEIGHT) * 100
+
+        if risk_score == 0:
+            risk_level = "None"
+
+        elif risk_score <= 33:
             risk_level = "Low"
 
-        elif result.compliance_status == "NOT_APPLICABLE":
-            risk_score = 0
-            risk_level = "Low"
+        elif risk_score <= 66:
+            risk_level = "Medium"
 
         else:
-            weight = control["weight"]
-
-            if result.compliance_status == "PARTIALLY_IMPLEMENTED":
-                multiplier = 0.5
-            else:
-                multiplier = 1.0
-
-            raw_risk = weight * multiplier
-
-            risk_score = (
-                raw_risk / MAX_CONTROL_WEIGHT
-            ) * 100
-
-            if risk_score <= 33:
-                risk_level = "Low"
-
-            elif risk_score <= 66:
-                risk_level = "Medium"
-
-            else:
-                risk_level = "High"
+            risk_level = "High"
 
         control_risk_result = ControlRiskResult(
             assessment_id=assessment_id,
@@ -74,9 +71,6 @@ def run_risk_engine(assessment_id):
 
     db.session.commit()
 
-    # -----------------------------
-    # Category Risk Calculation
-    # -----------------------------
     control_risk_results = ControlRiskResult.query.filter_by(
         assessment_id=assessment_id
     ).all()
@@ -84,21 +78,16 @@ def run_risk_engine(assessment_id):
     category_scores = defaultdict(list)
 
     for result in control_risk_results:
-
         control = get_control(result.control_id)
-
         category = control["category"]
 
-        category_scores[category].append(
-            result.risk_score
-        )
+        category_scores[category].append(result.risk_score)
 
     for category, scores in category_scores.items():
-
         average_score = sum(scores) / len(scores)
 
         if average_score == 0:
-            risk_level = "Low"
+            risk_level = "None"
 
         elif average_score <= 33:
             risk_level = "Low"
@@ -120,40 +109,16 @@ def run_risk_engine(assessment_id):
 
     db.session.commit()
 
-    # -----------------------------
-    # Overall Risk Calculation
-    # -----------------------------
     category_risk_results = CategoryRiskResult.query.filter_by(
         assessment_id=assessment_id
     ).all()
 
-    if not category_risk_results:
-
-        assessment = Assessment.query.get(
-            assessment_id
-        )
-
-        assessment.overall_risk_score = 0
-        assessment.risk_level = "Low"
-
-        db.session.commit()
-
-        return {
-            "assessment_id": assessment_id,
-            "overall_risk_score": 0,
-            "overall_risk_level": "Low"
-        }
-
     overall_risk_score = (
-        sum(
-            result.risk_score
-            for result in category_risk_results
-        )
-        / len(category_risk_results)
+        sum(result.risk_score for result in category_risk_results)/ len(category_risk_results)
     )
 
     if overall_risk_score == 0:
-        overall_risk_level = "Low"
+        overall_risk_level = "None"
 
     elif overall_risk_score <= 33:
         overall_risk_level = "Low"
@@ -164,9 +129,7 @@ def run_risk_engine(assessment_id):
     else:
         overall_risk_level = "High"
 
-    assessment = Assessment.query.get(
-        assessment_id
-    )
+    assessment = Assessment.query.get(assessment_id)
 
     assessment.overall_risk_score = overall_risk_score
     assessment.risk_level = overall_risk_level

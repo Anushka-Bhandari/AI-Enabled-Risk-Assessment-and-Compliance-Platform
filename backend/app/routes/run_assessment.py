@@ -172,6 +172,8 @@ def run_assessment_route():
 
         run_risk_engine(assessment.id)
 
+        run_risk_engine(assessment.id)
+
         db.session.commit()
 
     except IntegrityError:
