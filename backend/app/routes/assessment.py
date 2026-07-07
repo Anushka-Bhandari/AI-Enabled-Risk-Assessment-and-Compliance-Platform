@@ -5,6 +5,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.database import db
 from sqlalchemy.exc import IntegrityError
 from app.models import Assessment, AssessmentAnswer, User
+from werkzeug.utils import secure_filename
 
 assessment = Blueprint("assessment", __name__)
 
@@ -31,6 +32,10 @@ VALID_ANSWERS = {
     "Not Implemented",
     "Not Applicable",
 }
+
+UPLOAD_FOLDER = "uploads"
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @assessment.route("/assessment", methods=["POST"])
 @jwt_required()
@@ -119,3 +124,104 @@ def submit_assessment():
         "message": "Assessment stored successfully",
         "assessment_id": assessment.id
     }), 201
+
+@assessment.route(
+        "/assessment/<int:assessment_id>/result",
+        methods=["GET"]
+    )
+@jwt_required()
+def get_assessment_result(assessment_id):
+
+    assessment = Assessment.query.get(assessment_id)
+
+    if not assessment:
+        return jsonify({
+            "error": "Assessment not found"
+        }), 404
+
+    return jsonify({
+        "assessment_id": assessment.id,
+        "status": assessment.status,
+        "assessment_mode": assessment.assessment_mode,
+        "risk_level": assessment.risk_level,
+        "compliance_score": assessment.compliance_score
+})
+
+@assessment.route(
+    "/assessment/upload",
+    methods=["POST"]
+)
+@jwt_required()
+def upload_documents():
+
+    print("ENTERED UPLOAD ROUTE")
+    print("JWT USER =", get_jwt_identity())
+
+    assessment_id = request.form.get("assessment_id")
+
+
+# If upload is opened directly without questionnaire,
+# create a DOCUMENT assessment automatically.
+    if not assessment_id:
+
+        current_user_id = get_jwt_identity()
+
+        current_user = db.session.get(
+            User,
+            current_user_id
+        )
+
+        assessment_record = Assessment(
+            user_id=current_user.id,
+            university_id=current_user.university_id,
+            assessment_mode="DOCUMENT"
+        )
+
+        db.session.add(assessment_record)
+        db.session.commit()
+
+        assessment_id = assessment_record.id
+
+
+    else:
+
+        assessment_record = Assessment.query.get(
+            assessment_id
+        )
+
+        if not assessment_record:
+            return jsonify({
+                "error": "Assessment not found"
+            }), 404
+        if not assessment_record:
+            return jsonify({
+                "error": "Assessment not found"
+            }), 404
+
+    files = request.files.getlist("documents")
+
+    if not files:
+        return jsonify({
+            "error": "No files uploaded"
+        }), 400
+
+    uploaded = []
+
+    for file in files:
+
+        filename = secure_filename(file.filename)
+
+        filepath = os.path.join(
+            UPLOAD_FOLDER,
+            filename
+        )
+
+        file.save(filepath)
+
+        uploaded.append(filename)
+
+    return jsonify({
+        "message": "Files uploaded successfully",
+        "assessment_id": assessment_id,
+        "files": uploaded
+    }), 200

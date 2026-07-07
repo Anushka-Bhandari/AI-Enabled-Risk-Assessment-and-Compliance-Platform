@@ -69,12 +69,8 @@ function App() {
                 />
 
                 <Route
-                    path="/assessment-result"
-                    element={
-                        <ProtectedRoute>
-                            <AssessmentResult />
-                        </ProtectedRoute>
-                    }
+                    path="/assessment/result"
+                    element={<AssessmentResult />}
                 />
 
             </Routes>

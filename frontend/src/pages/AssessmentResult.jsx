@@ -74,9 +74,9 @@ export default function AssessmentResult() {
       setLoadError("");
 
       try {
-        const token = localStorage.getItem("access_token");
+        const token = localStorage.getItem("token");
         const response = await axios.get(
-          `${API_BASE_URL}/api/assessment/${assessmentId}/result`,
+          `${API_BASE_URL}/assessment/${assessmentId}/result`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

@@ -158,7 +158,9 @@ console.log(payload);
 );
 
       const assessmentId = response?.data?.assessment_id;
-      navigate("/assessment/upload", { state: { assessmentId } });
+      navigate("/assessment/result", {
+  state: { assessmentId }
+});
     } catch (err) {
       const message =
         err?.response?.data?.message ||

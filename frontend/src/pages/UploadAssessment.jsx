@@ -110,7 +110,9 @@ export default function UploadAssessment() {
         }, 1400);
 
         try {
-            const token = localStorage.getItem("access_token");
+            const token = localStorage.getItem("token");
+
+            console.log("TOKEN =", token);
             const formData = new FormData();
 
             files.forEach((file) => {
@@ -121,7 +123,7 @@ export default function UploadAssessment() {
             }
 
             const response = await axios.post(
-                `${API_BASE_URL}/api/assessment/upload`,
+                `${API_BASE_URL}/assessment/upload`,
                 formData,
                 {
                     headers: {

@@ -100,7 +100,7 @@ def _serialize_assessment(a: Assessment) -> dict:
         "assessment_id": a.id,
         "university_id": a.university_id,
         "submitted_at": a.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-        "risk_score": a.risk_score,
+        "compliance_score": a.compliance_score,
         "risk_level": a.risk_level if a.risk_level in VALID_RISK_LEVELS else "Unknown",
     }
 
@@ -183,15 +183,15 @@ def get_analytics():
         level = a.risk_level if a.risk_level in VALID_RISK_LEVELS else None
         if level:
             risk_breakdown[level] += 1
-        if a.risk_score is not None:
-            risk_scores.append(a.risk_score)
+        if a.compliance_score is not None:
+            risk_scores.append(a.compliance_score)
 
         month_key = a.created_at.strftime("%Y-%m")
         monthly[month_key]["total"] += 1
         if level:
             monthly[month_key][level] += 1
 
-    average_risk_score = round(sum(risk_scores) / len(risk_scores), 1) if risk_scores else None
+    average_compliance_score = round(sum(risk_scores) / len(risk_scores), 1) if risk_scores else None
 
     # Compliance score: penalize High/Medium risk assessments. Falls back to
     # 100 when there's no history yet, and never drops below 58 so a single
@@ -213,7 +213,7 @@ def get_analytics():
         "user": user.name,
         "total_assessments": total,
         "risk_breakdown": risk_breakdown,
-        "average_risk_score": average_risk_score,
+        "average_risk_score": average_compliance_score,
         "compliance_score": compliance_score,
         "monthly_trend": monthly_trend,
         "latest_assessment_at": (
