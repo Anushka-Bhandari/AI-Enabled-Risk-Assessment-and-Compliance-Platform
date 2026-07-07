@@ -66,30 +66,30 @@ const NAV_ITEMS = [
     icon: ClipboardList,
     path: "/assessments",
   },
-  {
-    key: "risks",
-    label: "Risks",
-    icon: ShieldAlert,
-    path: "/risks",
-  },
-  {
-    key: "reports",
-    label: "Reports",
-    icon: FileText,
-    path: "/reports",
-  },
-  {
-    key: "compliance",
-    label: "Compliance",
-    icon: CheckCircle,
-    path: "/compliance",
-  },
-  {
-    key: "settings",
-    label: "Settings",
-    icon: Settings,
-    path: "/settings",
-  },
+//   {
+//     key: "risks",
+//     label: "Risks",
+//     icon: ShieldAlert,
+//     path: "/risks",
+//   },
+//   {
+//     key: "reports",
+//     label: "Reports",
+//     icon: FileText,
+//     path: "/reports",
+//   },
+//   {
+//     key: "compliance",
+//     label: "Compliance",
+//     icon: CheckCircle,
+//     path: "/compliance",
+//   },
+//   {
+//     key: "settings",
+//     label: "Settings",
+//     icon: Settings,
+//     path: "/settings",
+//   },
 ];
 
 const RISK_STYLES = {

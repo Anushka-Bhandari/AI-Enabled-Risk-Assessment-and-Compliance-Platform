@@ -141,6 +141,7 @@ class Assessment(db.Model):
         secondary="assessment_documents",
         back_populates="assessments"
     )
+    
 
     control_results = db.relationship(
         "AssessmentControlResult",

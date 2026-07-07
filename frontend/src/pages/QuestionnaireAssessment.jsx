@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import API from "../services/authService";
 import {
   ShieldCheck,
   CheckCircle2,
@@ -11,70 +11,93 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-const API_BASE_URL = import.meta.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
-const QUESTION_STAGES = [
-  {
-    id: "access-control",
-    title: "Access Control",
-    description: "Identity, authentication, and privilege management controls.",
-    questions: [
-      { id: 101, text: "Is multi-factor authentication enforced for all administrative accounts?" },
-      { id: 102, text: "Are user access rights reviewed at least quarterly?" },
-      { id: 103, text: "Is a formal least-privilege policy documented and enforced?" },
-      { id: 104, text: "Are privileged sessions logged and monitored in real time?" },
-    ],
-  },
-  {
-    id: "data-protection",
-    title: "Data Protection",
-    description: "Encryption, classification, and data lifecycle safeguards.",
-    questions: [
-      { id: 201, text: "Is sensitive institutional data encrypted at rest?" },
-      { id: 202, text: "Is data encrypted in transit using current TLS standards?" },
-      { id: 203, text: "Does a documented data retention and disposal policy exist?" },
-      { id: 204, text: "Is data classified according to sensitivity tiers?" },
-    ],
-  },
-  {
-    id: "ai-governance",
-    title: "AI Governance",
-    description: "Oversight, transparency, and risk controls for AI systems.",
-    questions: [
-      { id: 301, text: "Is there a formal inventory of AI/ML models in production use?" },
-      { id: 302, text: "Are AI model outputs subject to human review before high-stakes decisions?" },
-      { id: 303, text: "Is there a documented AI risk management framework in place?" },
-      { id: 304, text: "Are third-party AI vendors assessed for compliance before onboarding?" },
-    ],
-  },
-  {
-    id: "incident-response",
-    title: "Incident Response",
-    description: "Detection, escalation, and recovery preparedness.",
-    questions: [
-      { id: 401, text: "Does a documented incident response plan exist and gets tested annually?" },
-      { id: 402, text: "Is there a 24/7 monitoring capability for security events?" },
-      { id: 403, text: "Are breach notification procedures aligned with regulatory timelines?" },
-      { id: 404, text: "Are post-incident reviews conducted and tracked to remediation?" },
-    ],
-  },
-];
 
 export default function QuestionnaireAssessment() {
   const navigate = useNavigate();
 
   const [currentStage, setCurrentStage] = useState(0);
-  const [answers, setAnswers] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState("");
+const [questionStages, setQuestionStages] = useState([]);
+const [answers, setAnswers] = useState({});
+const [isSubmitting, setIsSubmitting] = useState(false);
+const [submitError, setSubmitError] = useState("");
 
-  const totalStages = QUESTION_STAGES.length;
-  const stage = QUESTION_STAGES[currentStage];
+ useEffect(() => {
+  fetchQuestions();
+}, []);
 
-  const totalQuestions = useMemo(
-    () => QUESTION_STAGES.reduce((sum, s) => sum + s.questions.length, 0),
-    []
+const fetchQuestions = async () => {
+  try {
+    const response = await API.get("/questions");
+
+    const groupedStages = [
+      {
+        id: "governance",
+        title: "Governance",
+        description: "Questions 1-10",
+        questions: response.data.questions.slice(0, 10),
+      },
+      {
+        id: "security",
+        title: "Security",
+        description: "Questions 11-20",
+        questions: response.data.questions.slice(10, 20),
+      },
+      {
+        id: "privacy",
+        title: "Privacy",
+        description: "Questions 21-30",
+        questions: response.data.questions.slice(20, 30),
+      },
+      {
+        id: "compliance",
+        title: "Compliance",
+        description: "Questions 31-40",
+        questions: response.data.questions.slice(30, 40),
+      },
+      {
+        id: "risk",
+        title: "Risk Management",
+        description: "Questions 41-50",
+        questions: response.data.questions.slice(40, 50),
+      },
+    ];
+
+    setQuestionStages(groupedStages);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+// ===== MOVE THESE HERE =====
+
+const totalStages = questionStages.length;
+
+const stage =
+  questionStages.length > 0
+    ? questionStages[currentStage]
+    : null;
+
+const totalQuestions = useMemo(
+  () =>
+    questionStages.reduce(
+      (sum, s) => sum + (s.questions?.length || 0),
+      0
+    ),
+  [questionStages]
+);
+
+// ===== LOADING CHECK AFTER HOOKS =====
+
+if (questionStages.length === 0) {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <Loader2 className="w-8 h-8 animate-spin" />
+    </div>
   );
+}
   const answeredCount = Object.keys(answers).length;
   const overallProgress = Math.round((answeredCount / totalQuestions) * 100);
 
@@ -108,30 +131,31 @@ export default function QuestionnaireAssessment() {
     setSubmitError("");
 
     try {
-      const token = localStorage.getItem("access_token");
+      const token = localStorage.getItem("token");
 
-      const payload = {
-        answers: QUESTION_STAGES.flatMap((s) =>
-          s.questions.map((q) => ({
-            question_id: q.id,
-            category: s.id,
-            question_text: q.text,
-            // Strict string value matching AssessmentAnswer.answer constraint
-            answer: answers[q.id] === true ? "Yes" : "No",
-          }))
-        ),
-      };
+      console.log("TOKEN =", token);
 
-      const response = await axios.post(
-        `${API_BASE_URL}/api/assessment/submit`,
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const answersDict = {};
+
+questionStages.forEach((stage) => {
+  stage.questions.forEach((q) => {
+    answersDict[String(q.id)] =
+      answers[q.id] === true
+        ? "Implemented"
+        : "Not Implemented";
+  });
+});
+
+const payload = {
+  answers: answersDict,
+};
+
+console.log(payload);
+
+      const response = await API.post(
+  "/assessment",
+  payload
+);
 
       const assessmentId = response?.data?.assessment_id;
       navigate("/assessment/upload", { state: { assessmentId } });
@@ -189,7 +213,7 @@ export default function QuestionnaireAssessment() {
           </div>
 
           <div className="flex items-center gap-2">
-            {QUESTION_STAGES.map((s, index) => {
+            {questionStages.map((s, index) => {
               const isDone = index < currentStage;
               const isActive = index === currentStage;
               return (
@@ -247,7 +271,7 @@ export default function QuestionnaireAssessment() {
                     {String(qIndex + 1).padStart(2, "0")}
                   </span>
                   <p className="text-sm sm:text-[15px] font-medium text-slate-800 leading-relaxed">
-                    {q.text}
+                    {q.question}
                   </p>
                 </div>
 

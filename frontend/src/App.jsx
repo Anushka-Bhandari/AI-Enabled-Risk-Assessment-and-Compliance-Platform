@@ -42,7 +42,7 @@ function App() {
                 />
 
                 <Route
-                    path="/assessment"
+                    path="/assessments"
                     element={
                         <ProtectedRoute>
                             <NewAssessment />

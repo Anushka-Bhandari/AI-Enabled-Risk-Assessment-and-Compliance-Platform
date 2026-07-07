@@ -8,14 +8,21 @@ from app.models import Assessment, AssessmentAnswer, User
 
 assessment = Blueprint("assessment", __name__)
 
-QUESTIONNAIRE_PATH = Path(__file__).resolve().parent.parent / "questionnaire.json"
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+QUESTIONNAIRE_PATH = os.path.join(
+    BASE_DIR,
+    "questionnaire.json"
+)
 
 with open(QUESTIONNAIRE_PATH, "r", encoding="utf-8") as file:
-    QUESTIONNAIRE = json.load(file)
+    questionnaire = json.load(file)
     
 VALID_QUESTION_IDS = {
     str(question["id"])
-    for question in QUESTIONNAIRE["questions"]
+    for question in questionnaire["questions"]
 }
 
 VALID_ANSWERS = {
@@ -99,10 +106,13 @@ def submit_assessment():
             "error": "Database integrity error."
         }), 400
 
-    except Exception:
+    except Exception as e:
         db.session.rollback()
+
+        print("ERROR:", str(e))
+
         return jsonify({
-            "error": "Unable to save assessment."
+            "error": str(e)
         }), 500
 
     return jsonify({
