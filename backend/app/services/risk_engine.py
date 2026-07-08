@@ -20,6 +20,9 @@ def run_risk_engine(assessment_id):
         assessment_id=assessment_id
     ).all()
 
+    if not compliance_results:
+        raise ValueError("Compliance Engine did not produce any results.")
+
     for result in compliance_results:
         control = get_control(result.control_id)
 
