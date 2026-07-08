@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy.exc import IntegrityError
 from app.services.risk_engine import run_risk_engine
+from app.services.compliance_engine import ComplianceEngine
 
 from app.database import db
 from app.models import (
@@ -139,15 +140,12 @@ def run_assessment_route():
         # -----------------------------
         # Compliance Engine
         # -----------------------------
-        #
-        # Your teammate's function will be
-        # called here later.
-        #
-        # Example:
-        #
-        # result = run_compliance(
-        #     assessment.id
-        # )
+
+        db.session.commit()
+
+        compliance_result = ComplianceEngine(
+            assessment.id
+        ).run()
 
         run_risk_engine(assessment.id)
 
@@ -168,6 +166,7 @@ def run_assessment_route():
         }), 500
 
     return jsonify({
-        "message": "Assessment started successfully.",
-        "assessment_id": assessment.id
+        "message": "Assessment completed successfully.",
+        "assessment_id": assessment.id,
+        "compliance": compliance_result
     }), 200

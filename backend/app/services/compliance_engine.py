@@ -1,5 +1,3 @@
-import json
-
 from app.services.control_requirements import (
     CONTROL_REQUIREMENTS
 )
@@ -10,7 +8,7 @@ from app.database import db
 from app.models import (
     Assessment,
     AssessmentAnswer,
-    AssessmentControlResult,
+    ComplianceResult,
 )
 
 from app.services.control_library import CONTROL_LIBRARY
@@ -18,6 +16,29 @@ from app.services.control_frameworks import (
     CONTROL_FRAMEWORKS,
     SUPPORTED_FRAMEWORKS,
 )
+
+from pathlib import Path
+import json
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+QUESTIONNAIRE_PATH = (
+    BASE_DIR /
+    "routes" /
+    "questionnaire.json"
+)
+
+with open(
+    QUESTIONNAIRE_PATH,
+    "r",
+    encoding="utf-8"
+) as file:
+    questionnaire = json.load(file)
+
+CONTROL_TO_QUESTION = {
+    question["control_id"]: str(question["id"])
+    for question in questionnaire["questions"]
+}
 
 
 class ComplianceEngine:
@@ -31,10 +52,10 @@ class ComplianceEngine:
         Structured compliance result.
     """
 
-    IMPLEMENTED = "Implemented"
-    PARTIAL = "Partially Implemented"
-    NOT_IMPLEMENTED = "Not Implemented"
-    NOT_APPLICABLE = "Not Applicable"
+    IMPLEMENTED = "IMPLEMENTED"
+    PARTIAL = "PARTIALLY_IMPLEMENTED"
+    NOT_IMPLEMENTED = "NOT_IMPLEMENTED"
+    NOT_APPLICABLE = "NOT_APPLICABLE"
 
     QUESTIONNAIRE = "QUESTIONNAIRE"
     DOCUMENT = "DOCUMENT"
@@ -137,10 +158,11 @@ class ComplianceEngine:
 
         mode = self.assessment.assessment_mode
 
-        for index, control in enumerate(
-            CONTROL_LIBRARY,
-            start=1,
-        ):
+        for control in CONTROL_LIBRARY:
+
+            control_id = control["id"]
+
+            control_name = control["name"]
 
             questionnaire_status = None
             document_status = None
@@ -152,8 +174,12 @@ class ComplianceEngine:
                 self.COMBINED,
             ):
 
+                question_id = CONTROL_TO_QUESTION.get(
+                    control_id
+                )
+
                 questionnaire_status = self.answers.get(
-                    str(index),
+                    question_id,
                     self.NOT_IMPLEMENTED,
                 )
 
@@ -193,7 +219,7 @@ class ComplianceEngine:
                     evidence_source = "Documents"
 
             requirements = CONTROL_REQUIREMENTS.get(
-                control,
+                control_name,
                 []
             )
 
@@ -223,14 +249,16 @@ class ComplianceEngine:
             self.control_results.append(
                 {
 
-                    "control": control,
+                    "control_id": control_id,
+
+                    "control_name": control_name,
 
                     "status": final_status,
 
                     "evidence_source": evidence_source,
 
                     "affected_frameworks": CONTROL_FRAMEWORKS[
-                        control
+                        control_id
                     ],
 
                     "implemented_requirements": implemented_requirements,
@@ -252,7 +280,8 @@ class ComplianceEngine:
         text = self.document_text.lower()
 
         keywords = (
-            control.replace("(", "")
+            control["name"]
+            .replace("(", "")
             .replace(")", "")
             .replace("/", " ")
             .lower()
@@ -325,7 +354,7 @@ class ComplianceEngine:
 
             status = result["status"]
 
-            for framework in result["frameworks"]:
+            for framework in result["affected_frameworks"]:
 
                 framework_score = self.framework_scores[
                     framework
@@ -404,7 +433,7 @@ class ComplianceEngine:
 
         self.assessment.compliance_score = self.overall_score
 
-        AssessmentControlResult.query.filter_by(
+        ComplianceResult.query.filter_by(
             assessment_id=self.assessment.id
         ).delete()
 
@@ -412,33 +441,17 @@ class ComplianceEngine:
 
             db.session.add(
 
-                AssessmentControlResult(
+                ComplianceResult(
 
                     assessment_id=self.assessment.id,
 
-                    control_name=result["control"],
+                    control_id=result["control_id"],
 
-                    status=result["status"],
-
-                    evidence_source=result["evidence_source"],
-
-                    affected_frameworks=json.dumps(
-                        result["affected_frameworks"]
-                    ),
-
-                    implemented_requirements=json.dumps(
-                        result["implemented_requirements"]
-                    ),
-
-                    missing_requirements=json.dumps(
-                        result["missing_requirements"]
-                    )
+                    compliance_status=result["status"]
 
                 )
 
             )
-
-        db.session.commit()
 
 
     # ==========================================================
