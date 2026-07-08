@@ -77,13 +77,23 @@ def run_assessment_route():
                         "error": f"Document {document_id} not found."
                     }), 404
 
-                db.session.add(
-                    AssessmentDocument(
-                        assessment_id=assessment.id,
-                        document_id=document.id
-                    )
-                )
+                if document.university_id != current_user.university_id:
+                    return jsonify({
+                        "error": "Unauthorized document."
+                    }), 403
 
+                existing = AssessmentDocument.query.filter_by(
+                    assessment_id=assessment.id,
+                    document_id=document.id
+                ).first()
+
+                if not existing:
+                    db.session.add(
+                        AssessmentDocument(
+                            assessment_id=assessment.id,
+                            document_id=document.id
+                        )
+                    )
         # -----------------------------
         # Questionnaire Only
         # -----------------------------
@@ -98,6 +108,8 @@ def run_assessment_route():
                 return jsonify({
                     "error": "Assessment not found."
                 }), 404
+
+            assessment.assessment_mode = "QUESTIONNAIRE"
 
         # -----------------------------
         # Documents Only
@@ -125,12 +137,23 @@ def run_assessment_route():
                         "error": f"Document {document_id} not found."
                     }), 404
 
-                db.session.add(
-                    AssessmentDocument(
-                        assessment_id=assessment.id,
-                        document_id=document.id
+                if document.university_id != current_user.university_id:
+                    return jsonify({
+                        "error": "Unauthorized document."
+                    }), 403
+
+                existing = AssessmentDocument.query.filter_by(
+                    assessment_id=assessment.id,
+                    document_id=document.id
+                ).first()
+
+                if not existing:
+                    db.session.add(
+                        AssessmentDocument(
+                            assessment_id=assessment.id,
+                            document_id=document.id
+                        )
                     )
-                )
 
         else:
             return jsonify({
