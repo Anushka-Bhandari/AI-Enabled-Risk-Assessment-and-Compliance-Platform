@@ -134,6 +134,8 @@ export default function AssessmentResult() {
   const implementedControls = result?.implemented_controls || [];
   const criticalGaps = result?.critical_gaps || [];
 
+  const isPending = result?.status === "Pending";
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">

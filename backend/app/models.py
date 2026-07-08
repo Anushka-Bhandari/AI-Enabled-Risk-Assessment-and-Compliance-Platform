@@ -130,6 +130,11 @@ class Assessment(db.Model):
 
     assessment_mode = db.Column(db.String(20), nullable=False)
 
+    overall_risk_score = db.Column(
+        db.Float,
+        nullable=True
+    )
+
     answers = db.relationship(
         "AssessmentAnswer",
         backref="assessment",
@@ -141,13 +146,26 @@ class Assessment(db.Model):
         secondary="assessment_documents",
         back_populates="assessments"
     )
-    
 
-    control_results = db.relationship(
-        "AssessmentControlResult",
+    compliance_results = db.relationship(
+        "ComplianceResult",
         back_populates="assessment",
-        cascade="all, delete-orphan",
-        lazy=True
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
+
+    control_risk_results = db.relationship(
+        "ControlRiskResult",
+        back_populates="assessment",
+        lazy=True,
+        cascade="all, delete-orphan"
+    )
+
+    category_risk_results = db.relationship(
+        "CategoryRiskResult",
+        back_populates="assessment",
+        lazy=True,
+        cascade="all, delete-orphan"
     )
 
 
@@ -229,8 +247,8 @@ class AssessmentDocument(db.Model):
         primary_key=True
     )
 
-class AssessmentControlResult(db.Model):
-    __tablename__ = "assessment_control_results"
+class ComplianceResult(db.Model):
+    __tablename__ = "compliance_results"
 
     id = db.Column(
         db.Integer,
@@ -243,42 +261,101 @@ class AssessmentControlResult(db.Model):
         nullable=False
     )
 
-    control_name = db.Column(
-        db.String(255),
+    control_id = db.Column(
+        db.String(4),
         nullable=False
     )
 
-    status = db.Column(
-        db.String(50),
+    compliance_status = db.Column(
+        db.String(30),
         nullable=False
-    )
-
-    evidence_source = db.Column(
-        db.String(50),
-        nullable=False
-    )
-
-    affected_frameworks = db.Column(
-        db.Text,
-        nullable=False
-    )
-
-    implemented_requirements = db.Column(
-        db.Text,
-        nullable=True
-    )
-
-    missing_requirements = db.Column(
-        db.Text,
-        nullable=True
-    )
-
-    created_at = db.Column(
-        db.DateTime,
-        default=db.func.current_timestamp()
     )
 
     assessment = db.relationship(
         "Assessment",
-        back_populates="control_results"
+        back_populates="compliance_results"
+    )
+
+class ControlRiskResult(db.Model):
+    __tablename__ = "control_risk_results"
+
+    __table_args__ = (
+        db.UniqueConstraint(
+            "assessment_id",
+            "control_id",
+            name="uq_control_risk_results"
+        ),
+    )
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    assessment_id = db.Column(
+        db.Integer,
+        db.ForeignKey("assessments.id"),
+        nullable=False
+    )
+
+    control_id = db.Column(
+        db.String(4),
+        nullable=False
+    )
+
+    risk_score = db.Column(
+        db.Float,
+        nullable=False
+    )
+
+    risk_level = db.Column(
+        db.String(20),
+        nullable=False
+    )
+
+    assessment = db.relationship(
+        "Assessment",
+        back_populates="control_risk_results"
+    )
+
+class CategoryRiskResult(db.Model):
+    __tablename__ = "category_risk_results"
+
+    __table_args__ = (
+        db.UniqueConstraint(
+            "assessment_id",
+            "category",
+            name="uq_category_risk_results"
+        ),
+    )
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    assessment_id = db.Column(
+        db.Integer,
+        db.ForeignKey("assessments.id"),
+        nullable=False
+    )
+
+    category = db.Column(
+        db.String(100),
+        nullable=False
+    )
+
+    risk_score = db.Column(
+        db.Float,
+        nullable=False
+    )
+
+    risk_level = db.Column(
+        db.String(20),
+        nullable=False
+    )
+
+    assessment = db.relationship(
+        "Assessment",
+        back_populates="category_risk_results"
     )
