@@ -57,6 +57,23 @@ CONTROL_LIBRARY = [
             "transparency regarding personal data processing, increasing the "
             "risk of regulatory non-compliance and loss of stakeholder trust."
         ),
+        "frameworks": [
+            "DPDP Act 2023",
+            "ISO/IEC 27701",
+            "ISO/IEC 27001"
+        ],
+
+        "missing_requirements": [
+            "Privacy Notice",
+            "Transparency",
+            "Purpose Disclosure"
+        ],
+
+        "implementation_guidance": (
+            "Publish a clear privacy notice describing data collection, processing "
+            "purposes, retention period, user rights, grievance contact, and third-"
+            "party disclosures. Ensure it is available on all university portals."
+        )
     },
     {
         "id": "C002",
@@ -68,6 +85,24 @@ CONTROL_LIBRARY = [
             "unlawful processing of personal data, regulatory penalties, and "
             "privacy violations."
         ),
+        "frameworks": [
+            "DPDP Act 2023",
+            "ISO/IEC 27701",
+            "ISO/IEC 27001"
+        ],
+
+        "missing_requirements": [
+            "Consent Collection",
+            "Consent Withdrawal",
+            "Consent Records",
+            "Consent Audit Trail"
+        ],
+
+        "implementation_guidance": (
+            "Deploy a centralized consent management process, maintain verifiable "
+            "records of user consent, support consent withdrawal, and periodically "
+            "review compliance with privacy regulations."
+        )
     },
     {
         "id": "C003",
@@ -79,6 +114,23 @@ CONTROL_LIBRARY = [
             "assets, making it difficult to protect, monitor, and comply with "
             "data protection regulations."
         ),
+        "frameworks": [
+            "ISO/IEC 27001",
+            "ISO/IEC 27701",
+            "NIST CSF 2.0"
+        ],
+
+        "missing_requirements": [
+            "Data Inventory",
+            "Asset Register",
+            "Data Mapping"
+        ],
+
+        "implementation_guidance": (
+            "Maintain an inventory of all personal and institutional data assets, "
+            "including owners, storage locations, processing activities, and retention "
+            "requirements."
+        )
     },
     {
         "id": "C004",
@@ -89,6 +141,21 @@ CONTROL_LIBRARY = [
             "Failure to classify data appropriately may lead to inadequate "
             "security controls and increased exposure of sensitive information."
         ),
+        "frameworks": [
+            "ISO/IEC 27001",
+            "NIST CSF 2.0"
+        ],
+
+        "missing_requirements": [
+            "Classification Policy",
+            "Labeling",
+            "Handling Rules"
+        ],
+
+        "implementation_guidance": (
+            "Establish a classification scheme such as Public, Internal, Confidential, "
+            "and Restricted. Apply security controls according to classification."
+        )
     },
     {
         "id": "C005",
@@ -100,6 +167,21 @@ CONTROL_LIBRARY = [
             "personal information longer than necessary, increasing legal and "
             "security risks."
         ),
+        "frameworks": [
+            "DPDP Act 2023",
+            "ISO/IEC 27701"
+        ],
+
+        "missing_requirements": [
+            "Retention Policy",
+            "Retention Schedule",
+            "Legal Hold"
+        ],
+
+        "implementation_guidance": (
+            "Define retention periods for every category of institutional data and "
+            "automatically delete information once retention requirements expire."
+        )
     },
     {
         "id": "C006",
@@ -111,6 +193,21 @@ CONTROL_LIBRARY = [
             "information to unauthorized access and increase the likelihood of "
             "data breaches."
         ),
+        "frameworks": [
+            "ISO/IEC 27001",
+            "ISO/IEC 27701"
+        ],
+
+        "missing_requirements": [
+            "Secure Deletion",
+            "Media Sanitization",
+            "Disposal Procedure"
+        ],
+
+        "implementation_guidance": (
+            "Implement secure deletion procedures using approved sanitization methods "
+            "for digital storage and certified destruction for physical media."
+        )
     },
     {
         "id": "C007",
@@ -122,6 +219,21 @@ CONTROL_LIBRARY = [
             "increases privacy risks and expands the potential impact of data "
             "breaches."
         ),
+        "frameworks": [
+            "DPDP Act 2023",
+            "ISO/IEC 27701"
+        ],
+
+        "missing_requirements": [
+            "Minimal Collection",
+            "Purpose Review",
+            "Periodic Cleanup"
+        ],
+
+        "implementation_guidance": (
+            "Collect only the minimum personal information required for academic and "
+            "administrative purposes and regularly review unnecessary data collection."
+        )
     },
     {
         "id": "C008",
@@ -133,6 +245,21 @@ CONTROL_LIBRARY = [
             "purposes may lead to regulatory violations and misuse of personal "
             "information."
         ),
+        "frameworks": [
+            "DPDP Act 2023",
+            "ISO/IEC 27701"
+        ],
+
+        "missing_requirements": [
+            "Purpose Documentation",
+            "Purpose Validation",
+            "Processing Restrictions"
+        ],
+
+        "implementation_guidance": (
+            "Document every processing purpose and prevent personal data from being "
+            "used outside its originally approved purpose without additional consent."
+        )
     },
     {
         "id": "C009",
@@ -144,6 +271,22 @@ CONTROL_LIBRARY = [
             "exercising legal rights over their personal information, leading "
             "to compliance and reputational risks."
         ),
+        "frameworks": [
+            "DPDP Act 2023",
+            "ISO/IEC 27701"
+        ],
+
+        "missing_requirements": [
+            "Access Requests",
+            "Correction Requests",
+            "Deletion Requests",
+            "Grievance Handling"
+        ],
+
+        "implementation_guidance": (
+            "Establish workflows allowing students, faculty, and staff to access, "
+            "correct, or delete personal information within regulatory timelines."
+        )
     },
     {
         "id": "C010",
@@ -155,6 +298,23 @@ CONTROL_LIBRARY = [
             "serious privacy breaches, regulatory penalties, and significant "
             "harm to affected individuals."
         ),
+        "frameworks": [
+            "DPDP Act 2023",
+            "ISO/IEC 27001",
+            "ISO/IEC 27701"
+        ],
+
+        "missing_requirements": [
+            "Encryption",
+            "Access Restrictions",
+            "Monitoring",
+            "Audit Logging"
+        ],
+
+        "implementation_guidance": (
+            "Apply encryption, strict access control, continuous monitoring, and audit "
+            "logging for all sensitive personal information handled by the university."
+        )
     },
 
     # ==========================================================
