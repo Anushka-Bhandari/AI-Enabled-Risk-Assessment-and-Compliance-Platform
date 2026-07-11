@@ -12,6 +12,8 @@ def create_app():
 
     app.config.from_object(Config)
 
+    Config.create_report_directories()
+
     CORS(app)
 
     db.init_app(app)
