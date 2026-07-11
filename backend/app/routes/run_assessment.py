@@ -181,11 +181,14 @@ def run_assessment_route():
             "error": "Database integrity error."
         }), 400
 
-    except Exception:
+    except Exception as e:
         db.session.rollback()
 
+        import traceback
+        traceback.print_exc()
+
         return jsonify({
-            "error": "Unable to run assessment."
+            "error": str(e)
         }), 500
 
     return jsonify({

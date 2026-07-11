@@ -6,6 +6,12 @@ from app.database import db
 from sqlalchemy.exc import IntegrityError
 from app.models import Assessment, AssessmentAnswer, User
 from werkzeug.utils import secure_filename
+from app.models import (
+    Assessment,
+    AssessmentAnswer,
+    ComplianceResult,
+    User
+)
 
 assessment = Blueprint("assessment", __name__)
 
@@ -139,13 +145,38 @@ def get_assessment_result(assessment_id):
             "error": "Assessment not found"
         }), 404
 
+    implemented_count = ComplianceResult.query.filter_by(
+        assessment_id=assessment_id,
+        compliance_status="IMPLEMENTED"
+    ).count()
+
+    partial_count = ComplianceResult.query.filter_by(
+        assessment_id=assessment_id,
+        compliance_status="PARTIALLY_IMPLEMENTED"
+    ).count()
+
+    not_implemented_count = ComplianceResult.query.filter_by(
+        assessment_id=assessment_id,
+        compliance_status="NOT_IMPLEMENTED"
+    ).count()
+
+    na_count = ComplianceResult.query.filter_by(
+        assessment_id=assessment_id,
+        compliance_status="NOT_APPLICABLE"
+    ).count()
+
     return jsonify({
         "assessment_id": assessment.id,
         "status": assessment.status,
         "assessment_mode": assessment.assessment_mode,
         "risk_level": assessment.risk_level,
-        "compliance_score": assessment.compliance_score
-})
+        "compliance_score": assessment.compliance_score,
+
+        "implemented_count": implemented_count,
+        "partial_count": partial_count,
+        "not_implemented_count": not_implemented_count,
+        "na_count": na_count
+    })
 
 @assessment.route(
     "/assessment/upload",

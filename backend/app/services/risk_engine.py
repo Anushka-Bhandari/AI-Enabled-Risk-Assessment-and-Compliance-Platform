@@ -113,13 +113,29 @@ def run_risk_engine(assessment_id):
     db.session.commit()
 
     category_risk_results = CategoryRiskResult.query.filter_by(
-        assessment_id=assessment_id
-    ).all()
+    assessment_id=assessment_id
+).all()
+
+    # No risk records means everything was implemented
+    if not category_risk_results:
+
+        assessment = Assessment.query.get(assessment_id)
+
+        assessment.overall_risk_score = 0
+        assessment.risk_level = "Low"
+
+        db.session.commit()
+
+        return {
+            "assessment_id": assessment_id,
+            "overall_risk_score": 0,
+            "overall_risk_level": "Low"
+        }
 
     overall_risk_score = (
-        sum(result.risk_score for result in category_risk_results)/ len(category_risk_results)
+        sum(result.risk_score for result in category_risk_results)
+        / len(category_risk_results)
     )
-
     if overall_risk_score == 0:
         overall_risk_level = "None"
 

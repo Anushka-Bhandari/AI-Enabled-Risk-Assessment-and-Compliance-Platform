@@ -134,9 +134,17 @@ class ComplianceEngine:
         )
 
         self.answers = {
-            answer.question_id: answer.answer
-            for answer in records
-        }
+        answer.question_id: {
+            "Implemented": self.IMPLEMENTED,
+            "Partially Implemented": self.PARTIAL,
+            "Not Implemented": self.NOT_IMPLEMENTED,
+            "Not Applicable": self.NOT_APPLICABLE,
+        }.get(
+            answer.answer,
+            self.NOT_IMPLEMENTED
+        )
+        for answer in records
+}
 
     def _load_documents(self):
 
