@@ -917,7 +917,7 @@ export default function AssessmentResult() {
 
           <button
             onClick={() =>
-              navigate("/assessment/upload", {
+              navigate("/upload-assessment", {
                 state: { assessmentId }
               })
             }
