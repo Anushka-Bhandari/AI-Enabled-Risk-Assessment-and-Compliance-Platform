@@ -9,6 +9,7 @@ import NewAssessment from "./pages/NewAssessment";
 import QuestionnaireAssessment from "./pages/QuestionnaireAssessment";
 import UploadAssessment from "./pages/UploadAssessment";
 import AssessmentResult from "./pages/AssessmentResult";
+import AssessmentHistory from "./pages/AssessmentHistory";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 
@@ -40,6 +41,11 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
+
+                <Route
+    path="/assessment-history"
+    element={<AssessmentHistory />}
+/>
 
                 <Route
                     path="/assessments"

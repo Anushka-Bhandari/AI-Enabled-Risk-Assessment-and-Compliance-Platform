@@ -221,3 +221,26 @@ def get_analytics():
             if latest_assessment else None
         ),
     }), 200
+
+@dashboard.route("/dashboard/recent-assessments", methods=["GET"])
+@jwt_required()
+def recent_assessments():
+
+    user_id, user = _get_current_user()
+
+    if user_id is None:
+        return jsonify({"error": "Invalid user identity"}), 401
+
+    assessments = (
+        Assessment.query
+        .filter_by(user_id=user_id)
+        .order_by(Assessment.created_at.desc())
+        .limit(5)
+        .all()
+    )
+
+    history = [_serialize_assessment(a) for a in assessments]
+
+    return jsonify({
+        "history": history
+    }), 200

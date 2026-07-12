@@ -657,13 +657,22 @@ export default function Dashboard() {
                     <section className="grid grid-cols-1 xl:grid-cols-3 gap-5">
                         <div className="xl:col-span-2 rounded-2xl border border-slate-200/70 bg-white shadow-sm overflow-hidden">
                             <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
-                                <div>
-                                    <h3 className="font-semibold text-slate-900">Recent Assessments</h3>
-                                    <p className="text-xs text-slate-400 mt-0.5">
-                                        Latest submissions across your institution
-                                    </p>
-                                </div>
-                            </div>
+    <div>
+        <h3 className="font-semibold text-slate-900">
+            Recent Assessments
+        </h3>
+        <p className="text-xs text-slate-400 mt-0.5">
+            Latest submissions across your institution
+        </p>
+    </div>
+
+    <button
+        onClick={() => navigate("/assessment-history")}
+        className="text-sm font-medium text-blue-600 hover:text-blue-800"
+    >
+        View All
+    </button>
+</div>
 
                             {isLoading ? (
                                 <div className="p-6 space-y-3">
@@ -697,7 +706,7 @@ export default function Dashboard() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {filteredHistory.map((item) => {
+    {filteredHistory.slice(0, 5).map((item) => {
                                                 const level = item.risk_level || "Unknown";
                                                 const style = RISK_STYLES[level] || RISK_STYLES.Unknown;
                                                 return (
