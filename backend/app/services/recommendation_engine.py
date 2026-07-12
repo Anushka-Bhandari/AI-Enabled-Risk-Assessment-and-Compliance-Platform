@@ -213,15 +213,29 @@ class RecommendationEngine:
                 "risk_description":
                     control["risk_description"],
 
-                "frameworks":
-                    control.get("frameworks", []),
+                **(
+                    {
+                        "frameworks": control["frameworks"]
+                    }
+                    if control.get("frameworks")
+                    else {}
+                ),
 
-                "missing_requirements":
-                    control.get("missing_requirements", []),
+                **(
+                    {
+                        "missing_requirements": control["missing_requirements"]
+                    }
+                    if control.get("missing_requirements")
+                    else {}
+                ),
 
-                "implementation_guidance":
-                    control.get("implementation_guidance", "")
-
+                **(
+                    {
+                        "implementation_guidance": control["implementation_guidance"]
+                    }
+                    if control.get("implementation_guidance")
+                    else {}
+                )
             })
 
         category_summary = [
@@ -242,6 +256,16 @@ class RecommendationEngine:
             for category in self.category_risks
 
         ]
+
+        controls_requiring_action.sort(
+            key=lambda item: (
+                item["risk_score"],
+                item["weight"],
+            ),
+            reverse=True,
+        )
+
+        controls_requiring_action = controls_requiring_action[:10]
 
         return {
 

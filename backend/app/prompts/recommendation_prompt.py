@@ -124,10 +124,11 @@ Return EXACTLY this JSON:
 """
 
     user_prompt = (
-        "Assessment Context\n\n"
+        "Assessment Context:\n"
         + json.dumps(
             context,
-            indent=4
+            separators=(",", ":"),
+            ensure_ascii=False,
         )
     )
 
