@@ -8,7 +8,7 @@ app = create_app()
 with app.app_context():
 
     result = PDFService(
-        assessment_id=1
+        assessment_id=3
     ).generate()
 
     pprint(result)

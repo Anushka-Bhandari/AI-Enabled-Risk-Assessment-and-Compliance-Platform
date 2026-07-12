@@ -1,14 +1,21 @@
 import os
+import shutil
+import tempfile
 from datetime import datetime
 from html import escape
 from typing import Any, Dict, Iterable, List, Optional, Sequence
 
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
 from reportlab.platypus import (
     KeepTogether,
+    Image,
     PageBreak,
     Paragraph,
     SimpleDocTemplate,
@@ -30,6 +37,7 @@ class PDFService:
         self.report_data: Optional[Dict[str, Any]] = None
         self.recommendations: Optional[Dict[str, Any]] = None
         self.generated_at: Optional[datetime] = None
+        self._chart_directory: Optional[str] = None
 
         self.styles = getSampleStyleSheet()
         self._configure_styles()
@@ -69,8 +77,8 @@ class PDFService:
             fontSize=15,
             leading=19,
             textColor=self.brand_color,
-            spaceBefore=14,
-            spaceAfter=7,
+            spaceBefore=10,
+            spaceAfter=4,
             keepWithNext=True,
         )
         self.subheading_style = ParagraphStyle(
@@ -80,8 +88,8 @@ class PDFService:
             fontSize=10.5,
             leading=14,
             textColor=self.brand_color,
-            spaceBefore=8,
-            spaceAfter=3,
+            spaceBefore=5,
+            spaceAfter=2,
             keepWithNext=True,
         )
         self.normal_style = ParagraphStyle(
@@ -90,14 +98,14 @@ class PDFService:
             fontName="Helvetica",
             fontSize=9.2,
             leading=13,
-            spaceAfter=4,
+            spaceAfter=2,
         )
         self.bullet_style = ParagraphStyle(
             "ReportBullet",
             parent=self.normal_style,
             leftIndent=11,
             firstLineIndent=-7,
-            spaceAfter=2,
+            spaceAfter=1,
         )
         self.table_header_style = ParagraphStyle(
             "ReportTableHeader",
@@ -127,6 +135,23 @@ class PDFService:
             leading=15,
             spaceBefore=11,
             spaceAfter=5,
+        )
+        self.kpi_label_style = ParagraphStyle(
+            "KpiLabel",
+            parent=self.table_cell_style,
+            alignment=TA_CENTER,
+            fontName="Helvetica-Bold",
+            fontSize=8,
+            leading=10,
+            textColor=self.brand_color,
+        )
+        self.kpi_value_style = ParagraphStyle(
+            "KpiValue",
+            parent=self.kpi_label_style,
+            fontSize=15,
+            leading=18,
+            textColor=colors.HexColor("#102A43"),
+            spaceBefore=3,
         )
 
     def _load_data(self) -> None:
@@ -192,7 +217,12 @@ class PDFService:
 
         for item in values:
             story.append(
-                Paragraph(f"- {self._safe_text(item)}", self.bullet_style)
+                KeepTogether([
+                    Paragraph(
+                        f"- {self._safe_text(item)}",
+                        self.bullet_style,
+                    )
+                ])
             )
 
     def _table_cell(self, value: Any, style: ParagraphStyle) -> Paragraph:
@@ -253,8 +283,8 @@ class PDFService:
                     ("VALIGN", (0, 0), (-1, -1), "TOP"),
                     ("LEFTPADDING", (0, 0), (-1, -1), 6),
                     ("RIGHTPADDING", (0, 0), (-1, -1), 6),
-                    ("TOPPADDING", (0, 0), (-1, -1), 5),
-                    ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+                    ("TOPPADDING", (0, 0), (-1, -1), 3),
+                    ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
                 ]
             )
         )
@@ -286,8 +316,8 @@ class PDFService:
                     ("VALIGN", (0, 0), (-1, -1), "TOP"),
                     ("LEFTPADDING", (0, 0), (-1, -1), 6),
                     ("RIGHTPADDING", (0, 0), (-1, -1), 6),
-                    ("TOPPADDING", (0, 0), (-1, -1), 5),
-                    ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+                    ("TOPPADDING", (0, 0), (-1, -1), 3),
+                    ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
                 ]
             )
         )
@@ -299,6 +329,365 @@ class PDFService:
             return f"{float(value):.2f}"
         except (TypeError, ValueError):
             return self._display_value(value)
+
+    def _create_chart_path(self, filename: str) -> str:
+
+        if not self._chart_directory:
+            raise RuntimeError("Chart directory has not been initialized.")
+
+        return os.path.join(self._chart_directory, filename)
+
+    @staticmethod
+    def _save_chart(figure: Any, output_path: str) -> str:
+
+        try:
+            figure.savefig(
+                output_path,
+                dpi=180,
+                bbox_inches="tight",
+                facecolor="white",
+            )
+        finally:
+            plt.close(figure)
+
+        return output_path
+
+    def _generate_pie_chart(
+        self,
+        title: str,
+        labels: Sequence[str],
+        values: Sequence[int],
+        filename: str,
+        palette: Sequence[str],
+    ) -> str:
+
+        # Remove zero-value categories
+        chart_data = [
+            (label, value, color)
+            for label, value, color in zip(labels, values, palette)
+            if value > 0
+        ]
+
+        figure, axis = plt.subplots(figsize=(4.2, 3.2))
+        axis.set_title(
+            title,
+            fontsize=11,
+            fontweight="bold",
+            color="#0B3D91",
+        )
+
+        if chart_data:
+
+            labels = [item[0] for item in chart_data]
+            values = [item[1] for item in chart_data]
+            colors_used = [item[2] for item in chart_data]
+
+            wedges, texts, autotexts = axis.pie(
+                values,
+                labels=labels,
+                colors=colors_used,
+                startangle=90,
+                autopct=lambda pct: f"{pct:.1f}%" if pct > 0 else "",
+                pctdistance=0.72,
+                labeldistance=1.08,
+                wedgeprops={
+                    "linewidth": 1,
+                    "edgecolor": "white",
+                },
+                textprops={
+                    "fontsize": 8,
+                },
+            )
+
+            for autotext in autotexts:
+                autotext.set_fontsize(8)
+                autotext.set_weight("bold")
+
+            axis.axis("equal")
+
+        else:
+
+            axis.text(
+                0.5,
+                0.5,
+                "No data available",
+                ha="center",
+                va="center",
+                fontsize=10,
+                color="#52606D",
+            )
+            axis.axis("off")
+
+        figure.tight_layout()
+
+        return self._save_chart(
+            figure,
+            self._create_chart_path(filename),
+        )
+
+    def _generate_bar_chart(
+        self,
+        title: str,
+        labels: Sequence[str],
+        values: Sequence[float],
+        filename: str,
+        horizontal: bool = False,
+    ) -> str:
+
+        figure, axis = plt.subplots(figsize=(7.0, 3.2))
+        axis.set_title(title, fontsize=11, fontweight="bold", color="#0B3D91")
+
+        if not any(values):
+            axis.text(
+                0.5,
+                0.5,
+                "No data available",
+                ha="center",
+                va="center",
+                fontsize=10,
+                color="#52606D",
+            )
+            axis.axis("off")
+        elif horizontal:
+            bars = axis.barh(labels, values, color="#1F77B4")
+            axis.set_xlabel("Risk Score")
+            axis.invert_yaxis()
+            axis.set_xlim(0, max(100, max(values) * 1.15))
+            for bar, value in zip(bars, values):
+                axis.text(
+                    bar.get_width() + 1,
+                    bar.get_y() + bar.get_height() / 2,
+                    f"{value:.1f}",
+                    va="center",
+                    fontsize=8,
+                )
+        else:
+            bars = axis.bar(labels, values, color="#1F77B4")
+            axis.set_ylabel("Recommendation Count")
+            axis.set_ylim(0, max(1, max(values) + 1))
+            for bar, value in zip(bars, values):
+                axis.text(
+                    bar.get_x() + bar.get_width() / 2,
+                    bar.get_height() + 0.05,
+                    str(int(value)),
+                    ha="center",
+                    va="bottom",
+                    fontsize=8,
+                )
+
+        axis.spines[["top", "right"]].set_visible(False)
+        axis.grid(axis="x" if horizontal else "y", alpha=0.2)
+        figure.tight_layout()
+        return self._save_chart(
+            figure,
+            self._create_chart_path(filename),
+        )
+
+    def _build_chart_image(
+        self,
+        chart_path: str,
+        width: float,
+        height: float,
+    ) -> Image:
+
+        return Image(chart_path, width=width, height=height)
+
+    def _compliance_distribution(self) -> Dict[str, int]:
+
+        distribution = {
+            "Implemented": 0,
+            "Partially Implemented": 0,
+            "Not Implemented": 0,
+        }
+        status_to_label = {
+            "IMPLEMENTED": "Implemented",
+            "PARTIALLY_IMPLEMENTED": "Partially Implemented",
+            "NOT_IMPLEMENTED": "Not Implemented",
+        }
+
+        for result in self.report_data.get("compliance_results", []):
+            label = status_to_label.get(result.get("status"))
+            if label:
+                distribution[label] += 1
+
+        return distribution
+
+    def _risk_distribution(self) -> Dict[str, int]:
+
+        distribution = {
+            "Low": 0,
+            "Medium": 0,
+            "High": 0,
+            "Critical": 0,
+        }
+
+        for result in self.report_data.get("control_risks", []):
+            level = self._display_value(result.get("risk_level"), "").title()
+            if level in distribution:
+                distribution[level] += 1
+
+        return distribution
+
+    def _recommendation_priority_distribution(self) -> Dict[str, int]:
+
+        distribution = {
+            "Critical": 0,
+            "High": 0,
+            "Medium": 0,
+            "Low": 0,
+        }
+
+        for recommendation in self._as_list(
+            (self.recommendations or {}).get("recommendations")
+        ):
+            if not isinstance(recommendation, dict):
+                continue
+            priority = self._display_value(
+                recommendation.get("priority"),
+                "",
+            ).title()
+            if priority in distribution:
+                distribution[priority] += 1
+
+        return distribution
+
+    def _build_kpi_cards(self) -> Table:
+
+        assessment = self.report_data["assessment"]
+        compliance = self._compliance_distribution()
+        recommendations = self._as_list(
+            (self.recommendations or {}).get("recommendations")
+        )
+        total_controls = sum(compliance.values())
+        non_compliant = (
+            compliance["Partially Implemented"]
+            + compliance["Not Implemented"]
+        )
+        cards = [
+            ("Compliance Score", f"{self._score(assessment.get('compliance_score'))}%"),
+            ("Overall Risk Score", self._score(assessment.get("overall_risk_score"))),
+            ("Risk Level", assessment.get("risk_level")),
+            ("Overall Priority", (self.recommendations or {}).get("overall_priority")),
+            ("Total Controls", total_controls),
+            ("Implemented Controls", compliance["Implemented"]),
+            ("Non-Compliant Controls", non_compliant),
+            ("Total Recommendations", len(recommendations)),
+        ]
+        card_rows = []
+        for index in range(0, len(cards), 4):
+            card_rows.append(
+                [
+                    [
+                        Paragraph(self._safe_text(label), self.kpi_label_style),
+                        Paragraph(self._safe_text(value), self.kpi_value_style),
+                    ]
+                    for label, value in cards[index:index + 4]
+                ]
+            )
+
+        table = Table(
+            card_rows,
+            colWidths=[1.54 * inch] * 4,
+            rowHeights=[0.78 * inch, 0.78 * inch],
+            hAlign="LEFT",
+        )
+        table.setStyle(
+            TableStyle(
+                [
+                    ("BACKGROUND", (0, 0), (-1, -1), self.brand_light),
+                    ("BOX", (0, 0), (-1, -1), 0.5, self.border_color),
+                    ("INNERGRID", (0, 0), (-1, -1), 0.5, self.border_color),
+                    ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                    ("LEFTPADDING", (0, 0), (-1, -1), 5),
+                    ("RIGHTPADDING", (0, 0), (-1, -1), 5),
+                    ("TOPPADDING", (0, 0), (-1, -1), 3),
+                    ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+                ]
+            )
+        )
+        return table
+
+    def _build_executive_dashboard(self, story: List[Any]) -> None:
+
+        compliance = self._compliance_distribution()
+        risk = self._risk_distribution()
+
+        self._add_section_heading(story, "Executive Dashboard")
+        story.append(self._build_kpi_cards())
+        story.append(Spacer(1, 0.08 * inch))
+
+        compliance_chart = self._generate_pie_chart(
+            "Compliance Distribution",
+            list(compliance.keys()),
+            list(compliance.values()),
+            "compliance_distribution.png",
+            ["#2E8B57", "#E6A23C", "#D9534F"],
+        )
+        risk_chart = self._generate_pie_chart(
+            "Risk Distribution",
+            list(risk.keys()),
+            list(risk.values()),
+            "risk_distribution.png",
+            ["#5BC0DE", "#E6A23C", "#D9534F", "#8B1E3F"],
+        )
+        story.append(
+            Table(
+                [[
+                    self._build_chart_image(
+                        compliance_chart,
+                        2.9 * inch,
+                        2.1 * inch,
+                    ),
+                    self._build_chart_image(
+                        risk_chart,
+                        2.9 * inch,
+                        2.1 * inch,
+                    ),
+                ]],
+                colWidths=[3.07 * inch, 3.07 * inch],
+                hAlign="LEFT",
+            )
+        )
+
+    def _build_visual_analytics(self, story: List[Any]) -> None:
+
+        category_risks = sorted(
+            self.report_data.get("category_risks", []),
+            key=lambda item: float(item.get("risk_score") or 0),
+            reverse=True,
+        )
+        category_chart = self._generate_bar_chart(
+            "Category Risk Scores",
+            [item.get("category", "Unknown") for item in category_risks],
+            [float(item.get("risk_score") or 0) for item in category_risks],
+            "category_risk_scores.png",
+            horizontal=True,
+        )
+
+        self._add_section_heading(story, "Visual Analytics")
+        story.append(
+            self._build_chart_image(
+                category_chart,
+                6.1 * inch,
+                2.8 * inch,
+            )
+        )
+
+        priority = self._recommendation_priority_distribution()
+        if any(priority.values()):
+            priority_chart = self._generate_bar_chart(
+                "Recommendation Priority Distribution",
+                list(priority.keys()),
+                list(priority.values()),
+                "recommendation_priorities.png",
+            )
+            story.append(
+                self._build_chart_image(
+                    priority_chart,
+                    6.1 * inch,
+                    2.8 * inch,
+                )
+            )
 
     # ====================================================
     # Report sections
@@ -563,11 +952,12 @@ class PDFService:
                 ),
             ]
             if index == 0:
-                card_intro.insert(
-                    0,
-                    Paragraph("AI Recommendations", self.heading_style),
+                story.append(
+                    Paragraph("AI Recommendations", self.heading_style)
                 )
-            story.append(KeepTogether(card_intro))
+
+            for item in card_intro:
+                story.append(item)
             story.append(Paragraph("Technical Steps", self.subheading_style))
             self._add_bullets(story, recommendation.get("technical_steps"))
             story.append(Paragraph("Policy Steps", self.subheading_style))
@@ -580,7 +970,7 @@ class PDFService:
             )
             story.append(Paragraph("Success Metrics", self.subheading_style))
             self._add_bullets(story, recommendation.get("success_metrics"))
-            story.append(Spacer(1, 0.12 * inch))
+            story.append(Spacer(1, 0.06 * inch))
 
     @staticmethod
     def _roadmap_bucket(timeline: Any) -> str:
@@ -690,22 +1080,35 @@ class PDFService:
             topMargin=48,
             bottomMargin=40,
         )
-        story: List[Any] = []
-
-        self._build_cover_page(story)
-        self._build_summary_page(story)
-        self._build_assessment_source_page(story)
-        self._build_compliance_page(story)
-        self._build_category_risk_page(story)
-        self._build_control_risk_page(story)
-        self._build_recommendation_pages(story)
-        self._build_implementation_roadmap(story)
-
-        document.build(
-            story,
-            onFirstPage=self._add_page_number,
-            onLaterPages=self._add_page_number,
+        self._chart_directory = tempfile.mkdtemp(
+            prefix="assessment-report-charts-"
         )
+
+        try:
+            story: List[Any] = []
+
+            self._build_cover_page(story)
+            self._build_summary_page(story)
+            story.append(PageBreak())
+            self._build_executive_dashboard(story)
+            story.append(PageBreak())
+            self._build_visual_analytics(story)
+            self._build_assessment_source_page(story)
+            self._build_compliance_page(story)
+            self._build_category_risk_page(story)
+            self._build_control_risk_page(story)
+            self._build_recommendation_pages(story)
+            self._build_implementation_roadmap(story)
+
+            document.build(
+                story,
+                onFirstPage=self._add_page_number,
+                onLaterPages=self._add_page_number,
+            )
+        finally:
+            if self._chart_directory:
+                shutil.rmtree(self._chart_directory, ignore_errors=True)
+                self._chart_directory = None
 
         return {
             "success": True,
@@ -721,3 +1124,4 @@ class PDFService:
         return {
             "message": "ReportLab implementation does not use HTML rendering."
         }
+    
