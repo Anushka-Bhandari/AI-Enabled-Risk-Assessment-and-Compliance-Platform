@@ -11,6 +11,7 @@ import UploadAssessment from "./pages/UploadAssessment";
 import AssessmentResult from "./pages/AssessmentResult";
 import AssessmentHistory from "./pages/AssessmentHistory";
 
+
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 function App() {
@@ -43,9 +44,13 @@ function App() {
                 />
 
                 <Route
-    path="/assessment-history"
-    element={<AssessmentHistory />}
-/>
+                    path="/assessment-history"
+                    element={
+                        <ProtectedRoute>
+                            <AssessmentHistory />
+                        </ProtectedRoute>
+                    }
+                />
 
                 <Route
                     path="/assessments"

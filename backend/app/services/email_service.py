@@ -5,6 +5,8 @@ from app.config import Config
 
 def send_otp_email(email, otp):
     try:
+        print(f"Sending OTP to: {email}")
+
         msg = Message(
             subject="Email Verification OTP",
             sender=Config.MAIL_DEFAULT_SENDER,
@@ -15,12 +17,14 @@ def send_otp_email(email, otp):
 Your OTP for email verification is: {otp}
 
 This OTP will expire in 10 minutes.
-Do not share it with anyone.
 """
 
         mail.send(msg)
+
+        print("Email sent successfully")
         return True
 
     except Exception as e:
-        print("❌ EMAIL SENDING FAILED:", str(e))
+        print("EMAIL SENDING FAILED:")
+        print(e)
         return False

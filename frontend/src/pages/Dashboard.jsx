@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
     ShieldCheck,
     LayoutDashboard,
@@ -23,6 +23,7 @@ import {
     Activity,
     Inbox,
     RefreshCw,
+    History
 } from "lucide-react";
 import {
     ResponsiveContainer,
@@ -54,42 +55,51 @@ const UNIVERSITIES = {
 };
 
 const NAV_ITEMS = [
-  {
-    key: "dashboard",
-    label: "Dashboard",
-    icon: LayoutDashboard,
-    path: "/dashboard",
-  },
-  {
-    key: "assessments",
-    label: "Assessments",
-    icon: ClipboardList,
-    path: "/assessments",
-  },
-//   {
-//     key: "risks",
-//     label: "Risks",
-//     icon: ShieldAlert,
-//     path: "/risks",
-//   },
-//   {
-//     key: "reports",
-//     label: "Reports",
-//     icon: FileText,
-//     path: "/reports",
-//   },
-//   {
-//     key: "compliance",
-//     label: "Compliance",
-//     icon: CheckCircle,
-//     path: "/compliance",
-//   },
-//   {
-//     key: "settings",
-//     label: "Settings",
-//     icon: Settings,
-//     path: "/settings",
-//   },
+    {
+        key: "dashboard",
+        label: "Dashboard",
+        icon: LayoutDashboard,
+        path: "/dashboard",
+    },
+    {
+        key: "assessments",
+        label: "Assessments",
+        icon: ClipboardList,
+        path: "/assessments",
+    },
+
+    {
+        key: "history",
+        label: "Assessment History",
+        icon: History,
+        path: "/assessment-history",
+    }
+
+
+    //   {
+    //     key: "risks",
+    //     label: "Risks",
+    //     icon: ShieldAlert,
+    //     path: "/risks",
+    //   },
+    //   {
+    //     key: "reports",
+    //     label: "Reports",
+    //     icon: FileText,
+    //     path: "/reports",
+    //   },
+    //   {
+    //     key: "compliance",
+    //     label: "Compliance",
+    //     icon: CheckCircle,
+    //     path: "/compliance",
+    //   },
+    //   {
+    //     key: "settings",
+    //     label: "Settings",
+    //     icon: Settings,
+    //     path: "/settings",
+    //   },
 ];
 
 const RISK_STYLES = {
@@ -134,9 +144,9 @@ function getGreeting() {
 
 export default function Dashboard() {
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [activeNav, setActiveNav] = useState("dashboard");
     const [searchQuery, setSearchQuery] = useState("");
 
     const [dashboardData, setDashboardData] = useState(null);
@@ -359,18 +369,21 @@ export default function Dashboard() {
                 <nav className="relative z-10 flex-1 px-4 py-4 space-y-1 overflow-y-auto">
                     {NAV_ITEMS.map((item) => {
                         const Icon = item.icon;
-                        const isActive = activeNav === item.key;
+                        const isActive =
+                            location.pathname === item.path ||
+                            (item.path !== "/dashboard" &&
+                                location.pathname.startsWith(item.path));
                         return (
                             <button
                                 key={item.key}
                                 onClick={() => {
-    setActiveNav(item.key);
-    setSidebarOpen(false);
-    navigate(item.path);
-}}
+                                    setSidebarOpen(false);
+                                    console.log("Navigating to:", item.path);
+                                    navigate(item.path);
+                                }}
                                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${isActive
-                                        ? "bg-white/10 text-white shadow-inner border border-white/10"
-                                        : "text-blue-100/70 hover:bg-white/5 hover:text-white"
+                                    ? "bg-white/10 text-white shadow-inner border border-white/10"
+                                    : "text-blue-100/70 hover:bg-white/5 hover:text-white"
                                     }`}
                             >
                                 <Icon className="w-4.5 h-4.5" strokeWidth={2} />
@@ -657,22 +670,22 @@ export default function Dashboard() {
                     <section className="grid grid-cols-1 xl:grid-cols-3 gap-5">
                         <div className="xl:col-span-2 rounded-2xl border border-slate-200/70 bg-white shadow-sm overflow-hidden">
                             <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
-    <div>
-        <h3 className="font-semibold text-slate-900">
-            Recent Assessments
-        </h3>
-        <p className="text-xs text-slate-400 mt-0.5">
-            Latest submissions across your institution
-        </p>
-    </div>
+                                <div>
+                                    <h3 className="font-semibold text-slate-900">
+                                        Recent Assessments
+                                    </h3>
+                                    <p className="text-xs text-slate-400 mt-0.5">
+                                        Latest submissions across your institution
+                                    </p>
+                                </div>
 
-    <button
-        onClick={() => navigate("/assessment-history")}
-        className="text-sm font-medium text-blue-600 hover:text-blue-800"
-    >
-        View All
-    </button>
-</div>
+                                <button
+                                    onClick={() => navigate("/assessment-history")}
+                                    className="text-sm font-medium text-blue-600 hover:text-blue-800"
+                                >
+                                    View All
+                                </button>
+                            </div>
 
                             {isLoading ? (
                                 <div className="p-6 space-y-3">
@@ -706,7 +719,7 @@ export default function Dashboard() {
                                             </tr>
                                         </thead>
                                         <tbody>
-    {filteredHistory.slice(0, 5).map((item) => {
+                                            {filteredHistory.slice(0, 5).map((item) => {
                                                 const level = item.risk_level || "Unknown";
                                                 const style = RISK_STYLES[level] || RISK_STYLES.Unknown;
                                                 return (

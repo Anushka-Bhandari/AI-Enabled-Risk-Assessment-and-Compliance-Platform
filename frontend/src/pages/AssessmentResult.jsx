@@ -91,6 +91,21 @@ export default function AssessmentResult() {
   const [animatedScore, setAnimatedScore] = useState(0);
   const [riskData, setRiskData] = useState(null);
 
+  const handleDownload = async () => {
+      try {
+        await axios.post(
+          `${API_BASE_URL}/reports/generate/${assessmentId}`
+        );
+
+        window.open(
+          `${API_BASE_URL}/reports/download/${assessmentId}`,
+          "_blank"
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
   useEffect(() => {
     const fetchResult = async () => {
       setIsLoading(true);
@@ -130,6 +145,7 @@ export default function AssessmentResult() {
         setIsLoading(false);
       }
     };
+
 
     if (assessmentId) {
       fetchResult();
@@ -452,8 +468,8 @@ export default function AssessmentResult() {
 
               <div
                 className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border font-semibold text-sm ${isPending
-                    ? "bg-amber-400/10 border-amber-300/30 text-amber-200"
-                    : "bg-emerald-400/10 border-emerald-300/30 text-emerald-200"
+                  ? "bg-amber-400/10 border-amber-300/30 text-amber-200"
+                  : "bg-emerald-400/10 border-emerald-300/30 text-emerald-200"
                   }`}
               >
                 <span
@@ -922,8 +938,8 @@ export default function AssessmentResult() {
               })
             }
             className={`px-5 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 hover:scale-[1.03] ${result?.status === "Pending"
-                ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
-                : "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+              ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
+              : "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
               }`}
           >
             {result?.status}
@@ -1040,15 +1056,13 @@ export default function AssessmentResult() {
               Reassess
             </button>
 
-            <a
-              href={`${API_BASE_URL}/api/assessment/${assessmentId}/report/download`}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={handleDownload}
               className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-white bg-[#0B2A66] shadow-lg shadow-blue-900/20 transition-all duration-300 hover:bg-slate-900 hover:scale-[1.01] hover:shadow-xl"
             >
               <Download className="w-4 h-4" />
               Download Full Report
-            </a>
+            </button>
           </div>
         </div>
       </div>

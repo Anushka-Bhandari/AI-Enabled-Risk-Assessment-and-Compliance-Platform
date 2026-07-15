@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AsyncSelect from "react-select/async";
+import debounce from "lodash.debounce";
 import axios from "axios";
 import {
     ShieldCheck,
@@ -14,19 +16,10 @@ import {
 } from "lucide-react";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
-
-const UNIVERSITIES = [
-    { id: 1, name: "Rajasthan Institute of Technology" },
-    { id: 2, name: "National University of Governance" },
-    { id: 3, name: "Metropolitan School of Engineering" },
-    { id: 4, name: "Coastal State University" },
-    { id: 5, name: "Northbridge Institute of Compliance Studies" },
-];
+    import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 export default function Register() {
     const navigate = useNavigate();
-
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -77,6 +70,27 @@ export default function Register() {
         return Object.keys(nextErrors).length === 0;
     };
 
+
+    const loadUniversityOptions = async (inputValue) => {
+    if (inputValue.length < 2) return [];
+
+    const response = await axios.get(
+        `${API_BASE_URL}/universities/search`,
+        {
+            params: { q: inputValue }
+        }
+    );
+
+    return response.data.map((uni) => ({
+        value: uni.id,
+        label: uni.university_name,
+    }));
+};
+
+const debouncedLoadOptions = useMemo(
+    () => debounce(loadUniversityOptions, 300),
+    []
+);
     const handleSubmit = async (e) => {
         e.preventDefault();
         setServerError("");
@@ -114,6 +128,7 @@ export default function Register() {
             setIsSubmitting(false);
         }
     };
+
 
     return (
         <div className="min-h-screen w-full flex bg-slate-50">
@@ -254,37 +269,30 @@ export default function Register() {
 
                             {/* University Dropdown */}
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                                    Institution
-                                </label>
-                                <div className="relative">
-                                    <Building2 className="w-4.5 h-4.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none z-10" />
-                                    <select
-                                        name="university_id"
-                                        value={formData.university_id}
-                                        onChange={handleChange}
-                                        className={`w-full appearance-none pl-11 pr-10 py-3 rounded-xl border bg-slate-50/60 text-slate-900 outline-none transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white cursor-pointer ${errors.university_id
-                                                ? "border-red-400"
-                                                : "border-slate-200"
-                                            } ${!formData.university_id ? "text-slate-400" : ""}`}
-                                    >
-                                        <option value="" disabled>
-                                            Select your institution
-                                        </option>
-                                        {UNIVERSITIES.map((uni) => (
-                                            <option key={uni.id} value={uni.id} className="text-slate-900">
-                                                {uni.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <ChevronDown className="w-4 h-4 absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                                </div>
-                                {errors.university_id && (
-                                    <p className="text-xs text-red-600 mt-1.5">
-                                        {errors.university_id}
-                                    </p>
-                                )}
-                            </div>
+    <label className="block text-sm font-medium text-slate-700 mb-1.5">
+        Institution
+    </label>
+
+    <AsyncSelect
+    cacheOptions
+    defaultOptions={false}
+    loadOptions={debouncedLoadOptions}
+    placeholder="Search university..."
+    noOptionsMessage={() => "Start typing..."}
+    onChange={(selectedOption) =>
+        setFormData((prev) => ({
+            ...prev,
+            university_id: selectedOption?.value || "",
+        }))
+    }
+/>
+
+    {errors.university_id && (
+        <p className="text-xs text-red-600 mt-1.5">
+            {errors.university_id}
+        </p>
+    )}
+</div>
 
                             {/* Password */}
                             <div className="grid grid-cols-2 gap-4">
@@ -324,8 +332,8 @@ export default function Register() {
                                             onChange={handleChange}
                                             placeholder="••••••••"
                                             className={`w-full pl-11 pr-4 py-3 rounded-xl border bg-slate-50/60 text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white ${errors.confirmPassword
-                                                    ? "border-red-400"
-                                                    : "border-slate-200"
+                                                ? "border-red-400"
+                                                : "border-slate-200"
                                                 }`}
                                         />
                                     </div>

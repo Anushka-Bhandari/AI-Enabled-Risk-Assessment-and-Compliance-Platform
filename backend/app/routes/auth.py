@@ -99,7 +99,12 @@ def register():
         return jsonify({"error": "Server error"}), 500
 
     # 📩 send OTP email
-    send_otp_email(email, otp)
+    email_sent = send_otp_email(email, otp)
+
+    if not email_sent:
+        return jsonify({
+            "error": "Failed to send OTP email"
+        }), 500
 
     return jsonify({
         "message": "OTP sent to email. Please verify your account."
@@ -172,3 +177,39 @@ def resend_otp():
     send_otp_email(email, otp)
 
     return jsonify({"message": "OTP resent successfully"}), 200
+
+@auth.route('/universities', methods=['GET'])
+def get_universities():
+    universities = University.query.order_by(University.university_name).all()
+
+    return jsonify([
+        {
+            "id": u.id,
+            "name": u.university_name
+        }
+        for u in universities
+    ])
+
+@auth.route("/universities/search")
+def search_universities():
+    query = request.args.get("q", "").strip()
+
+    if len(query) < 2:
+        return jsonify([])
+
+    universities = (
+        University.query
+        .filter(
+            University.university_name.ilike(f"{query}%")
+        )
+        .limit(20)
+        .all()
+    )
+
+    return jsonify([
+        {
+            "id": u.id,
+            "university_name": u.university_name
+        }
+        for u in universities
+    ])

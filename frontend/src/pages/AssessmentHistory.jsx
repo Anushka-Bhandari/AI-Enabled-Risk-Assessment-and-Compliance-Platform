@@ -20,6 +20,7 @@ import {
     ChevronRight,
     Filter,
     Calendar,
+    History
 } from "lucide-react";
 
 const API_BASE_URL =
@@ -238,8 +239,10 @@ export default function AssessmentHistory() {
     }, [totalPages]);
 
     const goToResult = (assessmentId) => {
-        navigate(`/assessment-results/${assessmentId}`);
-    };
+    navigate("/assessment/result", {
+        state: { assessmentId }
+    });
+};
 
     return (
         <div className="min-h-screen w-full bg-slate-50 flex">
