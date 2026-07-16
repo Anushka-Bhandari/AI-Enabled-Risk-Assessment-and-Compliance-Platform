@@ -24,7 +24,7 @@ from reportlab.platypus import (
     TableStyle,
 )
 
-from app.services.recommendation_engine import RecommendationEngine
+from app.services.recommendation_service import RecommendationService
 from app.services.report_service import ReportService
 
 
@@ -159,9 +159,10 @@ class PDFService:
         self.report_data = ReportService(
             self.assessment_id
         ).build_report_data()
-        self.recommendations = RecommendationEngine(
+
+        self.recommendations = RecommendationService(
             self.assessment_id
-        ).run()
+        ).load()
 
     def _filename(self) -> str:
 
@@ -904,6 +905,73 @@ class PDFService:
             )
         )
 
+    def _build_framework_page(self, story):
+
+        framework_scores = self.report_data.get(
+            "framework_scores",
+            {}
+        )
+
+        self._add_section_heading(
+            story,
+            "Framework-wise Compliance"
+        )
+
+        rows = []
+
+        from app.services.control_frameworks import SUPPORTED_FRAMEWORKS
+
+        for framework in SUPPORTED_FRAMEWORKS:
+
+            values = framework_scores.get(framework)
+
+            if not values:
+                continue
+
+            rows.append([
+
+                framework,
+
+                values["total"],
+
+                values["implemented"],
+
+                values["partial"],
+
+                values["missing"],
+
+                f'{values["score"]}%'
+
+            ])
+
+        story.append(
+
+            self._build_table(
+
+                [
+                    "Framework",
+                    "Total",
+                    "Implemented",
+                    "Partial",
+                    "Missing",
+                    "Compliance Score"
+                ],
+
+                rows,
+
+                [
+                    1.6 * inch,
+                    0.8 * inch,
+                    0.9 * inch,
+                    0.8 * inch,
+                    0.8 * inch,
+                    1.3 * inch
+                ]
+
+            )
+
+        )
+
     def _build_recommendation_pages(self, story: List[Any]) -> None:
 
         recommendations = self._as_list(
@@ -1095,6 +1163,7 @@ class PDFService:
             self._build_visual_analytics(story)
             self._build_assessment_source_page(story)
             self._build_compliance_page(story)
+            self._build_framework_page(story)
             self._build_category_risk_page(story)
             self._build_control_risk_page(story)
             self._build_recommendation_pages(story)

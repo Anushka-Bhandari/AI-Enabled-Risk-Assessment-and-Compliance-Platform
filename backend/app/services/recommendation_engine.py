@@ -12,6 +12,7 @@ from app.models import (
     ComplianceResult,
     ControlRiskResult,
     CategoryRiskResult,
+    Recommendation,
 )
 
 from app.prompts.recommendation_prompt import (
@@ -472,6 +473,54 @@ class RecommendationEngine:
                 )
 
         return parsed
+    
+
+    def _save_recommendations(self, parsed):
+
+        Recommendation.query.filter_by(
+            assessment_id=self.assessment_id
+        ).delete()
+
+        for item in parsed["recommendations"]:
+
+            db.session.add(
+
+                Recommendation(
+
+                    assessment_id=self.assessment_id,
+
+                    control_id=item["control_id"],
+
+                    control_name=item["control_name"],
+
+                    priority=item["priority"],
+
+                    estimated_effort=item["estimated_effort"],
+
+                    implementation_timeline=item["implementation_timeline"],
+
+                    implementation_cost=item["implementation_cost"],
+
+                    root_cause=item["root_cause"],
+
+                    recommendation=item["recommendation"],
+
+                    technical_steps=item["technical_steps"],
+
+                    policy_steps=item["policy_steps"],
+
+                    business_impact=item["business_impact"],
+
+                    success_metrics=item["success_metrics"],
+
+                    reference=item["reference"],
+
+                )
+
+            )
+
+        db.session.commit()
+
 
     # =====================================================
     # Public API
@@ -509,9 +558,9 @@ class RecommendationEngine:
         # the prompt builder if we want to avoid
         # duplicate processing.
 
-        parsed = self._parse_response(
-            response
-        )
+        parsed = self._parse_response(response)
+
+        self._save_recommendations(parsed)
 
         logger.info(
             "Recommendation Engine completed successfully."

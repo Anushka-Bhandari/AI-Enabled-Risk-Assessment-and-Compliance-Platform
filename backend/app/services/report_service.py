@@ -26,6 +26,7 @@ class ReportService:
         self.control_risks = []
         self.category_risks = []
         self.answers = []
+        self.framework_scores = {}
 
     # =====================================================
     # Load Data
@@ -80,6 +81,15 @@ class ReportService:
                 assessment_id=self.assessment_id
             ).all()
         )
+
+
+    def _load_framework_scores(self):
+
+        from app.services.framework_service import FrameworkService
+
+        self.framework_scores = FrameworkService(
+            self.assessment_id
+        ).calculate_scores()
 
     def _load_answers(self):
 
@@ -151,6 +161,7 @@ class ReportService:
         self._load_compliance_results()
         self._load_control_risks()
         self._load_category_risks()
+        self._load_framework_scores()
         self._load_answers()
 
         report_data = {
@@ -225,6 +236,8 @@ class ReportService:
 
                 for item in self.category_risks
             ],
+
+            "framework_scores": self.framework_scores,
 
             "source": self._build_source_context()
 

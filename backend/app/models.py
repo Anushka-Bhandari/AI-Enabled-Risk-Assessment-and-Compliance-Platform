@@ -359,3 +359,97 @@ class CategoryRiskResult(db.Model):
         "Assessment",
         back_populates="category_risk_results"
     )
+
+class Recommendation(db.Model):
+    __tablename__ = "recommendations"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    assessment_id = db.Column(
+        db.Integer,
+        db.ForeignKey("assessments.id"),
+        nullable=False,
+        index=True
+    )
+
+    control_id = db.Column(
+        db.String(4),
+        nullable=False
+    )
+
+    control_name = db.Column(
+        db.String(255),
+        nullable=False
+    )
+
+    priority = db.Column(
+        db.String(20),
+        nullable=False
+    )
+
+    estimated_effort = db.Column(
+        db.String(50),
+        nullable=False
+    )
+
+    implementation_timeline = db.Column(
+        db.String(100),
+        nullable=False
+    )
+
+    implementation_cost = db.Column(
+        db.String(100),
+        nullable=False
+    )
+
+    root_cause = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    recommendation = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    technical_steps = db.Column(
+        db.JSON,
+        nullable=False
+    )
+
+    policy_steps = db.Column(
+        db.JSON,
+        nullable=False
+    )
+
+    business_impact = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    success_metrics = db.Column(
+        db.JSON,
+        nullable=False
+    )
+
+    reference = db.Column(
+        db.JSON,
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=db.func.current_timestamp()
+    )
+
+    assessment = db.relationship(
+        "Assessment",
+        backref=db.backref(
+            "recommendations",
+            lazy=True,
+            cascade="all, delete-orphan"
+        )
+    )

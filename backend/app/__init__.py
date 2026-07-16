@@ -31,6 +31,8 @@ def create_app():
     from app.routes.risk_results import risk_results
     from app.routes.summary_results import summary_results
     from app.routes.report import report_bp
+    from app.routes.recommendations import recommendation_bp
+    from app.routes.frameworks import framework_bp
 
 
     app.register_blueprint(auth)
@@ -40,6 +42,8 @@ def create_app():
     app.register_blueprint(run_assessment)
     app.register_blueprint(questionnaire_bp)
     app.register_blueprint(report_bp)
+    app.register_blueprint(recommendation_bp)
+    app.register_blueprint(framework_bp)
 
     app.register_blueprint(
         compliance_results
