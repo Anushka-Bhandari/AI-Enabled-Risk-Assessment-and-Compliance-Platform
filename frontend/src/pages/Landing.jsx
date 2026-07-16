@@ -48,6 +48,8 @@ import {
 
 const NAVY = "#0B2A66";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 // ---------------------------------------------------------------------------
 // Static content — kept out of the component body so it isn't re-created on
 // every render, and so copy changes don't touch the layout code below.

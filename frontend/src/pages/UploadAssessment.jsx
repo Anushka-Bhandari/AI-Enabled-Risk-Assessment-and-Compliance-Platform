@@ -14,7 +14,7 @@ import {
     ArrowRight,
 } from "lucide-react";
 
-const API_BASE_URL = import.meta.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 const ACCEPTED_TYPES = [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".csv"];
 const MAX_FILE_SIZE_MB = 25;
 

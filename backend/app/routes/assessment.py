@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, app, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.database import db
 from sqlalchemy.exc import IntegrityError
@@ -42,6 +42,7 @@ VALID_ANSWERS = {
 UPLOAD_FOLDER = "uploads"
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 
 @assessment.route("/assessment", methods=["POST"])
 @jwt_required()

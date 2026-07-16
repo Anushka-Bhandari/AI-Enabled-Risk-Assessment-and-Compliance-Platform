@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { ShieldCheck, Loader2, AlertCircle, RefreshCw, ArrowLeft } from "lucide-react";
 
-const API_BASE_URL = import.meta.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 const OTP_LENGTH = 6;
 const RESEND_WINDOW_SECONDS = 60;
 
