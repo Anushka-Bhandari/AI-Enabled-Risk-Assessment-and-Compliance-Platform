@@ -1,7 +1,7 @@
 from flask_jwt_extended import create_access_token
 from app.services.otp_services import generate_otp, get_expiry
 
-from flask import Blueprint , request, jsonify
+from flask import Blueprint, config , request, jsonify
 from werkzeug.security import generate_password_hash , check_password_hash
 
 from app.database import db
@@ -133,6 +133,9 @@ def verify_otp():
 
     if not user.otp_expiry or datetime.utcnow() > user.otp_expiry:
         return jsonify({"error": "OTP expired"}), 400
+    
+    print("MAIL_USERNAME =", config.MAIL_USERNAME)
+    print("MAIL_DEFAULT_SENDER =", config.MAIL_DEFAULT_SENDER)
 
     # ✅ verify user
     user.is_verified = True

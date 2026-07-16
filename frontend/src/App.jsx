@@ -10,6 +10,8 @@ import QuestionnaireAssessment from "./pages/QuestionnaireAssessment";
 import UploadAssessment from "./pages/UploadAssessment";
 import AssessmentResult from "./pages/AssessmentResult";
 import AssessmentHistory from "./pages/AssessmentHistory";
+import Landing from "./pages/Landing";
+
 
 
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -18,6 +20,11 @@ function App() {
     return (
         <BrowserRouter>
             <Routes>
+
+                <Route 
+                    path="/" 
+                    element={<Landing />} 
+                />
 
                 <Route
                     path="/login"
