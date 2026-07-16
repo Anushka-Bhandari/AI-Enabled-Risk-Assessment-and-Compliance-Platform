@@ -22,7 +22,7 @@ class Config:
 
     DB_USER = get_env("DB_USER")
     DB_PASSWORD = get_env("DB_PASSWORD")
-    DB_HOST = get_env("DB_HOST", "localhost")
+    DB_HOST = get_env("DB_HOST")
     DB_PORT = get_env("DB_PORT", "3306")
     DB_NAME = get_env("DB_NAME")
 
