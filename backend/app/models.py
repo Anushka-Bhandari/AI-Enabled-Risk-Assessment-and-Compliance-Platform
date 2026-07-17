@@ -276,6 +276,16 @@ class ComplianceResult(db.Model):
         back_populates="compliance_results"
     )
 
+    confidence = db.Column(
+        db.Float,
+        nullable=True
+    )
+
+    evidence = db.Column(
+        db.Text,
+        nullable=True
+    )
+
 class ControlRiskResult(db.Model):
     __tablename__ = "control_risk_results"
 

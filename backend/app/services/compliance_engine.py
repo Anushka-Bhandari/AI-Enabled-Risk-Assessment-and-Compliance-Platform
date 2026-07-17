@@ -2,6 +2,10 @@ from app.services.control_requirements import (
     CONTROL_REQUIREMENTS
 )
 
+from app.services.document_analysis_engine import (
+    DocumentAnalysisEngine,
+)
+
 from collections import defaultdict
 
 from app.database import db
@@ -73,6 +77,8 @@ class ComplianceEngine:
 
         self.document_text = ""
 
+        self.document_analysis = {}
+
         self.control_results = []
 
         self.framework_scores = defaultdict(
@@ -98,6 +104,8 @@ class ComplianceEngine:
         self._load_questionnaire_answers()
 
         self._load_documents()
+
+        self._analyze_documents()
 
         self._evaluate_controls()
 
@@ -134,28 +142,59 @@ class ComplianceEngine:
         )
 
         self.answers = {
-        answer.question_id: {
-            "Implemented": self.IMPLEMENTED,
-            "Partially Implemented": self.PARTIAL,
-            "Not Implemented": self.NOT_IMPLEMENTED,
-            "Not Applicable": self.NOT_APPLICABLE,
-        }.get(
-            answer.answer,
-            self.NOT_IMPLEMENTED
-        )
-        for answer in records
-}
+            answer.question_id: {
+                "Implemented": self.IMPLEMENTED,
+                "Partially Implemented": self.PARTIAL,
+                "Not Implemented": self.NOT_IMPLEMENTED,
+                "Not Applicable": self.NOT_APPLICABLE,
+            }.get(
+                answer.answer,
+                self.NOT_IMPLEMENTED
+            )
+            for answer in records
+        }
 
     def _load_documents(self):
 
         self.documents = self.assessment.documents
 
-        self.document_text = "\n".join(
-            [
-                document.extracted_text
-                for document in self.documents
-                if document.extracted_text
-            ]
+        extracted_documents = []
+
+        for document in self.documents:
+
+            if not document.extracted_text:
+                continue
+
+            extracted_documents.append(
+                f"""
+==================================================
+Document: {document.original_filename}
+==================================================
+
+{document.extracted_text}
+""".strip()
+            )
+
+        self.document_text = "\n\n".join(
+            extracted_documents
+        )
+
+    def _analyze_documents(self):
+
+        if self.assessment.assessment_mode not in (
+            self.DOCUMENT,
+            self.COMBINED,
+        ):
+            return
+
+        if not self.document_text:
+            return
+
+        self.document_analysis = (
+            DocumentAnalysisEngine(
+                document_text=self.document_text,
+                controls=CONTROL_LIBRARY,
+            ).run()
         )
 
     # ==========================================================
@@ -173,7 +212,12 @@ class ComplianceEngine:
             control_name = control["name"]
 
             questionnaire_status = None
+
             document_status = None
+
+            confidence = None
+
+            evidence = ""
 
             evidence_source = None
 
@@ -198,6 +242,20 @@ class ComplianceEngine:
 
                 document_status = self._evaluate_document(
                     control
+                )
+
+                document_result = self.document_analysis.get(
+                    control["id"],
+                    {}
+                )
+
+                confidence = document_result.get(
+                    "confidence"
+                )
+
+                evidence = document_result.get(
+                    "evidence",
+                    ""
                 )
 
             if mode == self.QUESTIONNAIRE:
@@ -256,12 +314,15 @@ class ComplianceEngine:
 
             self.control_results.append(
                 {
-
                     "control_id": control_id,
 
                     "control_name": control_name,
 
                     "status": final_status,
+
+                    "confidence": confidence,
+
+                    "evidence": evidence,
 
                     "evidence_source": evidence_source,
 
@@ -275,41 +336,36 @@ class ComplianceEngine:
                 }
             )
 
-
     # ==========================================================
     # Document Evaluation
     # ==========================================================
 
-    def _evaluate_document(self, control):
+    def _evaluate_document(
+        self,
+        control,
+    ):
 
-        if not self.document_text:
+        result = self.document_analysis.get(
+            control["id"]
+        )
+
+        if result is None:
             return self.NOT_IMPLEMENTED
 
-        text = self.document_text.lower()
-
-        keywords = (
-            control["name"]
-            .replace("(", "")
-            .replace(")", "")
-            .replace("/", " ")
-            .lower()
-            .split()
+        status = result.get(
+            "status",
+            self.NOT_IMPLEMENTED,
         )
 
-        matches = sum(
-            1
-            for keyword in keywords
-            if keyword in text
-        )
+        if status not in (
+            self.IMPLEMENTED,
+            self.PARTIAL,
+            self.NOT_IMPLEMENTED,
+            self.NOT_APPLICABLE,
+        ):
+            return self.NOT_IMPLEMENTED
 
-        if matches == len(keywords):
-            return self.IMPLEMENTED
-
-        if matches > 0:
-            return self.PARTIAL
-
-        return self.NOT_IMPLEMENTED
-
+        return status
 
     # ==========================================================
     # Combined Mode
@@ -350,7 +406,6 @@ class ComplianceEngine:
             return self.PARTIAL
 
         return self.NOT_IMPLEMENTED
-
 
     # ==========================================================
     # Framework Scoring
@@ -402,7 +457,6 @@ class ComplianceEngine:
                 2,
             )
 
-
     # ==========================================================
     # Overall Compliance
     # ==========================================================
@@ -432,7 +486,6 @@ class ComplianceEngine:
             2,
         )
 
-
     # ==========================================================
     # Database Update
     # ==========================================================
@@ -455,17 +508,19 @@ class ComplianceEngine:
 
                     control_id=result["control_id"],
 
-                    compliance_status=result["status"]
+                    compliance_status=result["status"],
+
+                    confidence=result["confidence"],
+
+                    evidence=result["evidence"]
 
                 )
 
             )
 
-
     # ==========================================================
     # Final Response
     # ==========================================================
-
 
     def _build_result(self):
 
