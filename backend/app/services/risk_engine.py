@@ -16,6 +16,17 @@ def run_risk_engine(assessment_id):
     """
     Calculate risk for a completed assessment.
     """
+
+    ControlRiskResult.query.filter_by(
+    assessment_id=assessment_id
+).delete()
+
+    CategoryRiskResult.query.filter_by(
+        assessment_id=assessment_id
+    ).delete()
+
+    db.session.commit()
+
     compliance_results = ComplianceResult.query.filter_by(
         assessment_id=assessment_id
     ).all()
