@@ -90,21 +90,39 @@ export default function AssessmentResult() {
   const [loadError, setLoadError] = useState("");
   const [animatedScore, setAnimatedScore] = useState(0);
   const [riskData, setRiskData] = useState(null);
+  const [downloading, setDownloading] = useState(false);
 
   const handleDownload = async () => {
-      try {
-        await axios.post(
-          `${API_BASE_URL}/reports/generate/${assessmentId}`
-        );
+  try {
+    setDownloading(true);
 
-        window.open(
-          `${API_BASE_URL}/reports/download/${assessmentId}`,
-          "_blank"
-        );
-      } catch (err) {
-        console.error(err);
+    await axios.post(
+      `${API_BASE_URL}/reports/generate/${assessmentId}`
+    );
+
+    const response = await axios.get(
+      `${API_BASE_URL}/reports/download/${assessmentId}`,
+      {
+        responseType: "blob",
       }
-    };
+    );
+
+    const url = window.URL.createObjectURL(
+      new Blob([response.data])
+    );
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `assessment_${assessmentId}.pdf`;
+    link.click();
+
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setDownloading(false);
+  }
+};
 
   useEffect(() => {
     const fetchResult = async () => {
@@ -395,7 +413,23 @@ export default function AssessmentResult() {
     );
   }
 
-  return (
+  return ( 
+    <>
+
+    {downloading && (
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9999] flex items-center justify-center">
+        <div className="bg-white rounded-2xl p-8 flex flex-col items-center gap-4 shadow-xl">
+          <Loader2 className="w-10 h-10 animate-spin text-[#0B2A66]" />
+          <p className="font-semibold text-slate-700">
+            Generating PDF Report...
+          </p>
+          <p className="text-sm text-slate-500">
+            Please wait while the report is being created.
+          </p>
+        </div>
+      </div>
+    )}
+    
     <div className="min-h-screen bg-slate-50 pb-16">
       {/* High-risk alert banner */}
       {theme.banner && (
@@ -1057,21 +1091,35 @@ export default function AssessmentResult() {
             </button>
 
             <button
-              onClick={handleDownload}
-              className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-white bg-[#0B2A66] shadow-lg shadow-blue-900/20 transition-all duration-300 hover:bg-slate-900 hover:scale-[1.01] hover:shadow-xl"
-            >
-              <Download className="w-4 h-4" />
-              Download Full Report
-            </button>
+  onClick={handleDownload}
+  disabled={downloading}
+  className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-white bg-[#0B2A66] shadow-lg shadow-blue-900/20 transition-all duration-300 hover:bg-slate-900 hover:scale-[1.01] hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed"
+>
+  {downloading ? (
+    <>
+      <Loader2 className="w-4 h-4 animate-spin" />
+      Generating PDF...
+    </>
+  ) : (
+    <>
+      <Download className="w-4 h-4" />
+      Download Full Report
+    </>
+  )}
+</button>
           </div>
         </div>
       </div>
     </div>
+
+  </>
+   
   );
 }
 
 function InsightCard({ icon: Icon, iconBg, iconColor, label, value, detail }) {
   return (
+
     <motion.div
       whileHover={{ y: -4 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}

@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from urllib.parse import quote_plus
+from datetime import timedelta
 
 load_dotenv()
 
@@ -25,13 +26,8 @@ class Config:
     DB_HOST = get_env("DB_HOST")
     DB_PORT = get_env("DB_PORT", "3306")
     DB_NAME = get_env("DB_NAME")
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
 
-    SQLALCHEMY_DATABASE_URI = (
-        f"mysql+pymysql://{DB_USER}:"
-        f"{quote_plus(DB_PASSWORD)}@"
-        f"{DB_HOST}:{DB_PORT}/"
-        f"{DB_NAME}"
-    )
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -41,6 +37,7 @@ class Config:
 
     SECRET_KEY = get_env("SECRET_KEY", "dev-secret")
     JWT_SECRET_KEY = get_env("JWT_SECRET_KEY", "jwt-secret")
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=1)
 
     # =====================================================
     # Email
