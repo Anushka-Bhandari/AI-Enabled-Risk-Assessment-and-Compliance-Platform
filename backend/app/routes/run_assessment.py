@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy.exc import IntegrityError
 from app.services.risk_engine import run_risk_engine
 from app.services.compliance_engine import ComplianceEngine
+from app.services.recommendation_engine import RecommendationEngine
 
 from app.database import db
 from app.models import (
@@ -11,6 +12,7 @@ from app.models import (
     Document,
     User
 )
+from backend.app.routes import assessment
 
 run_assessment = Blueprint(
     "run_assessment",
@@ -170,7 +172,13 @@ def run_assessment_route():
             assessment.id
         ).run()
 
-        run_risk_engine(assessment.id)
+        run_risk_engine(
+            assessment.id
+        )
+
+        RecommendationEngine(
+            assessment.id
+        ).run()
 
         db.session.commit()
 
