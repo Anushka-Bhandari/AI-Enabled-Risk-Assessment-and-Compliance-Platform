@@ -18,6 +18,11 @@ Your OTP for email verification is: {otp}
 
 This OTP will expire in 10 minutes.
 """
+        from app.config import Config
+
+        print("MAIL_USERNAME =", Config.MAIL_USERNAME)
+        print("MAIL_PASSWORD exists =", bool(Config.MAIL_PASSWORD))
+        print("MAIL_SERVER =", Config.MAIL_SERVER)
 
         mail.send(msg)
 
