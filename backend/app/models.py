@@ -123,6 +123,16 @@ class Assessment(db.Model):
         default="Pending"
     )
 
+    questionnaire_completed = db.Column(
+    db.Boolean,
+    default=False
+)
+
+    document_completed = db.Column(
+        db.Boolean,
+        default=False
+    )
+
     created_at = db.Column(
         db.DateTime,
         default=db.func.current_timestamp()

@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
-const ACCEPTED_TYPES = [".pdf",".docx"];
+const ACCEPTED_TYPES = ["pdf","docx"];
 const MAX_FILE_SIZE_MB = 25;
 
 export default function UploadAssessment() {
