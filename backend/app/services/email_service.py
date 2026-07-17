@@ -1,4 +1,4 @@
-from flask_mail import Message
+from flask_mail import Message # type: ignore
 from app.extensions import mail
 from app.config import Config
 

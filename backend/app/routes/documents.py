@@ -176,5 +176,3 @@ def upload_documents():
         "files_received": len(files),
         "document_ids": document_ids
     }), 200
-
-
