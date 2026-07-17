@@ -44,7 +44,7 @@ def upload_documents():
     )
 
     assessment_id = request.form.get("assessment_id")
-
+    print("DEBUG assessment_id received:", assessment_id)
     if not files:
         return jsonify({
             "error": "No files uploaded"
