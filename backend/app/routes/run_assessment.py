@@ -167,21 +167,26 @@ def run_assessment_route():
 
         db.session.commit()
 
+        print("========== Compliance Started ==========")
         compliance_result = ComplianceEngine(
             assessment.id
         ).run()
+        print("========== Compliance Finished ==========")
 
+        print("========== Risk Started ==========")
         run_risk_engine(
             assessment.id
         )
+        print("========== Risk Finished ==========")
 
+        print("========== Recommendation Started ==========")
         RecommendationEngine(
             assessment.id
         ).run()
-
-        run_risk_engine(assessment.id)
+        print("========== Recommendation Finished ==========")
 
         db.session.commit()
+        print("========== Assessment Completed ==========")
 
     except IntegrityError:
         db.session.rollback()

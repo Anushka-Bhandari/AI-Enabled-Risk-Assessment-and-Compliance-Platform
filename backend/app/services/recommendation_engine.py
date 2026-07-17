@@ -527,6 +527,7 @@ class RecommendationEngine:
     # =====================================================
 
     def run(self):
+        print("========== ENTERED RecommendationEngine.run() ==========")
 
         logger.info(
             "Recommendation Engine started for Assessment %s",
@@ -534,22 +535,29 @@ class RecommendationEngine:
         )
 
         self._load_assessment()
+        print("Assessment loaded")
 
         self._load_compliance_results()
+        print("Compliance results loaded")
 
         self._load_control_risks()
+        print("Control risks loaded")
 
         self._load_category_risks()
+        print("Category risks loaded")
 
         self._load_control_metadata()
+        print("Metadata loaded")
 
         context = self._build_context()
+        print("Context built")
 
         logger.info(
             "Recommendation context prepared."
         )
 
         response = self._call_llm(context)
+        print("LLM response received")
 
         # Currently build_recommendation_prompt()
         # rebuilds the prompt from models.
@@ -559,9 +567,11 @@ class RecommendationEngine:
         # duplicate processing.
 
         parsed = self._parse_response(response)
+        print("Response parsed")
 
         self._save_recommendations(parsed)
-
+        print("Recommendations saved")
+        
         logger.info(
             "Recommendation Engine completed successfully."
         )
