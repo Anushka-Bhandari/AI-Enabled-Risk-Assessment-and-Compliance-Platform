@@ -36,7 +36,8 @@ def login():
         return jsonify({"message": "Invalid credentials"}), 401
     
     token = create_access_token(
-    identity=str(user.id)
+    identity=str(user.id),
+    expires_delta=timedelta(days=1)
 )
 
     return jsonify({
@@ -146,7 +147,8 @@ def verify_otp():
 
     # 🔐 generate token AFTER verification
     token = create_access_token(
-        identity=str(user.id)
+        identity=str(user.id),
+        expires_delta=timedelta(days=1)
     )
 
     return jsonify({
