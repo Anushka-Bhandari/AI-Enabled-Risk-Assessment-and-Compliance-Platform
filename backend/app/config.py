@@ -27,6 +27,7 @@ class Config:
     DB_PORT = get_env("DB_PORT", "3306")
     DB_NAME = get_env("DB_NAME")
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
+    print("DATABASE_URL =", os.getenv("DATABASE_URL"))
 
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
