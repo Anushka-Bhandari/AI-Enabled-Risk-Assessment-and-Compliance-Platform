@@ -25,6 +25,7 @@ run_assessment = Blueprint(
 @jwt_required()
 def run_assessment_route():
     data = request.get_json()
+    print("REQUEST DATA =", data)
 
     if not data:
         return jsonify({
@@ -183,11 +184,14 @@ def run_assessment_route():
 
         db.session.commit()
 
-    except IntegrityError:
+    except IntegrityError as e:
         db.session.rollback()
 
+        print("INTEGRITY ERROR:")
+        print(e)
+
         return jsonify({
-            "error": "Database integrity error."
+            "error": str(e)
         }), 400
 
     except Exception as e:

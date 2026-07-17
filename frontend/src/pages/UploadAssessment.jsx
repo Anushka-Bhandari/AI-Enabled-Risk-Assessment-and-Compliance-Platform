@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
-const ACCEPTED_TYPES = [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".csv"];
+const ACCEPTED_TYPES = [".pdf",".docx"];
 const MAX_FILE_SIZE_MB = 25;
 
 export default function UploadAssessment() {
@@ -122,22 +122,42 @@ export default function UploadAssessment() {
                 formData.append("assessment_id", assessmentId);
             }
 
-            const response = await axios.post(
-                `${API_BASE_URL}/assessment/upload`,
-                formData,
-                {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+            const uploadResponse = await axios.post(
+    `${API_BASE_URL}/documents/upload`,
+    formData,
+    {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }
+);
+
+const documentIds =
+    uploadResponse.data.document_ids;
+
+    const assessmentResponse =
+    await axios.post(
+        `${API_BASE_URL}/assessment/run`,
+        {
+            assessment_id: assessmentId,
+            selected_document_ids: documentIds
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    );
+
+    const resultAssessmentId =
+    assessmentResponse.data.assessment_id;
 
             clearInterval(stepTimer);
-            const resultAssessmentId = response?.data?.assessment_id || assessmentId;
             navigate("/assessment/result", {
-                state: { assessmentId: resultAssessmentId },
-            });
+    state: {
+        assessmentId: resultAssessmentId
+    }
+});
         } catch (err) {
             clearInterval(stepTimer);
             const message =
