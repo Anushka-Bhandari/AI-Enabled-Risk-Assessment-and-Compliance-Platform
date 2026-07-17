@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
-const ACCEPTED_TYPES = ["pdf","docx"];
+const ACCEPTED_TYPES = ["pdf", "docx"];
 const MAX_FILE_SIZE_MB = 25;
 
 export default function UploadAssessment() {
@@ -39,28 +39,38 @@ export default function UploadAssessment() {
     ];
 
     const validateAndAddFiles = (incoming) => {
-        setUploadError("");
-        const validFiles = [];
+    setUploadError("");
+    const validFiles = [];
 
-        Array.from(incoming).forEach((file) => {
-            const extension = "." + file.name.split(".").pop().toLowerCase();
-            const sizeMb = file.size / (1024 * 1024);
+    Array.from(incoming).forEach((file) => {
+        const extension = file.name
+            .split(".")
+            .pop()
+            .toLowerCase();
 
-            if (!ACCEPTED_TYPES.includes(extension)) {
-                setUploadError(`Unsupported file type: ${file.name}`);
-                return;
-            }
-            if (sizeMb > MAX_FILE_SIZE_MB) {
-                setUploadError(`${file.name} exceeds ${MAX_FILE_SIZE_MB}MB limit.`);
-                return;
-            }
-            validFiles.push(file);
-        });
+        const sizeMb = file.size / (1024 * 1024);
 
-        if (validFiles.length) {
-            setFiles((prev) => [...prev, ...validFiles]);
+        console.log("Extension:", extension);
+
+        if (!ACCEPTED_TYPES.includes(extension)) {
+            setUploadError(`Unsupported file type: ${file.name}`);
+            return;
         }
-    };
+
+        if (sizeMb > MAX_FILE_SIZE_MB) {
+            setUploadError(
+                `${file.name} exceeds ${MAX_FILE_SIZE_MB}MB limit.`
+            );
+            return;
+        }
+
+        validFiles.push(file);
+    });
+
+    if (validFiles.length) {
+        setFiles((prev) => [...prev, ...validFiles]);
+    }
+};
 
     const handleDrop = useCallback((e) => {
         e.preventDefault();

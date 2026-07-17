@@ -269,11 +269,20 @@ def upload_documents():
 
     assessment_record.document_completed = True
 
-    if (
-        assessment_record.questionnaire_completed
-        and assessment_record.document_completed
-    ):
-        assessment_record.status = "Completed"
+    if assessment_record.assessment_mode == "COMBINED":
+        if (
+            assessment_record.questionnaire_completed
+            and assessment_record.document_completed
+        ):
+            assessment_record.status = "Completed"
+
+    elif assessment_record.assessment_mode == "DOCUMENT":
+        if assessment_record.document_completed:
+            assessment_record.status = "Completed"
+
+    elif assessment_record.assessment_mode == "QUESTIONNAIRE":
+        if assessment_record.questionnaire_completed:
+            assessment_record.status = "Completed"
 
     db.session.commit()
 
