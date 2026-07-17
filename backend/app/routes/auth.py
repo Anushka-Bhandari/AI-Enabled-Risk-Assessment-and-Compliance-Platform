@@ -218,3 +218,13 @@ def search_universities():
         }
         for u in universities
     ])
+
+@auth.route("/mail-test")
+def mail_test():
+    from flask import current_app
+
+    return {
+        "MAIL_SERVER": current_app.config["MAIL_SERVER"],
+        "MAIL_USERNAME": current_app.config["MAIL_USERNAME"],
+        "MAIL_DEFAULT_SENDER": current_app.config["MAIL_DEFAULT_SENDER"]
+    }
