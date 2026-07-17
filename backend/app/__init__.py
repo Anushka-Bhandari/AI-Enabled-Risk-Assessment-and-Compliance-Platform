@@ -12,6 +12,10 @@ def create_app():
 
     app.config.from_object(Config)
 
+    print("=" * 80)
+    print(app.config["SQLALCHEMY_DATABASE_URI"])
+    print("=" * 80)
+
     Config.create_report_directories()
 
     CORS(app)
