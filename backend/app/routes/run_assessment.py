@@ -12,7 +12,7 @@ from app.models import (
     Document,
     User
 )
-from backend.app.routes import assessment
+from app.routes import assessment
 
 run_assessment = Blueprint(
     "run_assessment",
