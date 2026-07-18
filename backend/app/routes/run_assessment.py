@@ -12,6 +12,7 @@ from app.models import (
     Document,
     User
 )
+from backend.app.routes import assessment
 
 run_assessment = Blueprint(
     "run_assessment",
@@ -185,6 +186,9 @@ def run_assessment_route():
             assessment.id
         ).run()
         print("========== Recommendation Finished ==========")
+
+        # All processing succeeded
+        assessment.status = "Completed"
 
         db.session.commit()
         print("========== Assessment Completed ==========")
