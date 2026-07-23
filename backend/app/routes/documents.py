@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 import os
 from datetime import datetime
 from app.database import db
-from app.models import Document, User
+from app.models import Assessment, Document, User
 from app.services.document_extractor import extract_text
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -43,6 +43,8 @@ def upload_documents():
         "documents"
     )
 
+    assessment_id = request.form.get("assessment_id")
+    print("DEBUG assessment_id received:", assessment_id)
     if not files:
         return jsonify({
             "error": "No files uploaded"
@@ -165,6 +167,21 @@ def upload_documents():
         return jsonify({
             "error": "Unable to save uploaded documents."
         }), 500
+    
+    # ---- ADD THIS BLOCK ----
+    if assessment_id:
+        assessment_record = Assessment.query.get(assessment_id)
+        if assessment_record:
+            assessment_record.document_completed = True
+
+            if assessment_record.assessment_mode == "COMBINED":
+                if assessment_record.questionnaire_completed and assessment_record.document_completed:
+                    assessment_record.status = "Completed"
+            elif assessment_record.assessment_mode == "DOCUMENT":
+                assessment_record.status = "Completed"
+
+            db.session.commit()
+    # ---- END BLOCK ----
 
     document_ids = [
         document.id

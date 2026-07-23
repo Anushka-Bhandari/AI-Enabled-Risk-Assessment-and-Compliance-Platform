@@ -259,6 +259,32 @@ export default function AssessmentResult() {
       ? sortedCategoryRisks[sortedCategoryRisks.length - 1]
       : null;
 
+  // --- Verification workflow (added) --------------------------------------
+  const questionnaireCompleted = !!result?.questionnaire_completed;
+  const documentCompleted = !!result?.document_completed;
+
+  let verificationType = "";
+  let verificationBadge = "";
+
+  if (questionnaireCompleted && documentCompleted) {
+    verificationType = "Combined Analysis";
+    verificationBadge = "Completed";
+  } else if (documentCompleted) {
+    // Document is priority — questionnaire remains optional
+    verificationType = "Document Analysis";
+    verificationBadge = "Optional";
+  } else if (questionnaireCompleted) {
+    // Questionnaire done — document verification still pending
+    verificationType = "Questionnaire Assessment";
+    verificationBadge = "Pending";
+  }
+
+  const verificationBadgeStyles = {
+    Optional: "bg-amber-50 text-amber-700 border border-amber-200",
+    Pending: "bg-orange-50 text-orange-700 border border-orange-200",
+    Completed: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+  };
+
   const trendCopy = useMemo(() => {
     const level = riskData?.overall_risk_level || result?.risk_level;
     if (level === "High") {
@@ -948,6 +974,63 @@ export default function AssessmentResult() {
           </div>
         </motion.div>
 
+        {/* ================= ASSESSMENT VERIFICATION ================= */}
+        {verificationType && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.5 }}
+            className="mt-8 bg-white rounded-3xl border border-slate-200/70 shadow-xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+          >
+            <div>
+              <h3 className="font-bold text-slate-900 text-lg">
+                Assessment Verification
+              </h3>
+              <p className="text-sm text-slate-600 mt-1">
+                Result Source:{" "}
+                <span className="font-medium text-slate-800">
+                  {verificationType}
+                </span>
+              </p>
+            </div>
+
+            <div className="flex flex-col items-start sm:items-end gap-3">
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-semibold ${verificationBadgeStyles[verificationBadge]}`}
+              >
+                {verificationBadge}
+              </span>
+
+              {verificationBadge === "Optional" && (
+                <button
+                  onClick={() =>
+                    navigate("/assessment/questionnaire", {
+                      state: { assessmentId },
+                    })
+                  }
+                  className="px-4 py-2 rounded-xl bg-[#0B2A66] text-white text-sm font-medium hover:bg-[#0B2A66]/90 transition-colors"
+                >
+                  Complete Questionnaire Verification
+                </button>
+              )}
+
+              {verificationBadge === "Pending" && (
+                <button
+                  onClick={() =>
+                    navigate("/upload-assessment", {
+                      state: { assessmentId },
+                    })
+                  }
+                  className="px-4 py-2 rounded-xl bg-[#0B2A66] text-white text-sm font-medium hover:bg-[#0B2A66]/90 transition-colors"
+                >
+                  Upload Verification Documents
+                </button>
+              )}
+            </div>
+          </motion.div>
+        )}
+
         {/* ================= ASSESSMENT STATUS ================= */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -961,22 +1044,44 @@ export default function AssessmentResult() {
               Assessment Status
             </h3>
             <p className="text-sm text-slate-500 mt-1">
-              Upload documents to complete verification.
-            </p>
+  {questionnaireCompleted && !documentCompleted &&
+    "Upload documents to complete verification."}
+
+  {!questionnaireCompleted && documentCompleted &&
+    "Complete questionnaire verification."}
+
+  {questionnaireCompleted && documentCompleted &&
+    "Assessment verification completed."}
+</p>
           </div>
 
           <button
-            onClick={() =>
-              navigate("/upload-assessment", {
-                state: { assessmentId }
-              })
-            }
+            onClick={() => {
+  if (questionnaireCompleted && !documentCompleted) {
+    navigate("/upload-assessment", {
+      state: { assessmentId }
+    });
+  }
+
+  else if (!questionnaireCompleted && documentCompleted) {
+    navigate("/assessment/questionnaire", {
+      state: { assessmentId }
+    });
+  }
+}}
             className={`px-5 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 hover:scale-[1.03] ${result?.status === "Pending"
               ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
               : "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
               }`}
           >
-            {result?.status}
+            {questionnaireCompleted && !documentCompleted &&
+  "Upload Documents"}
+
+{!questionnaireCompleted && documentCompleted &&
+  "Complete Questionnaire"}
+
+{questionnaireCompleted && documentCompleted &&
+  "Completed"}
           </button>
         </motion.div>
 
@@ -1083,7 +1188,11 @@ export default function AssessmentResult() {
 
           <div className="flex items-center gap-3">
             <button
-              onClick={() => navigate("/assessment/questionnaire")}
+              onClick={() =>
+  navigate("/assessment/questionnaire", {
+    state: { assessmentId }
+  })
+}
               className="flex items-center gap-2 px-5 py-3 rounded-xl font-semibold text-slate-600 bg-white border border-slate-200 transition-all duration-300 hover:bg-slate-50 hover:scale-[1.01]"
             >
               <RefreshCcw className="w-4 h-4" />

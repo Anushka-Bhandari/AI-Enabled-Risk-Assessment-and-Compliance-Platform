@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy.exc import IntegrityError
 from app.services.risk_engine import run_risk_engine
 from app.services.compliance_engine import ComplianceEngine
+from app.services.recommendation_engine import RecommendationEngine
 
 from app.database import db
 from app.models import (
@@ -11,6 +12,7 @@ from app.models import (
     Document,
     User
 )
+from app.routes import assessment
 
 run_assessment = Blueprint(
     "run_assessment",
@@ -24,6 +26,7 @@ run_assessment = Blueprint(
 @jwt_required()
 def run_assessment_route():
     data = request.get_json()
+    print("REQUEST DATA =", data)
 
     if not data:
         return jsonify({
@@ -166,21 +169,38 @@ def run_assessment_route():
 
         db.session.commit()
 
+        print("========== Compliance Started ==========")
         compliance_result = ComplianceEngine(
             assessment.id
         ).run()
+        print("========== Compliance Finished ==========")
 
-        run_risk_engine(assessment.id)
+        print("========== Risk Started ==========")
+        run_risk_engine(
+            assessment.id
+        )
+        print("========== Risk Finished ==========")
 
-        run_risk_engine(assessment.id)
+        print("========== Recommendation Started ==========")
+        RecommendationEngine(
+            assessment.id
+        ).run()
+        print("========== Recommendation Finished ==========")
+
+        # All processing succeeded
+        assessment.status = "Completed"
 
         db.session.commit()
+        print("========== Assessment Completed ==========")
 
-    except IntegrityError:
+    except IntegrityError as e:
         db.session.rollback()
 
+        print("INTEGRITY ERROR:")
+        print(e)
+
         return jsonify({
-            "error": "Database integrity error."
+            "error": str(e)
         }), 400
 
     except Exception as e:

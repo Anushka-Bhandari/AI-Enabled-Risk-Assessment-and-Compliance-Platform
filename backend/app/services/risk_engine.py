@@ -16,6 +16,17 @@ def run_risk_engine(assessment_id):
     """
     Calculate risk for a completed assessment.
     """
+
+    ControlRiskResult.query.filter_by(
+    assessment_id=assessment_id
+).delete()
+
+    CategoryRiskResult.query.filter_by(
+        assessment_id=assessment_id
+    ).delete()
+
+    db.session.commit()
+
     compliance_results = ComplianceResult.query.filter_by(
         assessment_id=assessment_id
     ).all()
@@ -24,32 +35,29 @@ def run_risk_engine(assessment_id):
         raise ValueError("Compliance Engine did not produce any results.")
 
     for result in compliance_results:
+
         control = get_control(result.control_id)
-
-        if result.compliance_status in (
-            "IMPLEMENTED",
-            "NOT_APPLICABLE"
-        ):
-            continue
-
-        # Remaining controls:
-        # PARTIALLY_IMPLEMENTED
-        # NOT_IMPLEMENTED
 
         weight = control["weight"]
         status = result.compliance_status
 
-        # Calculate risk score
-        # Calculate risk level
+        if status in (
+            "IMPLEMENTED",
+            "NOT_APPLICABLE"
+        ):
+            multiplier = 0.0
 
-        if status == "PARTIALLY_IMPLEMENTED":
+        elif status == "PARTIALLY_IMPLEMENTED":
             multiplier = 0.5
-        else:
+
+        else:  # NOT_IMPLEMENTED
             multiplier = 1.0
 
         raw_risk = weight * multiplier
 
-        risk_score = (raw_risk / MAX_CONTROL_WEIGHT) * 100
+        risk_score = (
+            raw_risk / MAX_CONTROL_WEIGHT
+        ) * 100
 
         if risk_score == 0:
             risk_level = "None"

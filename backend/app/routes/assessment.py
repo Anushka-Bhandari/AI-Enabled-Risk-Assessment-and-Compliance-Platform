@@ -94,9 +94,10 @@ def submit_assessment():
     assessment = Assessment(
         user_id=current_user.id,
         university_id=current_user.university_id,
-        assessment_mode="QUESTIONNAIRE"
+        assessment_mode="QUESTIONNAIRE",
+        questionnaire_completed=True,
+        status="Pending"
     )
-
 
     try:
         db.session.add(assessment)
@@ -172,6 +173,11 @@ def get_assessment_result(assessment_id):
         "assessment_mode": assessment.assessment_mode,
         "risk_level": assessment.risk_level,
         "compliance_score": assessment.compliance_score,
+        "questionnaire_completed":
+            assessment.questionnaire_completed,
+
+        "document_completed":
+            assessment.document_completed,
 
         "implemented_count": implemented_count,
         "partial_count": partial_count,
@@ -186,14 +192,19 @@ def get_assessment_result(assessment_id):
 @jwt_required()
 def upload_documents():
 
-    print("ENTERED UPLOAD ROUTE")
-    print("JWT USER =", get_jwt_identity())
-
     assessment_id = request.form.get("assessment_id")
 
+    files = request.files.getlist("documents")
 
-# If upload is opened directly without questionnaire,
-# create a DOCUMENT assessment automatically.
+    if not files:
+        return jsonify({
+            "error": "No files uploaded"
+        }), 400
+
+    # ----------------------------------
+    # DOCUMENT ONLY FLOW
+    # ----------------------------------
+
     if not assessment_id:
 
         current_user_id = get_jwt_identity()
@@ -206,7 +217,9 @@ def upload_documents():
         assessment_record = Assessment(
             user_id=current_user.id,
             university_id=current_user.university_id,
-            assessment_mode="DOCUMENT"
+            assessment_mode="DOCUMENT",
+            document_completed=True,
+            status="Pending"
         )
 
         db.session.add(assessment_record)
@@ -214,6 +227,9 @@ def upload_documents():
 
         assessment_id = assessment_record.id
 
+    # ----------------------------------
+    # QUESTIONNAIRE + DOCUMENT FLOW
+    # ----------------------------------
 
     else:
 
@@ -225,23 +241,14 @@ def upload_documents():
             return jsonify({
                 "error": "Assessment not found"
             }), 404
-        if not assessment_record:
-            return jsonify({
-                "error": "Assessment not found"
-            }), 404
-
-    files = request.files.getlist("documents")
-
-    if not files:
-        return jsonify({
-            "error": "No files uploaded"
-        }), 400
 
     uploaded = []
 
     for file in files:
 
-        filename = secure_filename(file.filename)
+        filename = secure_filename(
+            file.filename
+        )
 
         filepath = os.path.join(
             UPLOAD_FOLDER,
@@ -252,8 +259,78 @@ def upload_documents():
 
         uploaded.append(filename)
 
+    # ----------------------------------
+    # MARK DOCUMENT VERIFICATION COMPLETE
+    # ----------------------------------
+
+    assessment_record = Assessment.query.get(
+        assessment_id
+    )
+
+    assessment_record.document_completed = True
+
+    if assessment_record.assessment_mode == "COMBINED":
+        if (
+            assessment_record.questionnaire_completed
+            and assessment_record.document_completed
+        ):
+            assessment_record.status = "Completed"
+
+    elif assessment_record.assessment_mode == "DOCUMENT":
+        if assessment_record.document_completed:
+            assessment_record.status = "Completed"
+
+    elif assessment_record.assessment_mode == "QUESTIONNAIRE":
+        if assessment_record.questionnaire_completed:
+            assessment_record.status = "Completed"
+
+    db.session.commit()
+
     return jsonify({
         "message": "Files uploaded successfully",
         "assessment_id": assessment_id,
         "files": uploaded
     }), 200
+
+
+@assessment.route(
+    "/assessment/<int:assessment_id>",
+    methods=["PUT"]
+)
+@jwt_required()
+def update_assessment(assessment_id):
+
+    assessment = Assessment.query.get(
+        assessment_id
+    )
+
+    if not assessment:
+        return jsonify({
+            "error": "Assessment not found"
+        }), 404
+
+    data = request.get_json()
+
+    answers = data["answers"]
+
+    AssessmentAnswer.query.filter_by(
+        assessment_id=assessment_id
+    ).delete()
+
+    for question_id, answer in answers.items():
+
+        db.session.add(
+            AssessmentAnswer(
+                assessment_id=assessment_id,
+                question_id=question_id,
+                answer=answer
+            )
+        )
+
+    assessment.questionnaire_completed = True
+
+    db.session.commit()
+
+    return jsonify({
+        "message": "Assessment updated"
+    })
