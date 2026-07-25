@@ -44,7 +44,8 @@ def login():
         "message": "Login successful",
         "token": token,
         "user_id": user.id,
-        "name": user.name
+        "name": user.name,
+        "role": user.role
     }), 200
 
 @auth.route("/register", methods=["POST"])
