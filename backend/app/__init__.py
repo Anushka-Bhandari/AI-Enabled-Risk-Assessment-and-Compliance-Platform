@@ -37,6 +37,7 @@ def create_app():
     from app.routes.report import report_bp
     from app.routes.recommendations import recommendation_bp
     from app.routes.frameworks import framework_bp
+    from app.routes.events import events
 
 
     app.register_blueprint(auth)
@@ -48,6 +49,7 @@ def create_app():
     app.register_blueprint(report_bp)
     app.register_blueprint(recommendation_bp)
     app.register_blueprint(framework_bp)
+    app.register_blueprint(events,url_prefix="/api")
 
     app.register_blueprint(
         compliance_results

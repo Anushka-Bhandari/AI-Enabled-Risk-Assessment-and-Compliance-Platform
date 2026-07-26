@@ -473,3 +473,92 @@ class Recommendation(db.Model):
             cascade="all, delete-orphan"
         )
     )
+
+class ActivityLog(db.Model):
+    __tablename__ = "activity_logs"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    event_id = db.Column(
+        db.String(100),
+        unique=True,
+        nullable=False,
+        index=True
+    )
+
+    user_name = db.Column(
+        db.String(100),
+        nullable=False
+    )
+
+    user_email = db.Column(
+        db.String(120),
+        nullable=False,
+        index=True
+    )
+
+    role = db.Column(
+        db.String(50),
+        nullable=False
+    )
+
+    department = db.Column(
+        db.String(100),
+        nullable=False
+    )
+
+    timestamp = db.Column(
+        db.DateTime,
+        nullable=False
+    )
+
+    event_type = db.Column(
+        db.String(100),
+        nullable=False,
+        index=True
+    )
+
+    event_name = db.Column(
+        db.String(150),
+        nullable=False
+    )
+
+    resource = db.Column(
+        db.String(255),
+        nullable=False
+    )
+
+    ip_address = db.Column(
+        db.String(50),
+        nullable=False,
+        index=True
+    )
+
+    device = db.Column(
+        db.String(255),
+        nullable=False
+    )
+
+    location = db.Column(
+        db.String(255),
+        nullable=False
+    )
+
+    status = db.Column(
+        db.String(50),
+        nullable=False
+    )
+
+    event_metadata = db.Column(
+        db.JSON,
+        nullable=True
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=db.func.current_timestamp(),
+        nullable=False
+    )

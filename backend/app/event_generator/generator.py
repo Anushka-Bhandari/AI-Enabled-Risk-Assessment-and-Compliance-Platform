@@ -13,6 +13,7 @@ from .event_templates import (
 )
 
 from .utils import (
+    generate_event_id,
     generate_timestamp,
     random_user,
     random_resource,
@@ -119,6 +120,7 @@ def generate_event():
     event_type = choose_event_type()
 
     event = {
+        "event_id": generate_event_id(),
 
         "user_name": user["name"],
 
