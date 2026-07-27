@@ -1,4 +1,5 @@
 from app.database import db
+from datetime import datetime
 
 
 class User(db.Model):
@@ -561,4 +562,68 @@ class ActivityLog(db.Model):
         db.DateTime,
         default=db.func.current_timestamp(),
         nullable=False
+    )
+
+
+class Alert(db.Model):
+    __tablename__ = "alerts"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    event_id = db.Column(
+        db.String(100),
+        nullable=False,
+        index=True
+    )
+
+    rule_id = db.Column(
+        db.String(20),
+        nullable=False
+    )
+
+    title = db.Column(
+        db.String(255),
+        nullable=False
+    )
+
+    description = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    severity = db.Column(
+        db.String(20),
+        nullable=False,
+        index=True
+    )
+
+    status = db.Column(
+        db.String(20),
+        nullable=False,
+        default="OPEN",
+        index=True
+    )
+
+    assigned_role = db.Column(
+        db.String(50),
+        nullable=False,
+        default="SECURITY_OFFICER"
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        nullable=False
+    )
+
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False
+    )
+
+    resolved_at = db.Column(
+        db.DateTime,
+        nullable=True
     )
