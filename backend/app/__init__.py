@@ -5,7 +5,7 @@ from app.config import Config
 from app.database import db
 
 from app.extensions import mail, jwt, migrate
-
+from app.routes.alerts import alerts_bp
 
 def create_app():
     app = flask.Flask(__name__)
@@ -50,6 +50,7 @@ def create_app():
     app.register_blueprint(recommendation_bp)
     app.register_blueprint(framework_bp)
     app.register_blueprint(events,url_prefix="/api")
+    app.register_blueprint(alerts_bp, url_prefix="/alerts")
 
     app.register_blueprint(
         compliance_results
