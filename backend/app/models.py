@@ -628,6 +628,13 @@ class Alert(db.Model):
         nullable=True
     )
 
+    threat_analysis = db.relationship(
+        "ThreatAnalysis",
+        back_populates="alert",
+        uselist=False,
+        cascade="all, delete-orphan"
+    )
+
     def to_dict(self):
         return {
             "id": self.id,
@@ -638,7 +645,107 @@ class Alert(db.Model):
             "severity": self.severity,
             "status": self.status,
             "assigned_role": self.assigned_role,
+            "has_analysis": self.threat_analysis is not None,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
             "resolved_at": self.resolved_at.isoformat() if self.resolved_at else None,
+        }
+
+class ThreatAnalysis(db.Model):
+    __tablename__ = "threat_analyses"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    alert_id = db.Column(
+        db.Integer,
+        db.ForeignKey("alerts.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+        index=True
+    )
+
+    summary = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    likely_attack_type = db.Column(
+        db.String(100),
+        nullable=False
+    )
+
+    risk_level = db.Column(
+        db.String(20),
+        nullable=False,
+        index=True
+    )
+
+    impact = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    recommended_actions = db.Column(
+        db.JSON,
+        nullable=False
+    )
+
+    investigation_steps = db.Column(
+        db.JSON,
+        nullable=False
+    )
+
+    confidence_score = db.Column(
+        db.Float,
+        nullable=True
+    )
+
+    model_name = db.Column(
+        db.String(100),
+        nullable=False
+    )
+
+    analysis_version = db.Column(
+        db.String(20),
+        nullable=False,
+        default="v1"
+    )
+
+    analyzed_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        nullable=False
+    )
+
+    updated_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False
+    )
+
+    alert = db.relationship(
+        "Alert",
+        back_populates="threat_analysis",
+        lazy=True
+    )
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "alert_id": self.alert_id,
+            "summary": self.summary,
+            "likely_attack_type": self.likely_attack_type,
+            "risk_level": self.risk_level,
+            "impact": self.impact,
+            "recommended_actions": self.recommended_actions,
+            "investigation_steps": self.investigation_steps,
+            "confidence_score": self.confidence_score,
+            "model_name": self.model_name,
+            "analysis_version": self.analysis_version,
+            "analyzed_at": self.analyzed_at.isoformat() if self.analyzed_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None
         }
