@@ -1,5 +1,7 @@
-from flask import Blueprint, jsonify, send_file
+import csv
 
+from flask import Blueprint, jsonify, send_file
+import io
 from app.services.pdf_service import PDFService
 
 from datetime import datetime
@@ -126,3 +128,105 @@ def report_history():
             "success": False,
             "message": str(e),
         }), 500
+
+@report_bp.route("/reports/compliance/pdf", methods=["GET"])
+def generate_compliance_pdf():
+
+    pdf_content = """
+    COMPLIANCE REPORT
+
+    Compliance Score: 88%
+    High Risk Findings: 3
+    Assessments Completed: 42
+
+    Recommendations:
+    - Enable MFA
+    - Improve Logging
+    - Conduct Training
+    """
+
+    pdf_file = io.BytesIO()
+    pdf_file.write(pdf_content.encode())
+    pdf_file.seek(0)
+
+    return send_file(
+        pdf_file,
+        as_attachment=True,
+        download_name="compliance-report.pdf",
+        mimetype="application/pdf"
+    )
+
+@report_bp.route(
+    "/reports/compliance/executive-summary",
+    methods=["GET"]
+)
+def executive_summary():
+
+    summary = """
+    EXECUTIVE SUMMARY
+
+    Overall Compliance Score: 88%
+
+    Key Findings:
+    - MFA Missing
+    - Weak Password Policy
+
+    Recommended Actions:
+    - Enable MFA
+    - Review Security Controls
+    """
+
+    pdf_file = io.BytesIO()
+    pdf_file.write(summary.encode())
+    pdf_file.seek(0)
+
+    return send_file(
+        pdf_file,
+        as_attachment=True,
+        download_name="executive-summary.pdf",
+        mimetype="application/pdf"
+    )
+
+@report_bp.route("/reports/compliance/csv", methods=["GET"])
+def export_csv():
+
+    output = io.StringIO()
+
+    writer = csv.writer(output)
+
+    writer.writerow([
+        "Assessment",
+        "Score",
+        "Risk"
+    ])
+
+    writer.writerow([
+        "Assessment 1",
+        "88",
+        "Medium"
+    ])
+
+    writer.writerow([
+        "Assessment 2",
+        "92",
+        "Low"
+    ])
+
+    writer.writerow([
+        "Assessment 3",
+        "76",
+        "High"
+    ])
+
+    memory_file = io.BytesIO()
+
+    memory_file.write(output.getvalue().encode())
+
+    memory_file.seek(0)
+
+    return send_file(
+        memory_file,
+        as_attachment=True,
+        download_name="compliance-report.csv",
+        mimetype="text/csv"
+    )
