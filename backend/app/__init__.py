@@ -38,6 +38,7 @@ def create_app():
     from app.routes.recommendations import recommendation_bp
     from app.routes.frameworks import framework_bp
     from app.routes.events import events
+    from app.routes.threat_analysis import threat_analysis_bp
 
 
     app.register_blueprint(auth)
@@ -51,6 +52,7 @@ def create_app():
     app.register_blueprint(framework_bp)
     app.register_blueprint(events,url_prefix="/api")
     app.register_blueprint(alerts_bp, url_prefix="/alerts")
+    app.register_blueprint(threat_analysis_bp, url_prefix="/threat-analysis")
 
     app.register_blueprint(
         compliance_results
