@@ -2,9 +2,11 @@ from collections import defaultdict
 
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from datetime import datetime, timedelta
+from flask import jsonify
 
 from app.database import db
-from app.models import Assessment, User
+from app.models import Assessment, User , ActivityLog
 
 dashboard = Blueprint("dashboard", __name__)
 
@@ -178,3 +180,80 @@ def recent_assessments():
     return jsonify({
         "history": history
     }), 200
+
+
+@dashboard.route("/dashboard/event-activity", methods=["GET"])
+@jwt_required()
+def event_activity():
+
+    # Last 5 hours
+    end_time = datetime.now()
+    start_time = end_time - timedelta(hours=5)
+
+    logs = (
+        ActivityLog.query
+        .filter(ActivityLog.timestamp >= start_time)
+        .filter(ActivityLog.timestamp <= end_time)
+        .order_by(ActivityLog.timestamp.asc())
+        .all()
+    )
+
+    # Create hourly buckets
+    buckets = {}
+
+    current = start_time.replace(
+        minute=0,
+        second=0,
+        microsecond=0
+    )
+
+    while current <= end_time:
+
+        label = current.strftime("%H:00")
+
+        buckets[label] = {
+            "time": label,
+            "login": 0,
+            "fileAccess": 0,
+            "failedLogin": 0,
+            "suspicious": 0
+        }
+
+        current += timedelta(hours=1)
+
+    # Fill bucket data
+    for log in logs:
+
+        bucket_time = log.timestamp.replace(
+            minute=0,
+            second=0,
+            microsecond=0
+        )
+
+        label = bucket_time.strftime("%H:00")
+
+        if label not in buckets:
+            continue
+
+        event_type = (log.event_type or "").upper()
+        status = (log.status or "").upper()
+
+        # Login events
+        if "LOGIN" in event_type:
+            buckets[label]["login"] += 1
+
+        # File operations
+        if "FILE" in event_type:
+            buckets[label]["fileAccess"] += 1
+
+        # Failed logins
+        if status in ["FAILED", "FAILURE"]:
+            buckets[label]["failedLogin"] += 1
+
+        # Suspicious activities
+        if status == "CRITICAL":
+            buckets[label]["suspicious"] += 1
+
+    print(list(buckets.values()))
+
+    return jsonify(list(buckets.values())), 200

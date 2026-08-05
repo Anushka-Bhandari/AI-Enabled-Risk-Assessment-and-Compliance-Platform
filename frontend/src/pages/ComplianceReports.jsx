@@ -57,7 +57,7 @@ const NAV_SECTIONS = [
   {
     section: "OPERATIONS",
     items: [
-      { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+      { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/SecurityCommandCenter" },
       { key: "activity-logs", label: "Activity Logs", icon: ScrollText, path: "/activity-logs" },
       { key: "alerts", label: "Alerts", icon: AlertTriangle, path: "/alerts" },
       { key: "investigations", label: "Investigations", icon: Search, path: "/investigations" },

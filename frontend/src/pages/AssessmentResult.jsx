@@ -62,7 +62,7 @@ const NAV_SECTIONS = [
   {
     section: "OPERATIONS",
     items: [
-      { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+      { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/SecurityCommandCenter" },
       { key: "activity-logs", label: "Activity Logs", icon: ScrollText, path: "/activity-logs" },
       { key: "alerts", label: "Alerts", icon: AlertTriangle, path: "/alerts" },
       { key: "investigations", label: "Investigations", icon: Search, path: "/investigations" },
@@ -1249,7 +1249,7 @@ export default function AssessmentResult() {
           {/* Actions */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <button
-              onClick={() => navigate("/dashboard")}
+              onClick={() => navigate("/SecurityCommandCenter")}
               className="flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-300 transition-colors duration-200"
             >
               <ArrowLeft className="w-4 h-4" />

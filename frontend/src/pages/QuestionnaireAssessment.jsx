@@ -4,6 +4,7 @@ import API from "../services/authService";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ShieldCheck,
+  ArrowLeft,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
@@ -40,7 +41,7 @@ const NAV_SECTIONS = [
   {
     section: "OPERATIONS",
     items: [
-      { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+      { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/SecurityCommandCenter" },
       { key: "activity-logs", label: "Activity Logs", icon: ScrollText, path: "/activity-logs" },
       { key: "alerts", label: "Alerts", icon: AlertTriangle, path: "/alerts" },
       { key: "investigations", label: "Investigations", icon: Search, path: "/investigations" },
@@ -528,44 +529,55 @@ export default function QuestionnaireAssessment() {
 
             {/* ================= NAVIGATION ================= */}
             <div className="flex items-center justify-between pt-2">
-              <button
-                type="button"
-                onClick={goBack}
-                disabled={currentStage === 0}
-                className="flex items-center gap-1.5 px-5 py-3 rounded-xl font-semibold text-sm text-slate-300 bg-white/[0.03] border border-white/[0.08] transition-all duration-200 hover:bg-white/[0.06] hover:border-white/20 disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                Previous
-              </button>
+  <div className="flex items-center gap-3">
+    <button
+      type="button"
+      onClick={() => navigate("/assessments/new")}
+      className="flex items-center gap-1.5 px-5 py-3 rounded-xl font-semibold text-sm text-slate-300 bg-white/[0.03] border border-white/[0.08] transition-all duration-200 hover:bg-white/[0.06] hover:border-white/20"
+    >
+      <ArrowLeft className="w-4 h-4" />
+      Back to New Assessment
+    </button>
 
-              {isLastStage ? (
-                <button
-                  type="button"
-                  onClick={handleSubmit}
-                  disabled={!isStageComplete || isSubmitting}
-                  className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm text-[#020817] bg-cyan-400 shadow-[0_0_24px_-6px_rgba(34,211,238,0.7)] transition-all duration-200 hover:bg-cyan-300 disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Submitting…
-                    </>
-                  ) : (
-                    "Submit Questionnaire"
-                  )}
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={goNext}
-                  disabled={!isStageComplete}
-                  className="flex items-center gap-1.5 px-6 py-3 rounded-xl font-semibold text-sm text-[#020817] bg-cyan-400 shadow-[0_0_24px_-6px_rgba(34,211,238,0.7)] transition-all duration-200 hover:bg-cyan-300 disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none"
-                >
-                  Next Stage
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              )}
-            </div>
+    <button
+      type="button"
+      onClick={goBack}
+      disabled={currentStage === 0}
+      className="flex items-center gap-1.5 px-5 py-3 rounded-xl font-semibold text-sm text-slate-300 bg-white/[0.03] border border-white/[0.08] transition-all duration-200 hover:bg-white/[0.06] hover:border-white/20 disabled:opacity-30 disabled:cursor-not-allowed"
+    >
+      <ChevronLeft className="w-4 h-4" />
+      Previous
+    </button>
+  </div>
+
+  {isLastStage ? (
+    <button
+      type="button"
+      onClick={handleSubmit}
+      disabled={!isStageComplete || isSubmitting}
+      className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm text-[#020817] bg-cyan-400 shadow-[0_0_24px_-6px_rgba(34,211,238,0.7)] transition-all duration-200 hover:bg-cyan-300 disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none"
+    >
+      {isSubmitting ? (
+        <>
+          <Loader2 className="w-4 h-4 animate-spin" />
+          Submitting…
+        </>
+      ) : (
+        "Submit Questionnaire"
+      )}
+    </button>
+  ) : (
+    <button
+      type="button"
+      onClick={goNext}
+      disabled={!isStageComplete}
+      className="flex items-center gap-1.5 px-6 py-3 rounded-xl font-semibold text-sm text-[#020817] bg-cyan-400 shadow-[0_0_24px_-6px_rgba(34,211,238,0.7)] transition-all duration-200 hover:bg-cyan-300 disabled:opacity-30 disabled:cursor-not-allowed disabled:shadow-none"
+    >
+      Next Stage
+      <ChevronRight className="w-4 h-4" />
+    </button>
+  )}
+</div>
           </section>
         </main>
       </div>

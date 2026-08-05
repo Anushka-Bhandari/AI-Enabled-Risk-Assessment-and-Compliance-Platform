@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import socket from "../services/socket";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -57,7 +58,7 @@ const NAV_SECTIONS = [
   {
     section: "OPERATIONS",
     items: [
-      { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+      { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/SecurityCommandCenter" },
       { key: "activity-logs", label: "Activity Logs", icon: ScrollText, path: "/activity-logs" },
       { key: "alerts", label: "Alerts", icon: AlertTriangle, path: "/alerts" },
       { key: "investigations", label: "Investigations", icon: Search, path: "/investigations" },
@@ -75,7 +76,8 @@ const NAV_SECTIONS = [
     section: "ASSESSMENT",
     items: [
       {
-        key: "new-assessment", label: "New Assessment", path: "/assessments/new" , icon: ClipboardCheck},
+        key: "new-assessment", label: "New Assessment", path: "/assessments/new", icon: ClipboardCheck
+      },
       { key: "assessment-history", label: "Assessment History", icon: History, path: "/assessment-history" },
     ],
   },
@@ -151,20 +153,37 @@ const KPI_META = [
   },
 ];
 
-const EVENT_ACTIVITY_DATA = [
-  { time: "00:00", login: 42, fileAccess: 18, failedLogin: 3, suspicious: 0 },
-  { time: "02:00", login: 21, fileAccess: 9, failedLogin: 5, suspicious: 1 },
-  { time: "04:00", login: 12, fileAccess: 4, failedLogin: 2, suspicious: 0 },
-  { time: "06:00", login: 58, fileAccess: 26, failedLogin: 4, suspicious: 0 },
-  { time: "08:00", login: 214, fileAccess: 132, failedLogin: 11, suspicious: 2 },
-  { time: "10:00", login: 386, fileAccess: 241, failedLogin: 18, suspicious: 3 },
-  { time: "12:00", login: 402, fileAccess: 298, failedLogin: 9, suspicious: 1 },
-  { time: "14:00", login: 375, fileAccess: 265, failedLogin: 14, suspicious: 4 },
-  { time: "16:00", login: 291, fileAccess: 187, failedLogin: 22, suspicious: 5 },
-  { time: "18:00", login: 156, fileAccess: 98, failedLogin: 15, suspicious: 2 },
-  { time: "20:00", login: 87, fileAccess: 44, failedLogin: 7, suspicious: 1 },
-  { time: "22:00", login: 53, fileAccess: 21, failedLogin: 4, suspicious: 0 },
-];
+// The chart used to read from a hardcoded 12-bucket array. Now the buckets
+// are generated empty, filled once from a real aggregation endpoint on
+// load, and bumped live as socket events arrive — see fetchEventActivity
+// and the categorizeEventForChart() call inside the socket handler below.
+
+// Same 2-hour bucketing the backend aggregation endpoint uses, so a
+// locally-computed live increment lands in the same bucket the backend
+// would put it in on the next full refresh.
+function getBucketLabelForDate(date) {
+  const hour = date.getHours();
+  const flooredHour = hour - (hour % 2);
+  return `${String(flooredHour).padStart(2, "0")}:00`;
+}
+
+// Maps a raw socket event onto one of the four chart series. Returns null
+// for event types that don't belong on this particular chart (they still
+// show up in the Live Event Stream panel, just don't move this graph).
+function categorizeEventForChart(event) {
+  const type = (event.event_type || "").toUpperCase();
+  const status = (event.status || "").toUpperCase();
+
+  if (status === "CRITICAL") return "suspicious";
+  if (["SUSPICIOUS_ACTIVITY", "PRIVILEGE_ESCALATION", "ALERT"].includes(type)) return "suspicious";
+
+  if (type === "LOGIN") return status === "INFO" ? "login" : "failedLogin";
+  if (type === "FAILED_LOGIN") return "failedLogin";
+
+  if (type.includes("FILE")) return "fileAccess";
+
+  return null;
+}
 
 const EVENT_POOL = [
   { type: "Faculty Login", status: "info" },
@@ -224,6 +243,43 @@ function randomFrom(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+const ACTIVITY_BUCKET_LABELS = [
+  "00:00",
+  "01:00",
+  "02:00",
+  "03:00",
+  "04:00",
+  "05:00",
+  "06:00",
+  "07:00",
+  "08:00",
+  "09:00",
+  "10:00",
+  "11:00",
+  "12:00",
+  "13:00",
+  "14:00",
+  "15:00",
+  "16:00",
+  "17:00",
+  "18:00",
+  "19:00",
+  "20:00",
+  "21:00",
+  "22:00",
+  "23:00",
+];
+
+function buildEmptyActivityBuckets() {
+  return ACTIVITY_BUCKET_LABELS.map((hour) => ({
+    time: hour,
+    login: 0,
+    fileAccess: 0,
+    failedLogin: 0,
+    suspicious: 0,
+  }));
+}
+
 export default function SecurityCommandCenter() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -235,14 +291,50 @@ export default function SecurityCommandCenter() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [events, setEvents] = useState(() =>
-    Array.from({ length: 8 }).map((_, i) => ({
-      id: `seed-${i}`,
-      time: new Date(Date.now() - i * 45000),
-      user: randomFrom(FACULTY_POOL),
-      ...randomFrom(EVENT_POOL),
-    }))
-  );
+  const [events, setEvents] = useState([]);
+
+  // Real chart data — starts at zero, filled from the aggregation
+  // endpoint on load, then incremented live as socket events arrive.
+  const [eventActivityData, setEventActivityData] = useState(buildEmptyActivityBuckets);
+
+  const updateGraph = useCallback((event) => {
+
+    setEventActivityData(prev => {
+
+      const label =
+        `${String(new Date(event.timestamp).getHours()).padStart(2, "0")}:00`;
+
+      return prev.map(item => {
+
+        if (item.time !== label)
+          return item;
+
+        const updated = { ...item };
+
+        const type = event.event_type?.toUpperCase();
+        const status = event.status?.toUpperCase();
+
+        if (type === "LOGIN")
+          updated.login += 1;
+
+        if (type?.includes("FILE"))
+          updated.fileAccess += 1;
+
+        if (status === "CRITICAL")
+          updated.suspicious += 1;
+
+        if (
+          status === "FAILED" ||
+          status === "FAILURE"
+        )
+          updated.failedLogin += 1;
+
+        return updated;
+      });
+
+    });
+
+  }, []);
 
   const streamRef = useRef(null);
 
@@ -257,9 +349,9 @@ export default function SecurityCommandCenter() {
   // dashboard used. Everything with a sane mapping (critical incidents,
   // compliance score, assessments completed, reports generated, high
   // risk findings) is wired to real data below. Fields with no backend
-  // equivalent yet (open alerts, active faculty, live event stream,
-  // alerts table, faculty monitoring) keep their fallback/mock values —
-  // swap those endpoint URLs in once they exist.
+  // equivalent yet (open alerts, active faculty, alerts table, faculty
+  // monitoring) keep their fallback/mock values — swap those endpoint
+  // URLs in once they exist.
   const fetchDashboard = useCallback(async () => {
     setIsLoading(true);
     setError("");
@@ -293,6 +385,27 @@ export default function SecurityCommandCenter() {
     }
   }, [authHeaders, navigate]);
 
+  const fetchEventActivity = useCallback(async () => {
+    try {
+      const res = await axios.get(
+        `${API_BASE_URL}/dashboard/event-activity`,
+        {
+          headers: authHeaders(),
+        }
+      );
+
+      if (Array.isArray(res.data)) {
+        setEventActivityData(res.data);
+      }
+
+    } catch (err) {
+      console.warn(
+        "Unable to load event activity history:",
+        err?.message
+      );
+    }
+  }, [authHeaders]);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -300,25 +413,102 @@ export default function SecurityCommandCenter() {
       return;
     }
     fetchDashboard();
+    fetchEventActivity();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Simulated live event feed — new entries prepend, list is capped.
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setEvents((prev) => {
-        const next = {
-          id: `${Date.now()}`,
-          time: new Date(),
-          user: randomFrom(FACULTY_POOL),
-          ...randomFrom(EVENT_POOL),
-        };
-        return [next, ...prev].slice(0, 30);
-      });
-    }, 3200);
-    return () => clearInterval(interval);
-  }, []);
+  // Historical fill for the Security Event Activity chart. Kept separate
+  // from fetchDashboard so a missing/erroring endpoint here doesn't take
+  // down the rest of the dashboard — the chart just stays at zero (or
+  // live-only) until this succeeds.
 
+  // Simulated live event feed — new entries prepend, list is capped.
+  // Real-time security event stream
+  useEffect(() => {
+
+    const handleNewEvent = (event) => {
+      console.log(
+        event.event_name,
+        event.event_type,
+        event.status
+      );
+
+      const criticalEvents = [
+        "FAILED_LOGIN",
+        "PRIVILEGE_ESCALATION",
+        "MALWARE_DETECTED",
+        "UNKNOWN_DEVICE",
+        "UNKNOWN_IP",
+      ];
+
+      const warningEvents = [
+        "DATABASE_DOWNLOAD",
+        "FILE_DOWNLOAD",
+        "USB_CONNECTED",
+        "VPN_LOGIN",
+      ];
+
+      const eventType = (event.event_type || "").toUpperCase();
+
+      let uiStatus = "info";
+
+      if (criticalEvents.includes(eventType)) {
+        uiStatus = "critical";
+      } else if (warningEvents.includes(eventType)) {
+        uiStatus = "warning";
+      }
+
+      const newEvent = {
+        id: event.event_id,
+        time: new Date(event.timestamp),
+        user: event.user_name,
+        type: event.event_name,
+        status: uiStatus,
+      };
+
+      updateGraph(event);
+
+
+      // Update Live Stream
+      setEvents(prev => {
+
+        const exists = prev.some(
+          e => e.id === newEvent.id
+        );
+
+        if (exists)
+          return prev;
+
+
+        return [
+          newEvent,
+          ...prev
+        ].slice(0, 30);
+
+      });
+
+
+
+      // Update Graph
+      updateGraph(event);
+    };
+
+
+    socket.on(
+      "new_event",
+      handleNewEvent
+    );
+
+
+    return () => {
+      socket.off(
+        "new_event",
+        handleNewEvent
+      );
+    };
+
+
+  }, []);
   // Last-sync heartbeat, purely cosmetic — reinforces "live system" feel.
   useEffect(() => {
     const interval = setInterval(() => setLastSync(new Date()), 30000);
@@ -608,7 +798,7 @@ export default function SecurityCommandCenter() {
               </div>
 
               <ResponsiveContainer width="100%" height={280}>
-                <AreaChart data={EVENT_ACTIVITY_DATA}>
+                <AreaChart data={eventActivityData}>
                   <defs>
                     <linearGradient id="loginGrad" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#22D3EE" stopOpacity={0.35} />
@@ -662,13 +852,50 @@ export default function SecurityCommandCenter() {
             </div>
 
             {/* LIVE EVENT STREAM — terminal-inspired signature panel */}
-            <div className="rounded-2xl border border-white/[0.06] bg-[#0B1120] overflow-hidden flex flex-col">
+            <div
+              onClick={() => navigate("/event-stream")}
+              className="
+  rounded-2xl 
+  border border-white/[0.06] 
+  bg-[#0B1120] 
+  overflow-hidden 
+  flex flex-col
+  cursor-pointer
+  hover:border-cyan-400/30
+  transition-all
+  "
+            >
               <div className="relative px-5 py-4 border-b border-white/[0.06] overflow-hidden">
-                <div className="flex items-center gap-2">
-                  <Radio className="w-4 h-4 text-cyan-400" />
-                  <h3 className="text-xs font-semibold tracking-[0.15em] text-cyan-300 font-mono">
-                    LIVE EVENT STREAM
-                  </h3>
+                <div className="flex items-center justify-between">
+
+                  <div className="flex items-center gap-2">
+                    <Radio className="w-4 h-4 text-cyan-400" />
+
+                    <h3 className="
+  text-xs 
+  font-semibold 
+  tracking-[0.15em] 
+  text-cyan-300 
+  font-mono
+  ">
+                      LIVE EVENT STREAM
+                    </h3>
+                  </div>
+
+
+                  <button
+                    onClick={() => navigate("/event-stream")}
+                    className="
+  text-xs
+  text-cyan-400
+  hover:text-cyan-300
+  font-mono
+  "
+                  >
+                    View Full Stream →
+                  </button>
+
+
                 </div>
                 {/* scanline sweep, ties back to the sidebar/header grid motif */}
                 <motion.div
@@ -685,7 +912,11 @@ export default function SecurityCommandCenter() {
               >
                 <AnimatePresence initial={false}>
                   {events.map((evt) => {
-                    const style = EVENT_STATUS_STYLES[evt.status];
+
+                    const style =
+                      EVENT_STATUS_STYLES[evt.status] ||
+                      EVENT_STATUS_STYLES.info;
+
                     return (
                       <motion.div
                         key={evt.id}

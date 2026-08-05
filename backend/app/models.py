@@ -564,6 +564,26 @@ class ActivityLog(db.Model):
         nullable=False
     )
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "event_id": self.event_id,
+            "user_name": self.user_name,
+            "user_email": self.user_email,
+            "role": self.role,
+            "department": self.department,
+            "timestamp": self.timestamp.isoformat() if self.timestamp else None,
+            "event_type": self.event_type,
+            "event_name": self.event_name,
+            "resource": self.resource,
+            "ip_address": self.ip_address,
+            "device": self.device,
+            "location": self.location,
+            "status": self.status,
+            "event_metadata": self.event_metadata,
+            "created_at": self.created_at.isoformat() if self.created_at else None
+        }
+
 
 class Alert(db.Model):
     __tablename__ = "alerts"

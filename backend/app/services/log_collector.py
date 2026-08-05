@@ -10,6 +10,7 @@ will be triggered.
 """
 
 from datetime import datetime
+from app.extensions import socketio
 
 from app.models import ActivityLog
 from app.database import db
@@ -194,7 +195,9 @@ def save_activity_log(normalized_event):
 
         status=normalized_event["status"],
 
-        event_metadata=normalized_event["event_metadata"]
+        event_metadata=normalized_event["event_metadata"],
+
+        created_at=datetime.now()
 
     )
 
@@ -203,6 +206,27 @@ def save_activity_log(normalized_event):
         db.session.add(activity_log)
 
         db.session.commit()
+
+        socketio.emit(
+            "new_event",
+            {
+                "event_id": activity_log.event_id,
+                "user_name": activity_log.user_name,
+                "event_name": activity_log.event_name,
+                "event_type": activity_log.event_type,
+                "status": activity_log.status,
+                "department": activity_log.department,
+                "ip_address": activity_log.ip_address,
+                "device": activity_log.device,
+                "location": activity_log.location,
+                "timestamp": activity_log.timestamp.isoformat()
+            }
+        )
+
+        print(
+            "SOCKET EMIT:",
+            activity_log.event_id
+        )
 
     except Exception:
 

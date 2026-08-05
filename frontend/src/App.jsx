@@ -12,6 +12,8 @@ import AssessmentResult from "./pages/AssessmentResult";
 import AssessmentHistory from "./pages/AssessmentHistory";
 import Landing from "./pages/Landing";
 import ComplianceReports from "./pages/ComplianceReports";
+import ActivityLogs from "./pages/ActivityLogs";
+import LiveEventStream from "./pages/LiveEventStream";
 
 
 
@@ -59,6 +61,11 @@ function App() {
                 />
 
                 <Route
+                    path="/activity-logs"
+                    element={<ActivityLogs />}
+                />
+
+                <Route
                     path="/assessment-history"
                     element={
                         <ProtectedRoute>
@@ -97,6 +104,11 @@ function App() {
                 <Route
                     path="/assessment/result"
                     element={<AssessmentResult />}
+                />
+
+                <Route
+                    path="/event-stream"
+                    element={<LiveEventStream />}
                 />
 
             </Routes>

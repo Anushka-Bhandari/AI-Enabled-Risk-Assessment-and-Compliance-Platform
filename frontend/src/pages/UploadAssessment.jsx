@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import {
   UploadCloud,
+  ArrowLeft,
   FileText,
   FileCheck2,
   X,
@@ -45,7 +46,7 @@ const NAV_SECTIONS = [
   {
     section: "OPERATIONS",
     items: [
-      { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+      { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/SecurityCommandCenter" },
       { key: "activity-logs", label: "Activity Logs", icon: ScrollText, path: "/activity-logs" },
       { key: "alerts", label: "Alerts", icon: AlertTriangle, path: "/alerts" },
       { key: "investigations", label: "Investigations", icon: Search, path: "/investigations" },
@@ -242,9 +243,8 @@ export default function UploadAssessment() {
 
       {/* ================= SIDEBAR ================= */}
       <aside
-        className={`fixed lg:sticky top-0 h-screen w-72 bg-[#0B1120] border-r border-white/[0.06] z-40 flex flex-col transform transition-transform duration-300 ease-in-out ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        }`}
+        className={`fixed lg:sticky top-0 h-screen w-72 bg-[#0B1120] border-r border-white/[0.06] z-40 flex flex-col transform transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          }`}
       >
         <div
           className="absolute inset-0 opacity-[0.05] pointer-events-none"
@@ -294,11 +294,10 @@ export default function UploadAssessment() {
                         setSidebarOpen(false);
                         navigate(item.path);
                       }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group ${
-                        isActive
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group ${isActive
                           ? "bg-cyan-400/[0.08] text-white border border-cyan-400/20 shadow-[0_0_18px_-6px_rgba(34,211,238,0.5)]"
                           : "text-slate-400 hover:bg-white/[0.04] hover:text-slate-100 border border-transparent"
-                      }`}
+                        }`}
                     >
                       <Icon
                         className={`w-4 h-4 ${isActive ? "text-cyan-300" : "text-slate-500 group-hover:text-slate-300"}`}
@@ -362,6 +361,17 @@ export default function UploadAssessment() {
             will extract and map controls automatically.
           </p>
 
+          <div>
+            <button
+              type="button"
+              onClick={() => navigate("/assessments/new")}
+              className="flex items-center gap-1.5 px-5 py-3 rounded-xl font-semibold text-sm text-slate-300 bg-white/[0.03] border border-white/[0.08] transition-all duration-200 hover:bg-white/[0.06] hover:border-white/20"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to New Assessment
+            </button>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Drop Zone */}
             <div className="lg:col-span-2">
@@ -373,20 +383,18 @@ export default function UploadAssessment() {
                       onDragOver={handleDragOver}
                       onDragLeave={handleDragLeave}
                       onClick={() => fileInputRef.current?.click()}
-                      className={`relative rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-300 flex flex-col items-center justify-center text-center px-6 py-14 group ${
-                        isDragging
+                      className={`relative rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-300 flex flex-col items-center justify-center text-center px-6 py-14 group ${isDragging
                           ? "border-cyan-400/60 bg-cyan-400/[0.06] scale-[1.01]"
                           : "border-white/15 hover:border-cyan-400/40 hover:bg-white/[0.02]"
-                      }`}
+                        }`}
                     >
                       {isDragging && (
                         <span className="absolute inset-0 rounded-2xl bg-cyan-400/[0.04] animate-pulse" />
                       )}
 
                       <div
-                        className={`w-16 h-16 rounded-2xl bg-cyan-400/10 border border-cyan-400/30 flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110 ${
-                          isDragging ? "scale-110" : ""
-                        }`}
+                        className={`w-16 h-16 rounded-2xl bg-cyan-400/10 border border-cyan-400/30 flex items-center justify-center mb-5 transition-transform duration-300 group-hover:scale-110 ${isDragging ? "scale-110" : ""
+                          }`}
                       >
                         <UploadCloud className="w-8 h-8 text-cyan-300" strokeWidth={1.75} />
                       </div>

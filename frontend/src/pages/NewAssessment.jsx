@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ShieldCheck,
+  ArrowLeft,
   LayoutDashboard,
   ScrollText,
   AlertTriangle,
@@ -41,7 +42,7 @@ const NAV_SECTIONS = [
   {
     section: "OPERATIONS",
     items: [
-      { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+      { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/SecurityCommandCenter" },
       { key: "activity-logs", label: "Activity Logs", icon: ScrollText, path: "/activity-logs" },
       { key: "alerts", label: "Alerts", icon: AlertTriangle, path: "/alerts" },
       { key: "investigations", label: "Investigations", icon: Search, path: "/investigations" },
@@ -221,10 +222,24 @@ export default function NewAssessment() {
             </div>
 
             <div className="ml-auto flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-cyan-400/10 border border-cyan-400/30 text-cyan-200 flex items-center justify-center font-semibold text-xs">
-                {getInitials("Security Admin")}
-              </div>
-            </div>
+
+  <button
+    onClick={() => navigate("/SecurityCommandCenter")}
+    className="flex items-center gap-2 px-4 py-2 rounded-xl 
+    bg-cyan-400/10 border border-cyan-400/30 
+    text-cyan-300 text-sm font-medium
+    hover:bg-cyan-400/20 hover:text-white
+    transition-all duration-200"
+  >
+    <ArrowLeft className="w-4 h-4" />
+    Back to Dashboard
+  </button>
+
+  <div className="w-10 h-10 rounded-xl bg-cyan-400/10 border border-cyan-400/30 text-cyan-200 flex items-center justify-center font-semibold text-xs">
+    {getInitials("Security Admin")}
+  </div>
+
+</div>
           </div>
         </header>
 

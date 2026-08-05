@@ -4,7 +4,7 @@ from flask_cors import CORS
 from app.config import Config
 from app.database import db
 
-from app.extensions import mail, jwt, migrate
+from app.extensions import mail, jwt, migrate , socketio
 from app.routes.alerts import alerts_bp
 
 def create_app():
@@ -24,6 +24,10 @@ def create_app():
     mail.init_app(app)      # ✅ ADD THIS
     jwt.init_app(app)
     migrate.init_app(app, db)
+    socketio.init_app(
+    app,
+    cors_allowed_origins="*"
+)
 
     from app.routes.auth import auth
     from app.routes.assessment import assessment
@@ -39,6 +43,7 @@ def create_app():
     from app.routes.frameworks import framework_bp
     from app.routes.events import events
     from app.routes.threat_analysis import threat_analysis_bp
+    from app.routes.activity_logs import activity_logs_bp
 
 
     app.register_blueprint(auth)
@@ -48,6 +53,7 @@ def create_app():
     app.register_blueprint(run_assessment)
     app.register_blueprint(questionnaire_bp)
     app.register_blueprint(report_bp)
+    app.register_blueprint(activity_logs_bp)
     app.register_blueprint(recommendation_bp)
     app.register_blueprint(framework_bp)
     app.register_blueprint(events,url_prefix="/api")

@@ -43,7 +43,7 @@ const NAV_SECTIONS = [
   {
     section: "OPERATIONS",
     items: [
-      { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
+      { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/SecurityCommandCenter" },
       { key: "activity-logs", label: "Activity Logs", icon: ScrollText, path: "/activity-logs" },
       { key: "alerts", label: "Alerts", icon: AlertTriangle, path: "/alerts" },
       { key: "investigations", label: "Investigations", icon: Search, path: "/investigations" },
@@ -438,7 +438,7 @@ export default function AssessmentHistory() {
 
               <div className="flex flex-wrap gap-3">
                 <button
-                  onClick={() => navigate("/dashboard")}
+                  onClick={() => navigate("/SecurityCommandCenter")}
                   className="flex items-center gap-2 border border-white/10 bg-white/[0.03] hover:border-cyan-400/30 hover:bg-cyan-400/[0.06] text-slate-200 text-sm font-medium px-4 py-2.5 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <ArrowLeft className="w-4 h-4 text-cyan-400" />
