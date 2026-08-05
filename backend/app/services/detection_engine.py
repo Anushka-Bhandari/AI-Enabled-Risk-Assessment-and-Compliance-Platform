@@ -133,6 +133,8 @@ class DetectionEngine:
             triggered_at=activity_log.timestamp,
             activity_log_id=activity_log.id,
             alert_metadata=metadata,
+            status = "OPEN",
+            assigned_role = None,
         )
 
     # =========================================================================

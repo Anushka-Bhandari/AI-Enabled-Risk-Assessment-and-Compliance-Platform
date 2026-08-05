@@ -1,9 +1,6 @@
 from app.database import db
 from datetime import datetime
-<<<<<<< HEAD
 from sqlalchemy import JSON
-=======
->>>>>>> dbfa7d9c972072377980d8d78b1d5d1d06f4d004
 
 
 class User(db.Model):
@@ -588,33 +585,102 @@ class ActivityLog(db.Model):
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
 
-
 class Alert(db.Model):
     __tablename__ = "alerts"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
-    rule_id = db.Column(db.String(20), nullable=False)
+    # ==========================================================
+    # Detection Information
+    # ==========================================================
 
-    rule_name = db.Column(db.String(150), nullable=False)
+    rule_id = db.Column(
+        db.String(20),
+        nullable=False
+    )
 
-    category = db.Column(db.String(100), nullable=False)
+    rule_name = db.Column(
+        db.String(150),
+        nullable=False
+    )
 
-    severity = db.Column(db.String(20), nullable=False)
+    category = db.Column(
+        db.String(100),
+        nullable=False
+    )
 
-    title = db.Column(db.String(200), nullable=False)
+    severity = db.Column(
+        db.String(20),
+        nullable=False
+    )
 
-    description = db.Column(db.Text, nullable=False)
+    title = db.Column(
+        db.String(200),
+        nullable=False
+    )
 
-    user_name = db.Column(db.String(100), nullable=False)
+    description = db.Column(
+        db.Text,
+        nullable=False
+    )
 
-    user_email = db.Column(db.String(150), nullable=False)
+    user_name = db.Column(
+        db.String(100),
+        nullable=False
+    )
 
-    source_event_id = db.Column(db.String(100), nullable=False)
+    user_email = db.Column(
+        db.String(150),
+        nullable=False,
+        index=True
+    )
 
-    triggered_at = db.Column(db.DateTime, nullable=False)
+    source_event_id = db.Column(
+        db.String(100),
+        nullable=False,
+        index=True
+    )
 
-    alert_metadata = db.Column(JSON, nullable=True)
+    triggered_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        index=True
+    )
+
+    alert_metadata = db.Column(
+        JSON,
+        nullable=True
+    )
+
+    activity_log_id = db.Column(
+        db.Integer,
+        db.ForeignKey("activity_logs.id"),
+        nullable=False
+    )
+
+    activity_log = db.relationship(
+        "ActivityLog",
+        backref="alerts"
+    )
+
+    # ==========================================================
+    # Alert Lifecycle
+    # ==========================================================
+
+    status = db.Column(
+        db.String(20),
+        nullable=False,
+        default="OPEN",
+        index=True
+    )
+
+    assigned_role = db.Column(
+        db.String(100),
+        nullable=True
+    )
 
     created_at = db.Column(
         db.DateTime,
@@ -634,16 +700,9 @@ class Alert(db.Model):
         nullable=True
     )
 
-    activity_log_id = db.Column(
-        db.Integer,
-        db.ForeignKey("activity_logs.id"),
-        nullable=False
-    )
-
-    activity_log = db.relationship(
-        "ActivityLog",
-        backref="alerts"
-    )
+    # ==========================================================
+    # AI Threat Analysis
+    # ==========================================================
 
     threat_analysis = db.relationship(
         "ThreatAnalysis",
@@ -651,6 +710,10 @@ class Alert(db.Model):
         uselist=False,
         cascade="all, delete-orphan"
     )
+
+    # ==========================================================
+    # Serialization
+    # ==========================================================
 
     def to_dict(self):
         return {
@@ -665,6 +728,8 @@ class Alert(db.Model):
             "user_email": self.user_email,
             "source_event_id": self.source_event_id,
             "triggered_at": self.triggered_at.isoformat() if self.triggered_at else None,
+            "status": self.status,
+            "assigned_role": self.assigned_role,
             "alert_metadata": self.alert_metadata,
             "activity_log_id": self.activity_log_id,
             "has_analysis": self.threat_analysis is not None,
