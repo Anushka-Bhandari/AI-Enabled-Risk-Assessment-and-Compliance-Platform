@@ -1,9 +1,3 @@
-"""
-Event Routes.
-
-Receives security events from the Event Generator.
-"""
-
 from flask import (
     Blueprint,
     jsonify,
@@ -11,6 +5,7 @@ from flask import (
 )
 
 from app.services.log_collector import process_event
+from app.extensions import socketio
 
 
 events = Blueprint(
@@ -19,37 +14,48 @@ events = Blueprint(
 )
 
 
-# ============================================================
-# RECEIVE EVENT
-# ============================================================
-
 @events.route(
     "/events",
     methods=["POST"]
 )
 def receive_event():
-    """
-    Receive one security event from the
-    Event Generator.
-    """
+
 
     event = request.get_json()
+
 
     if event is None:
 
         return jsonify({
 
             "success": False,
-
             "message": "No event data received."
 
-        }), 400
+        }),400
+
 
     try:
 
-        activity_log = process_event(
-            event
+        # 1. SAVE INTO DATABASE
+        activity_log = process_event(event)
+
+
+        # 2. SEND LIVE STREAM
+        socketio.emit(
+            "new_event",
+            {
+                "event_id": activity_log.event_id,
+                "user_name": activity_log.user_name,
+                "user_email": activity_log.user_email,
+                "event_type": activity_log.event_type,
+                "event_name": activity_log.event_name,
+                "resource": activity_log.resource,
+                "ip_address": activity_log.ip_address,
+                "status": activity_log.status,
+                "timestamp": str(activity_log.timestamp)
+            }
         )
+
 
         return jsonify({
 
@@ -59,24 +65,29 @@ def receive_event():
 
             "event_id": activity_log.event_id
 
-        }), 201
+        }),201
+
 
     except ValueError as e:
 
-        return jsonify({
-
-            "success": False,
-
-            "message": str(e)
-
-        }), 400
-
-    except Exception:
 
         return jsonify({
 
-            "success": False,
+            "success":False,
 
-            "message": "Internal server error."
+            "message":str(e)
 
-        }), 500
+        }),400
+
+
+    except Exception as e:
+
+        print(e)
+
+        return jsonify({
+
+            "success":False,
+
+            "message":"Internal server error."
+
+        }),500

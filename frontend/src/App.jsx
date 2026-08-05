@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import VerifyOtp from "./pages/VerifyOtp";
-import Dashboard from "./pages/Dashboard";
+import SecurityCommandCenter from "./pages/SecurityCommandCenter";
 
 import NewAssessment from "./pages/NewAssessment";
 import QuestionnaireAssessment from "./pages/QuestionnaireAssessment";
@@ -11,6 +11,9 @@ import UploadAssessment from "./pages/UploadAssessment";
 import AssessmentResult from "./pages/AssessmentResult";
 import AssessmentHistory from "./pages/AssessmentHistory";
 import Landing from "./pages/Landing";
+import ComplianceReports from "./pages/ComplianceReports";
+import ActivityLogs from "./pages/ActivityLogs";
+import LiveEventStream from "./pages/LiveEventStream";
 
 
 
@@ -21,14 +24,23 @@ function App() {
         <BrowserRouter>
             <Routes>
 
-                <Route 
-                    path="/" 
-                    element={<Landing />} 
+                <Route
+                    path="/"
+                    element={<Landing />}
                 />
 
                 <Route
                     path="/login"
                     element={<Login />}
+                />
+
+                <Route
+                    path="/compliance-reports"
+                    element={
+                        <ProtectedRoute>
+                            <ComplianceReports />
+                        </ProtectedRoute>
+                    }
                 />
 
                 <Route
@@ -42,12 +54,15 @@ function App() {
                 />
 
                 <Route
-                    path="/dashboard"
+                    path="/SecurityCommandCenter"
                     element={
-                        <ProtectedRoute>
-                            <Dashboard />
-                        </ProtectedRoute>
+                        <SecurityCommandCenter />
                     }
+                />
+
+                <Route
+                    path="/activity-logs"
+                    element={<ActivityLogs />}
                 />
 
                 <Route
@@ -60,7 +75,7 @@ function App() {
                 />
 
                 <Route
-                    path="/assessments"
+                    path="/assessments/new"
                     element={
                         <ProtectedRoute>
                             <NewAssessment />
@@ -89,6 +104,11 @@ function App() {
                 <Route
                     path="/assessment/result"
                     element={<AssessmentResult />}
+                />
+
+                <Route
+                    path="/event-stream"
+                    element={<LiveEventStream />}
                 />
 
             </Routes>
