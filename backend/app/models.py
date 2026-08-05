@@ -1,4 +1,6 @@
 from app.database import db
+from datetime import datetime
+from sqlalchemy import JSON
 
 
 class User(db.Model):
@@ -561,4 +563,48 @@ class ActivityLog(db.Model):
         db.DateTime,
         default=db.func.current_timestamp(),
         nullable=False
+    )
+
+class Alert(db.Model):
+    __tablename__ = "alerts"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    rule_id = db.Column(db.String(20), nullable=False)
+
+    rule_name = db.Column(db.String(150), nullable=False)
+
+    category = db.Column(db.String(100), nullable=False)
+
+    severity = db.Column(db.String(20), nullable=False)
+
+    title = db.Column(db.String(200), nullable=False)
+
+    description = db.Column(db.Text, nullable=False)
+
+    user_name = db.Column(db.String(100), nullable=False)
+
+    user_email = db.Column(db.String(150), nullable=False)
+
+    source_event_id = db.Column(db.String(100), nullable=False)
+
+    triggered_at = db.Column(db.DateTime, nullable=False)
+
+    alert_metadata = db.Column(JSON, nullable=True)
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow,
+        nullable=False
+    )
+
+    activity_log_id = db.Column(
+        db.Integer,
+        db.ForeignKey("activity_logs.id"),
+        nullable=False
+    )
+
+    activity_log = db.relationship(
+        "ActivityLog",
+        backref="alerts"
     )

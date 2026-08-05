@@ -39,7 +39,13 @@ EVENT_TYPES = {
 
     "APPLICATION_INSTALL": "Unauthorized Application",
 
-    "FIREWALL_BLOCK": "Firewall Blocked Request"
+    "FIREWALL_BLOCK": "Firewall Blocked Request",
+
+    "FILE_DELETE": "File Delete",
+
+    "ANTIVIRUS_DISABLED": "Antivirus Disabled",
+
+    "AUDIT_LOG_TAMPERING": "Audit Log Tampering",
 }
 
 # ============================================================
@@ -81,7 +87,13 @@ EVENT_WEIGHTS = {
 
     "PRIVILEGE_ESCALATION": 0.2,
 
-    "FIREWALL_BLOCK": 0.8
+    "FIREWALL_BLOCK": 0.8,
+
+    "FILE_DELETE": 0.7,
+
+    "ANTIVIRUS_DISABLED": 0.2,
+
+    "AUDIT_LOG_TAMPERING": 0.1,
 }
 
 # ============================================================

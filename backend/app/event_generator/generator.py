@@ -26,6 +26,7 @@ from .utils import (
     database_download_metadata,
     file_download_metadata,
     file_upload_metadata,
+    file_delete_metadata,
     password_metadata,
     usb_metadata,
     malware_metadata,
@@ -33,6 +34,9 @@ from .utils import (
     email_metadata,
     bulk_email_metadata,
     firewall_metadata,
+    antivirus_metadata,
+    privilege_metadata,
+    audit_log_metadata,
     default_metadata,
 )
 
@@ -94,7 +98,15 @@ def build_metadata(event_type):
 
         "BULK_EMAIL": bulk_email_metadata,
 
-        "FIREWALL_BLOCK": firewall_metadata
+        "FIREWALL_BLOCK": firewall_metadata,
+
+        "FILE_DELETE": file_delete_metadata,
+
+        "ANTIVIRUS_DISABLED": antivirus_metadata,
+
+        "PRIVILEGE_ESCALATION": privilege_metadata,
+
+        "AUDIT_LOG_TAMPERING": audit_log_metadata
 
     }
 

@@ -121,8 +121,30 @@ def random_ip():
 def login_metadata():
 
     return {
+
         "browser": random.choice(BROWSERS),
-        "operating_system": random.choice(OPERATING_SYSTEMS)
+
+        "operating_system": random.choice(OPERATING_SYSTEMS),
+
+        "session_id": str(uuid.uuid4()),
+
+        "login_method": random.choice(
+            [
+                "PASSWORD",
+                "SSO",
+                "MFA"
+            ]
+        ),
+
+        "successful": random.choice(
+            [
+                True,
+                True,
+                True,
+                False
+            ]
+        )
+
     }
 
 
@@ -133,8 +155,25 @@ def login_metadata():
 def database_metadata():
 
     return {
+
         "table": random.choice(DATABASE_TABLES),
-        "records_accessed": random.randint(10, 500)
+
+        "records_accessed": random.randint(10, 500),
+
+        "is_sensitive_table": random.choice(
+            [
+                True,
+                False
+            ]
+        ),
+
+        "query_status": random.choice(
+            [
+                "SUCCESS",
+                "FAILED"
+            ]
+        )
+
     }
 
 
@@ -144,10 +183,22 @@ def database_metadata():
 
 def database_download_metadata():
 
-    return {
-        "table": random.choice(DATABASE_TABLES),
-        "records_downloaded": random.randint(500, 5000)
-    }
+  return {
+
+    "table": random.choice(DATABASE_TABLES),
+
+    "records_accessed": random.randint(1000, 5000),
+
+    "records_downloaded": random.randint(500, 5000),
+
+    "is_sensitive_table": random.choice(
+        [
+            True,
+            False
+        ]
+    )
+
+}
 
 
 # ============================================================
@@ -160,7 +211,27 @@ def file_download_metadata():
 
         "file_name": f"document_{random.randint(1,500)}.pdf",
 
-        "file_size_mb": round(random.uniform(0.5, 150.0), 2)
+        "file_size_mb": round(
+            random.uniform(0.5, 700.0),
+            2
+        ),
+
+        "file_type": random.choice(
+            [
+                "pdf",
+                "docx",
+                "xlsx",
+                "pptx",
+                "zip"
+            ]
+        ),
+
+        "is_sensitive": random.choice(
+            [
+                True,
+                False
+            ]
+        )
 
     }
 
@@ -175,7 +246,20 @@ def file_upload_metadata():
 
         "file_name": f"upload_{random.randint(1,500)}.pdf",
 
-        "file_size_mb": round(random.uniform(0.5, 100.0), 2)
+        "file_size_mb": round(
+            random.uniform(0.5, 500.0),
+            2
+        ),
+
+        "file_type": random.choice(
+            [
+                "pdf",
+                "docx",
+                "xlsx",
+                "pptx",
+                "zip"
+            ]
+        )
 
     }
 
@@ -199,7 +283,6 @@ def password_metadata():
         )
 
     }
-
 
 # ============================================================
 # USB
@@ -256,7 +339,16 @@ def application_metadata():
 
         "application": random.choice(APPLICATIONS),
 
-        "version": f"{random.randint(1,10)}.{random.randint(0,9)}"
+        "version": f"{random.randint(1,10)}.{random.randint(0,9)}",
+
+        "authorized": random.choice(
+            [
+                True,
+                True,
+                True,
+                False
+            ]
+        )
 
     }
 
@@ -267,16 +359,30 @@ def application_metadata():
 
 def email_metadata():
 
+    recipient_count = random.randint(1, 10)
+
+    attachment = random.choice(
+        [
+            True,
+            False
+        ]
+    )
+
     return {
 
-        "recipient_count": random.randint(1, 10),
+        "recipient_count": recipient_count,
 
-        "attachment": random.choice(
-            [
-                True,
-                False
-            ]
-        )
+        "external_recipient_count": random.randint(
+            0,
+            recipient_count
+        ),
+
+        "attachment": attachment,
+
+        "attachment_count": random.randint(
+            1,
+            5
+        ) if attachment else 0
 
     }
 
@@ -287,16 +393,30 @@ def email_metadata():
 
 def bulk_email_metadata():
 
+    recipient_count = random.randint(500, 5000)
+
+    attachment = random.choice(
+        [
+            True,
+            False
+        ]
+    )
+
     return {
 
-        "recipient_count": random.randint(500, 5000),
+        "recipient_count": recipient_count,
 
-        "attachment": random.choice(
-            [
-                True,
-                False
-            ]
-        )
+        "external_recipient_count": random.randint(
+            100,
+            recipient_count
+        ),
+
+        "attachment": attachment,
+
+        "attachment_count": random.randint(
+            20,
+            200
+        ) if attachment else 0
 
     }
 
@@ -328,6 +448,106 @@ def firewall_metadata():
 
     }
 
+
+# ============================================================
+# ANTIVIRUS
+# ============================================================
+
+def antivirus_metadata():
+
+    return {
+
+        "action": random.choice(
+            [
+                "DISABLED",
+                "ENABLED"
+            ]
+        )
+
+    }
+
+
+# ============================================================
+# PRIVILEGE ESCALATION
+# ============================================================
+
+def privilege_metadata():
+
+    roles = [
+        "Student",
+        "Faculty",
+        "Administrator",
+        "System Administrator"
+    ]
+
+    before = random.choice(roles[:-1])
+
+    after = random.choice(
+        roles[
+            roles.index(before) + 1:
+        ]
+    )
+
+    return {
+
+        "privilege_before": before,
+
+        "privilege_after": after
+
+    }
+
+
+# ============================================================
+# AUDIT LOG
+# ============================================================
+
+def audit_log_metadata():
+
+    return {
+
+        "action": random.choice(
+            [
+                "MODIFIED",
+                "DELETED",
+                "TAMPERED"
+            ]
+        )
+
+    }
+
+# ============================================================
+# FILE DELETE
+# ============================================================
+
+def file_delete_metadata():
+
+    return {
+
+        "file_name": f"document_{random.randint(1,500)}.pdf",
+
+        "file_size_mb": round(
+            random.uniform(0.5, 700.0),
+            2
+        ),
+
+        "file_type": random.choice(
+            [
+                "pdf",
+                "docx",
+                "xlsx",
+                "pptx",
+                "zip"
+            ]
+        ),
+
+        "is_sensitive": random.choice(
+            [
+                True,
+                False
+            ]
+        )
+
+    }
 
 # ============================================================
 # DEFAULT
