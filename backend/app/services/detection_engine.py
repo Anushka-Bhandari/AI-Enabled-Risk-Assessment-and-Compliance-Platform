@@ -20,7 +20,7 @@ from datetime import timedelta
 from typing import Any, Dict, List, Optional, Tuple
 
 from app.models import ActivityLog, Alert
-from app.detection_rules import RULE_LIBRARY
+from app.services.detection_rules import RULE_LIBRARY
 
 logger = logging.getLogger(__name__)
 
@@ -108,15 +108,25 @@ class DetectionEngine:
     # =========================================================================
     def _create_alert(
         self,
-        activity_log: ActivityLog,
-        rule_id: str,
-        details: str,
-        extra_metadata: Optional[Dict[str, Any]] = None,
-    ) -> Alert:
-        """Build an Alert object. Does NOT add it to the session or commit."""
+        activity_log,
+        rule_id,
+        details,
+        extra_metadata=None,
+    ):
 
         rule = RULE_LIBRARY[rule_id]
+
+        severity = rule["severity"]
+
+        if severity == "LOW":
+            status = "RESOLVED"
+            resolved_at = activity_log.timestamp
+        else:
+            status = "OPEN"
+            resolved_at = None
+
         metadata = {"rule_id": rule_id}
+
         if extra_metadata:
             metadata.update(extra_metadata)
 
@@ -124,19 +134,20 @@ class DetectionEngine:
             rule_id=rule["rule_id"],
             rule_name=rule["rule_name"],
             category=rule["category"],
-            severity=rule["severity"],
+            severity=severity,
             title=rule["title"],
             description=details,
-            user_name=getattr(activity_log, "user_name", None),
-            user_email=getattr(activity_log, "user_email", None),
-            source_event_id=getattr(activity_log, "event_id", None),
+            user_name=activity_log.user_name,
+            user_email=activity_log.user_email,
+            source_event_id=activity_log.event_id,
             triggered_at=activity_log.timestamp,
             activity_log_id=activity_log.id,
             alert_metadata=metadata,
-            status = "OPEN",
-            assigned_role = None,
-        )
 
+            status=status,
+            resolved_at=resolved_at,
+            assigned_role=None
+        )
     # =========================================================================
     # Query Helpers (cached per detection run)
     # =========================================================================

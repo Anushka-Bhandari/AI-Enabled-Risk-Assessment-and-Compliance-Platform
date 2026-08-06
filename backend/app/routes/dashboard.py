@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from flask import jsonify
 
 from app.database import db
-from app.models import Assessment, User , ActivityLog
+from app.models import Assessment, User , ActivityLog , Alert
 
 dashboard = Blueprint("dashboard", __name__)
 
@@ -257,3 +257,31 @@ def event_activity():
     print(list(buckets.values()))
 
     return jsonify(list(buckets.values())), 200
+
+
+@dashboard.route("/dashboard/recent-alerts", methods=["GET"])
+
+def recent_alerts():
+
+    alerts = (
+        Alert.query
+        .order_by(Alert.triggered_at.desc())
+        .limit(10)
+        .all()
+    )
+
+    return jsonify([
+        {
+            "id": alert.id,
+            "severity": alert.severity,
+            "user": alert.user_name,
+            "department": (
+                alert.activity_log.department
+                if alert.activity_log
+                else "Unknown"
+            ),
+            "status": alert.status,
+            "time": alert.triggered_at.strftime("%I:%M %p")
+        }
+        for alert in alerts
+    ])

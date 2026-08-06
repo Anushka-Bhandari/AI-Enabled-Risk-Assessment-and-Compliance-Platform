@@ -720,22 +720,26 @@ class Alert(db.Model):
             "id": self.id,
             "rule_id": self.rule_id,
             "rule_name": self.rule_name,
-            "category": self.category,
-            "severity": self.severity,
             "title": self.title,
             "description": self.description,
+
+            "severity": self.severity,
+            "status": self.status,
+
+            "category": self.category,
+
             "user_name": self.user_name,
             "user_email": self.user_email,
+
             "source_event_id": self.source_event_id,
+
             "triggered_at": self.triggered_at.isoformat() if self.triggered_at else None,
-            "status": self.status,
-            "assigned_role": self.assigned_role,
-            "alert_metadata": self.alert_metadata,
-            "activity_log_id": self.activity_log_id,
-            "has_analysis": self.threat_analysis is not None,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
             "resolved_at": self.resolved_at.isoformat() if self.resolved_at else None,
+
+            # IMPORTANT
+            "detection_metadata": self.alert_metadata
         }
 
 class ThreatAnalysis(db.Model):

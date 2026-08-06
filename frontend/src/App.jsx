@@ -14,6 +14,8 @@ import Landing from "./pages/Landing";
 import ComplianceReports from "./pages/ComplianceReports";
 import ActivityLogs from "./pages/ActivityLogs";
 import LiveEventStream from "./pages/LiveEventStream";
+import AlertsDashboard from "./pages/AlertsDashboard";
+import AlertDetails from "./pages/AlertDetails";
 
 
 
@@ -110,6 +112,10 @@ function App() {
                     path="/event-stream"
                     element={<LiveEventStream />}
                 />
+
+                <Route path="/alerts" element={<AlertsDashboard />} />
+
+                <Route path="/alerts/:id" element={<AlertDetails />} />
 
             </Routes>
         </BrowserRouter>

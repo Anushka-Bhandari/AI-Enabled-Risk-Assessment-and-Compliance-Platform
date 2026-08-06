@@ -14,6 +14,7 @@ from app.extensions import socketio
 
 from app.models import ActivityLog
 from app.database import db
+from app.services.detection_engine import DetectionEngine
 
 
 # ============================================================
@@ -241,23 +242,49 @@ def save_activity_log(normalized_event):
 # ============================================================
 
 def trigger_detection_engine(activity_log):
-    """
-    Trigger the Detection Engine after the event
-    has been successfully stored.
 
-    The Detection Engine implementation will be
-    connected in the next module.
-    """
+    engine = DetectionEngine(
+        db.session
+    )
 
-    #
-    # Future Implementation:
-    #
-    # from app.services.detection_engine import analyze_event
-    #
-    # analyze_event(activity_log)
-    #
+    alerts = engine.run_detection(
+        activity_log
+    )
 
-    return
+    print("ALERTS GENERATED:", len(alerts))
+
+    for alert in alerts:
+        print(
+            alert.rule_id,
+            alert.rule_name,
+            alert.severity
+        )
+
+    if not alerts:
+        return []
+
+    try:
+
+        for alert in alerts:
+
+            db.session.add(alert)
+
+        db.session.commit()
+
+        for alert in alerts:
+
+            socketio.emit(
+                "new_alert",
+                alert.to_dict()
+            )
+
+        return alerts
+
+    except Exception:
+
+        db.session.rollback()
+
+        raise
 
 
 # ============================================================
@@ -298,8 +325,10 @@ def process_event(event):
     # Trigger Detection Engine
     # --------------------------------------------------------
 
-    trigger_detection_engine(
+    alerts = trigger_detection_engine(
         activity_log
     )
+
+    print(f"Generated {len(alerts)} alerts")
 
     return activity_log

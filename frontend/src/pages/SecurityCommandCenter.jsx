@@ -211,15 +211,6 @@ const FACULTY_POOL = [
 
 const DEPARTMENTS = ["Computer Science", "Finance", "Registrar's Office", "Engineering", "Admissions", "Library Systems"];
 
-const RECENT_ALERTS = [
-  { id: "ALT-7734", severity: "Critical", user: "unknown.actor", department: "Finance", status: "Investigating", time: "12:06 PM" },
-  { id: "ALT-7733", severity: "High", user: "r.mehta", department: "Registrar's Office", status: "Open", time: "11:52 AM" },
-  { id: "ALT-7731", severity: "Medium", user: "s.fernandez", department: "Engineering", status: "Open", time: "11:20 AM" },
-  { id: "ALT-7728", severity: "Critical", user: "unknown.actor", department: "Admissions", status: "Escalated", time: "10:47 AM" },
-  { id: "ALT-7725", severity: "Low", user: "n.patel", department: "Library Systems", status: "Resolved", time: "09:58 AM" },
-  { id: "ALT-7719", severity: "High", user: "l.chen", department: "Computer Science", status: "Open", time: "09:12 AM" },
-];
-
 const FACULTY_MONITORING = [
   { name: "Dr. A. Sharma", department: "Computer Science", activities: 214, risk: "Low" },
   { name: "Prof. R. Mehta", department: "Registrar's Office", activities: 187, risk: "Medium" },
@@ -290,6 +281,8 @@ export default function SecurityCommandCenter() {
   const [analyticsData, setAnalyticsData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [recentAlerts, setRecentAlerts] = useState([]);
+
 
   const [events, setEvents] = useState([]);
 
@@ -417,6 +410,52 @@ export default function SecurityCommandCenter() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        navigate("/login");
+        return;
+    }
+
+
+    socket.auth = {
+        token
+    };
+
+
+    socket.connect();
+
+
+    socket.on("connect", () => {
+        console.log(
+            "Socket connected:",
+            socket.id
+        );
+    });
+
+
+    socket.on("disconnect", () => {
+        console.log(
+            "Socket disconnected"
+        );
+    });
+
+
+
+    return () => {
+
+        socket.disconnect();
+
+        socket.off("connect");
+        socket.off("disconnect");
+
+    };
+
+
+}, []);
+
   // Historical fill for the Security Event Activity chart. Kept separate
   // from fetchDashboard so a missing/erroring endpoint here doesn't take
   // down the rest of the dashboard — the chart just stays at zero (or
@@ -529,6 +568,18 @@ export default function SecurityCommandCenter() {
       }),
     [lastSync]
   );
+
+  useEffect(() => {
+    axios
+      .get(`${API_BASE_URL}/alerts/recent`, {
+        headers: authHeaders(),
+      })
+      .then((res) => {
+        console.log("ALERT DATA:", res.data);
+        setRecentAlerts(res.data);
+      })
+      .catch(console.error);
+  }, []);
 
   // Same derivation as the old Dashboard.jsx: risk breakdown, total
   // assessments, and compliance score all come straight off the
@@ -963,14 +1014,20 @@ export default function SecurityCommandCenter() {
                     <th className="px-6 py-3 font-medium">Alert ID</th>
                     <th className="px-6 py-3 font-medium">Severity</th>
                     <th className="px-6 py-3 font-medium">User</th>
-                    <th className="px-6 py-3 font-medium">Department</th>
+                    <th className="px-6 py-3 font-medium">Title</th>
                     <th className="px-6 py-3 font-medium">Status</th>
                     <th className="px-6 py-3 font-medium">Timestamp</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {RECENT_ALERTS.map((alert) => {
-                    const style = SEVERITY_STYLES[alert.severity];
+                  {recentAlerts.map((alert) => {
+
+                    const normalizedSeverity =
+                      alert.severity?.charAt(0).toUpperCase() +
+                      alert.severity?.slice(1).toLowerCase();
+
+                    const style =
+                      SEVERITY_STYLES[normalizedSeverity] || SEVERITY_STYLES.Low;
                     return (
                       <tr
                         key={alert.id}
@@ -985,10 +1042,16 @@ export default function SecurityCommandCenter() {
                             {alert.severity}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-slate-400 font-mono">{alert.user}</td>
-                        <td className="px-6 py-4 text-slate-400">{alert.department}</td>
+
+                        <td className="px-6 py-4 text-slate-400">{alert.user_name}</td>
+                        <td className="px-6 py-4 text-slate-400">{alert.title}</td>
+
                         <td className="px-6 py-4 text-slate-400">{alert.status}</td>
-                        <td className="px-6 py-4 text-slate-500 font-mono">{alert.time}</td>
+
+
+                        <td className="px-6 py-4 text-slate-500 font-mono">
+                          {new Date(alert.triggered_at).toLocaleString()}
+                        </td>
                       </tr>
                     );
                   })}
