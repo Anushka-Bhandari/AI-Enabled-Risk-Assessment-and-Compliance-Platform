@@ -488,6 +488,480 @@ CONTROL_FRAMEWORKS: dict[str, list[str]] = {
         ISO27701,
         NIST,
     ],
+
+    # ==========================================================
+    # ISO/IEC 27001:2022 Annex A Alignment — Additional Controls
+    # (C051-C117)
+    # ==========================================================
+
+    # ---------- A.5 Organizational controls (remaining) ----------
+
+    "C051": [
+        UGC,
+        NAAC,
+        NBA,
+        ISO27001,
+        NIST,
+    ],
+
+    "C052": [
+        UGC,
+        NAAC,
+        NBA,
+        ISO27001,
+        NIST,
+    ],
+
+    "C053": [
+        UGC,
+        NAAC,
+        NBA,
+        ISO27001,
+        NIST,
+    ],
+
+    "C054": [
+        DPDP,
+        IT_ACT,
+        UGC,
+        NAAC,
+        ISO27001,
+        ISO27701,
+        NIST,
+    ],
+
+    "C055": [
+        ISO27001,
+    ],
+
+    "C056": [
+        IT_ACT,
+        UGC,
+        ISO27001,
+        NIST,
+    ],
+
+    "C057": [
+        UGC,
+        NAAC,
+        NBA,
+        ISO27001,
+        NIST,
+    ],
+
+    "C058": [
+        IT_ACT,
+        UGC,
+        NAAC,
+        ISO27001,
+        NIST,
+    ],
+
+    "C059": [
+        UGC,
+        ISO27001,
+        NIST,
+    ],
+
+    "C060": [
+        DPDP,
+        ISO27001,
+        ISO27701,
+    ],
+
+    "C061": [
+        DPDP,
+        IT_ACT,
+        UGC,
+        ISO27001,
+        ISO27701,
+        NIST,
+    ],
+
+    "C062": [
+        IT_ACT,
+        UGC,
+        NAAC,
+        NBA,
+        ISO27001,
+        NIST,
+    ],
+
+    "C063": [
+        IT_ACT,
+        UGC,
+        ISO27001,
+        NIST,
+    ],
+
+    "C064": [
+        IT_ACT,
+        UGC,
+        NAAC,
+        NBA,
+        ISO27001,
+        NIST,
+    ],
+
+    "C065": [
+        DPDP,
+        UGC,
+        ISO27001,
+        NIST,
+    ],
+
+    "C066": [
+        IT_ACT,
+        UGC,
+        NBA,
+        ISO27001,
+        NIST,
+    ],
+
+    "C067": [
+        UGC,
+        ISO27001,
+        NIST,
+    ],
+
+    "C068": [
+        DPDP,
+        IT_ACT,
+        UGC,
+        ISO27001,
+        ISO27701,
+        NIST,
+    ],
+
+    "C069": [
+        IT_ACT,
+        UGC,
+        ISO27001,
+        NIST,
+    ],
+
+    "C070": [
+        IT_ACT,
+        ISO27001,
+        NIST,
+    ],
+
+    "C071": [
+        UGC,
+        NAAC,
+        NBA,
+        ISO27001,
+        NIST,
+    ],
+
+    "C072": [
+        DPDP,
+        IT_ACT,
+        UGC,
+        NAAC,
+        NBA,
+        ISO27001,
+        ISO27701,
+        NIST,
+    ],
+
+    "C073": [
+        UGC,
+        NAAC,
+        NBA,
+        ISO27001,
+    ],
+
+    "C074": [
+        DPDP,
+        IT_ACT,
+        UGC,
+        NAAC,
+        NBA,
+        ISO27001,
+        ISO27701,
+    ],
+
+    "C075": [
+        UGC,
+        NAAC,
+        NBA,
+        ISO27001,
+        NIST,
+    ],
+
+    "C076": [
+        UGC,
+        NAAC,
+        NBA,
+        ISO27001,
+        NIST,
+    ],
+
+    "C077": [
+        UGC,
+        ISO27001,
+        NIST,
+    ],
+
+    # ---------- A.6 People controls (remaining) ----------
+
+    "C078": [
+        UGC,
+        ISO27001,
+        NIST,
+    ],
+
+    "C079": [
+        ISO27001,
+    ],
+
+    "C080": [
+        ISO27001,
+    ],
+
+    "C081": [
+        IT_ACT,
+        UGC,
+        ISO27001,
+        NIST,
+    ],
+
+    "C082": [
+        DPDP,
+        UGC,
+        ISO27001,
+        ISO27701,
+    ],
+
+    "C083": [
+        IT_ACT,
+        UGC,
+        ISO27001,
+        NIST,
+    ],
+
+    # ---------- A.7 Physical controls ----------
+
+    "C084": [
+        UGC,
+        ISO27001,
+        NIST,
+    ],
+
+    "C085": [
+        UGC,
+        ISO27001,
+        NIST,
+    ],
+
+    "C086": [
+        DPDP,
+        UGC,
+        ISO27001,
+        NIST,
+    ],
+
+    "C087": [
+        UGC,
+        ISO27001,
+        NIST,
+    ],
+
+    "C088": [
+        UGC,
+        ISO27001,
+        NIST,
+    ],
+
+    "C089": [
+        UGC,
+        ISO27001,
+    ],
+
+    "C090": [
+        DPDP,
+        UGC,
+        ISO27001,
+    ],
+
+    "C091": [
+        UGC,
+        ISO27001,
+    ],
+
+    "C092": [
+        IT_ACT,
+        UGC,
+        ISO27001,
+        NIST,
+    ],
+
+    "C093": [
+        DPDP,
+        IT_ACT,
+        UGC,
+        ISO27001,
+        NIST,
+    ],
+
+    "C094": [
+        UGC,
+        ISO27001,
+    ],
+
+    "C095": [
+        UGC,
+        ISO27001,
+    ],
+
+    "C096": [
+        UGC,
+        ISO27001,
+    ],
+
+    "C097": [
+        DPDP,
+        IT_ACT,
+        UGC,
+        ISO27001,
+        NIST,
+    ],
+
+    # ---------- A.8 Technological controls (remaining) ----------
+
+    "C098": [
+        IT_ACT,
+        UGC,
+        ISO27001,
+        NIST,
+    ],
+
+    "C099": [
+        ISO27001,
+        NIST,
+    ],
+
+    "C100": [
+        DPDP,
+        IT_ACT,
+        ISO27001,
+        ISO27701,
+        NIST,
+    ],
+
+    "C101": [
+        DPDP,
+        IT_ACT,
+        ISO27001,
+        ISO27701,
+        NIST,
+    ],
+
+    "C102": [
+        DPDP,
+        IT_ACT,
+        UGC,
+        ISO27001,
+        ISO27701,
+        NIST,
+    ],
+
+    "C103": [
+        ISO27001,
+        NIST,
+    ],
+
+    "C104": [
+        IT_ACT,
+        ISO27001,
+        NIST,
+    ],
+
+    "C105": [
+        IT_ACT,
+        ISO27001,
+        NIST,
+    ],
+
+    "C106": [
+        IT_ACT,
+        ISO27001,
+        NIST,
+    ],
+
+    "C107": [
+        IT_ACT,
+        ISO27001,
+        NIST,
+    ],
+
+    "C108": [
+        IT_ACT,
+        UGC,
+        ISO27001,
+        NIST,
+    ],
+
+    "C109": [
+        IT_ACT,
+        NBA,
+        ISO27001,
+        NIST,
+    ],
+
+    "C110": [
+        IT_ACT,
+        NBA,
+        ISO27001,
+        NIST,
+    ],
+
+    "C111": [
+        NBA,
+        ISO27001,
+        NIST,
+    ],
+
+    "C112": [
+        IT_ACT,
+        NBA,
+        ISO27001,
+        NIST,
+    ],
+
+    "C113": [
+        IT_ACT,
+        NBA,
+        ISO27001,
+        NIST,
+    ],
+
+    "C114": [
+        IT_ACT,
+        ISO27001,
+        NIST,
+    ],
+
+    "C115": [
+        IT_ACT,
+        ISO27001,
+        NIST,
+    ],
+
+    "C116": [
+        DPDP,
+        IT_ACT,
+        ISO27001,
+        ISO27701,
+        NIST,
+    ],
+
+    "C117": [
+        IT_ACT,
+        ISO27001,
+        NIST,
+    ],
 }
 
 
@@ -534,4 +1008,30 @@ if extra_controls:
     raise RuntimeError(
         "Framework mappings exist for unknown controls:\n"
         + "\n".join(sorted(extra_controls))
+    )
+
+unmapped_controls = {
+    control_id
+    for control_id, frameworks in CONTROL_FRAMEWORKS.items()
+    if not frameworks
+}
+
+if unmapped_controls:
+    raise RuntimeError(
+        "The following controls have no framework mappings:\n"
+        + "\n".join(sorted(unmapped_controls))
+    )
+
+iso_controls_missing_framework = {
+    control_id
+    for control_id, control in CONTROL_BY_ID.items()
+    if control.get("iso27001") and ISO27001 not in CONTROL_FRAMEWORKS.get(control_id, [])
+}
+
+if iso_controls_missing_framework:
+    raise RuntimeError(
+        "The following controls have ISO/IEC 27001:2022 Annex A mappings in "
+        "control_library.py but are missing the ISO27001 framework in "
+        "CONTROL_FRAMEWORKS:\n"
+        + "\n".join(sorted(iso_controls_missing_framework))
     )

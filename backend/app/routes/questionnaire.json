@@ -2,8 +2,7 @@
     "version": "1.0",
     "title": "University Security & Privacy Assessment Questionnaire",
     "description": "Assessment questionnaire for evaluating cybersecurity, privacy, and regulatory compliance of Indian universities.",
-    "total_questions": 50,
-
+    "total_questions": 117,
     "questions": [
         {
             "id": 1,
@@ -129,7 +128,7 @@
             "id": 25,
             "question": "Are desktops, laptops, workstations, and other endpoint devices secured through centralized policies, security monitoring, and device protection controls?",
             "control_id": "C025"
-        },        
+        },
         {
             "id": 26,
             "question": "Are institution-owned or authorized mobile devices protected through security measures such as device encryption, screen locks, remote wipe capabilities, and mobile device management where appropriate?",
@@ -254,6 +253,341 @@
             "id": 50,
             "question": "Are the institution's Enterprise Resource Planning (ERP), Learning Management System (LMS), Student Information System (SIS), and other academic platforms securely configured, regularly updated, protected by appropriate access controls, and continuously monitored against security threats?",
             "control_id": "C050"
+        },
+        {
+            "id": 51,
+            "question": "Are information security roles and responsibilities formally defined, assigned to accountable personnel across departments, communicated to staff, and reviewed periodically?",
+            "control_id": "C051"
+        },
+        {
+            "id": 52,
+            "question": "Are conflicting duties, such as combining finance, admissions, or examination record creation with their approval, segregated or covered by compensating controls, and periodically reviewed?",
+            "control_id": "C052"
+        },
+        {
+            "id": 53,
+            "question": "Does university leadership actively require staff and faculty to follow security policy, provide adequate resources for security activities, and promote a culture of security awareness?",
+            "control_id": "C053"
+        },
+        {
+            "id": 54,
+            "question": "Has your institution identified relevant regulatory, law enforcement, and data protection authorities, and documented procedures and designated personnel for contacting them?",
+            "control_id": "C054"
+        },
+        {
+            "id": 55,
+            "question": "Does your institution maintain contact with security forums, higher-education information-sharing groups, or professional associations, and disseminate relevant information internally?",
+            "control_id": "C055"
+        },
+        {
+            "id": 56,
+            "question": "Does your institution collect and analyze threat intelligence relevant to higher education to inform risk assessments and security decisions?",
+            "control_id": "C056"
+        },
+        {
+            "id": 57,
+            "question": "Are information security requirements integrated into IT and infrastructure projects, such as ERP rollouts or system migrations, from initiation through go-live?",
+            "control_id": "C057"
+        },
+        {
+            "id": 58,
+            "question": "Does your institution have an acceptable use policy for institutional information and IT assets that is communicated to students, faculty, and staff, with acknowledgment obtained and violations addressed?",
+            "control_id": "C058"
+        },
+        {
+            "id": 59,
+            "question": "Is there a documented and tracked process to ensure institutional devices, access cards, and information assets are returned when students graduate or staff leave, with outstanding items followed up?",
+            "control_id": "C059"
+        },
+        {
+            "id": 60,
+            "question": "Is information labelled according to its classification level using a defined scheme, with labelling procedures communicated to relevant staff?",
+            "control_id": "C060"
+        },
+        {
+            "id": 61,
+            "question": "Are secure mechanisms and documented procedures used to transfer sensitive academic, financial, or personal data between departments, campuses, or external parties, including agreements with external parties where relevant?",
+            "control_id": "C061"
+        },
+        {
+            "id": 62,
+            "question": "Is there a formal process for creating and managing unique identities for students, faculty, and staff across university systems, covering role changes, departures, and periodic reconciliation?",
+            "control_id": "C062"
+        },
+        {
+            "id": 63,
+            "question": "Are authentication credentials for university accounts securely issued, stored (e.g., hashed and salted), and supported by a process for reporting and resetting compromised credentials?",
+            "control_id": "C063"
+        },
+        {
+            "id": 64,
+            "question": "Is access to university systems formally provisioned based on role, periodically reviewed with documented evidence of remediation, and promptly revoked upon role change or departure?",
+            "control_id": "C064"
+        },
+        {
+            "id": 65,
+            "question": "Do contracts with vendors serving the university, such as ERP, LMS, or cloud providers, include information security requirements, defined responsibilities, and incident notification obligations, reviewed periodically?",
+            "control_id": "C065"
+        },
+        {
+            "id": 66,
+            "question": "Does your institution assess security risks in its ICT supply chain, including software and hardware vendors, and verify the provenance of components used in critical systems?",
+            "control_id": "C066"
+        },
+        {
+            "id": 67,
+            "question": "Is supplier service delivery and security performance monitored through periodic reviews or audits, with identified issues tracked to resolution?",
+            "control_id": "C067"
+        },
+        {
+            "id": 68,
+            "question": "Does your institution have defined criteria and a documented process for assessing security events and deciding whether they constitute an incident requiring escalation?",
+            "control_id": "C068"
+        },
+        {
+            "id": 69,
+            "question": "Are post-incident reviews and root cause analyses conducted after security incidents, with lessons learned documented and used to improve controls over time?",
+            "control_id": "C069"
+        },
+        {
+            "id": 70,
+            "question": "Does your institution have documented procedures to identify, collect, and preserve evidence during security incidents while maintaining chain of custody?",
+            "control_id": "C070"
+        },
+        {
+            "id": 71,
+            "question": "Are ICT systems and infrastructure configured, tested, and maintained to meet the continuity and recovery objectives needed to support critical university services during a disruption?",
+            "control_id": "C071"
+        },
+        {
+            "id": 72,
+            "question": "Does your institution identify, document, and periodically review compliance with applicable legal, statutory, regulatory, and contractual requirements relevant to education and data protection?",
+            "control_id": "C072"
+        },
+        {
+            "id": 73,
+            "question": "Are intellectual property rights related to research output, course materials, and licensed software documented, protected, and monitored for licensing compliance?",
+            "control_id": "C073"
+        },
+        {
+            "id": 74,
+            "question": "Are academic, financial, and administrative records, including transcripts and examination results, protected from loss, falsification, or unauthorized alteration, with periodic integrity verification?",
+            "control_id": "C074"
+        },
+        {
+            "id": 75,
+            "question": "Are independent reviews of the university's information security posture conducted periodically by reviewers independent of the areas being reviewed, with findings tracked to remediation?",
+            "control_id": "C075"
+        },
+        {
+            "id": 76,
+            "question": "Does your institution periodically assess departments and staff for compliance with information security policies and standards, tracking non-compliance to resolution?",
+            "control_id": "C076"
+        },
+        {
+            "id": 77,
+            "question": "Are operating procedures for critical IT and administrative processes documented, kept up to date, and accessible to relevant personnel?",
+            "control_id": "C077"
+        },
+        {
+            "id": 78,
+            "question": "Is background screening conducted for faculty, staff, and contractors prior to granting access to institutional systems, scoped to role sensitivity and updated for role changes?",
+            "control_id": "C078"
+        },
+        {
+            "id": 79,
+            "question": "Are information security responsibilities, including confidentiality obligations, included in employment or appointment terms and acknowledged by personnel before access is granted?",
+            "control_id": "C079"
+        },
+        {
+            "id": 80,
+            "question": "Does your institution maintain a formal, documented disciplinary process for information security policy violations that is applied consistently?",
+            "control_id": "C080"
+        },
+        {
+            "id": 81,
+            "question": "Are security responsibilities that continue after termination or role change documented and enforced, with access revocation and asset return coordinated as part of offboarding?",
+            "control_id": "C081"
+        },
+        {
+            "id": 82,
+            "question": "Are confidentiality or non-disclosure agreements used with relevant personnel, researchers, and third parties to protect institutional and research data, and reviewed periodically?",
+            "control_id": "C082"
+        },
+        {
+            "id": 83,
+            "question": "Does your institution enforce a remote working security policy that defines requirements for home networks, personal devices, and secure remote access methods such as VPN and MFA?",
+            "control_id": "C083"
+        },
+        {
+            "id": 84,
+            "question": "Are defined physical security perimeters established around data centers, server rooms, and sensitive administrative offices, with perimeter integrity periodically assessed?",
+            "control_id": "C084"
+        },
+        {
+            "id": 85,
+            "question": "Are physical entry controls, such as badges or locks, enforced at server rooms, examination departments, and administrative areas, with entry logs maintained and visitor procedures defined?",
+            "control_id": "C085"
+        },
+        {
+            "id": 86,
+            "question": "Are offices, records rooms, and facilities containing sensitive student, financial, or research information physically secured and restricted to authorized personnel?",
+            "control_id": "C086"
+        },
+        {
+            "id": 87,
+            "question": "Are sensitive campus areas monitored through surveillance or access logging, with retained records and investigation of anomalies?",
+            "control_id": "C087"
+        },
+        {
+            "id": 88,
+            "question": "Are facilities housing IT infrastructure protected against fire, flooding, power surges, and other environmental threats through detection, suppression, and tested protection measures?",
+            "control_id": "C088"
+        },
+        {
+            "id": 89,
+            "question": "Are rules defined and enforced for working within secure areas such as data centers or examination record rooms, limiting access to authorized personnel?",
+            "control_id": "C089"
+        },
+        {
+            "id": 90,
+            "question": "Does your institution enforce a clear desk and clear screen policy in administrative and faculty offices, with screen locking configured on university devices?",
+            "control_id": "C090"
+        },
+        {
+            "id": 91,
+            "question": "Is IT equipment sited and protected to reduce environmental hazards, unauthorized viewing, and accidental damage, with protection measures reviewed periodically?",
+            "control_id": "C091"
+        },
+        {
+            "id": 92,
+            "question": "Are university-owned laptops and devices used off-campus protected through defined security requirements such as encryption, with loss or theft reported through a defined process?",
+            "control_id": "C092"
+        },
+        {
+            "id": 93,
+            "question": "Is removable storage media containing institutional data encrypted or otherwise protected, inventoried, and securely disposed of when no longer needed?",
+            "control_id": "C093"
+        },
+        {
+            "id": 94,
+            "question": "Are backup power, cooling, and other supporting utilities for server rooms and data centers monitored, alerted on failure, and periodically tested?",
+            "control_id": "C094"
+        },
+        {
+            "id": 95,
+            "question": "Is power and network cabling protected from damage or interception, documented, labelled, and periodically inspected?",
+            "control_id": "C095"
+        },
+        {
+            "id": 96,
+            "question": "Is a maintenance schedule defined and followed for critical IT and physical security equipment, performed by authorized personnel with records maintained?",
+            "control_id": "C096"
+        },
+        {
+            "id": 97,
+            "question": "Are data sanitization or destruction procedures applied and verified before retired equipment is disposed of or reused, with disposal records maintained?",
+            "control_id": "C097"
+        },
+        {
+            "id": 98,
+            "question": "Is access to the source code of ERP, LMS, or other custom university systems restricted to authorized developers, version-controlled, logged, and periodically reviewed?",
+            "control_id": "C098"
+        },
+        {
+            "id": 99,
+            "question": "Is the capacity of critical university systems monitored and planned ahead of peak periods such as admissions or examinations, with thresholds and alerts configured?",
+            "control_id": "C099"
+        },
+        {
+            "id": 100,
+            "question": "Does your institution securely and verifiably delete information from systems, applications, and backups when it is no longer required, consistent with a defined deletion policy?",
+            "control_id": "C100"
+        },
+        {
+            "id": 101,
+            "question": "Is sensitive data such as student records masked or anonymized before use in testing, training, or analytics environments, with masking effectiveness periodically verified?",
+            "control_id": "C101"
+        },
+        {
+            "id": 102,
+            "question": "Are data leakage prevention controls implemented to detect and prevent unauthorized exfiltration of sensitive student, research, or financial data, with alerts investigated?",
+            "control_id": "C102"
+        },
+        {
+            "id": 103,
+            "question": "Is redundancy implemented for critical information processing facilities based on business impact analysis, with failover mechanisms tested and availability monitored?",
+            "control_id": "C103"
+        },
+        {
+            "id": 104,
+            "question": "Do university systems use a centralized, authoritative time source for clock synchronization, with discrepancies in timestamps monitored and investigated?",
+            "control_id": "C104"
+        },
+        {
+            "id": 105,
+            "question": "Is the use of privileged utility programs identified, restricted to authorized personnel, logged, and monitored?",
+            "control_id": "C105"
+        },
+        {
+            "id": 106,
+            "question": "Is software installation on operational university systems restricted through an approved list or change process, with installation activity logged and unauthorized software remediated?",
+            "control_id": "C106"
+        },
+        {
+            "id": 107,
+            "question": "Are the network services relied upon by university systems identified, documented, and secured, with unnecessary or insecure services disabled?",
+            "control_id": "C107"
+        },
+        {
+            "id": 108,
+            "question": "Is a web filtering solution implemented on campus networks to block malicious or inappropriate websites, with filtering rules kept up to date?",
+            "control_id": "C108"
+        },
+        {
+            "id": 109,
+            "question": "Does your institution follow a documented secure development life cycle that incorporates security requirements at each phase, with developers trained and compliance verified for university system projects?",
+            "control_id": "C109"
+        },
+        {
+            "id": 110,
+            "question": "Are security requirements covering authentication, authorization, and data protection defined before developing or acquiring university applications, and verified before deployment?",
+            "control_id": "C110"
+        },
+        {
+            "id": 111,
+            "question": "Are secure architecture and engineering principles documented and applied when designing university systems, with architecture reviews conducted for new or significantly modified systems?",
+            "control_id": "C111"
+        },
+        {
+            "id": 112,
+            "question": "Are documented secure coding standards followed for custom university applications, with developers trained and code reviews or static/dynamic analysis performed to identify vulnerabilities?",
+            "control_id": "C112"
+        },
+        {
+            "id": 113,
+            "question": "Is security testing performed during development and prior to acceptance or go-live of university systems, with identified vulnerabilities tracked to remediation?",
+            "control_id": "C113"
+        },
+        {
+            "id": 114,
+            "question": "Are security requirements defined for outsourced or contracted development work, with externally developed code reviewed or tested before acceptance?",
+            "control_id": "C114"
+        },
+        {
+            "id": 115,
+            "question": "Are development, test, and production environments logically or physically separated, with a controlled change promotion process and production data restricted unless masked?",
+            "control_id": "C115"
+        },
+        {
+            "id": 116,
+            "question": "Is sensitive production data masked or anonymized before use as test data, with access to test data controlled and securely disposed of after use?",
+            "control_id": "C116"
+        },
+        {
+            "id": 117,
+            "question": "Are audit testing activities on operational university systems planned and agreed with system owners in advance, with access controlled, time-limited, and monitored to prevent disruption?",
+            "control_id": "C117"
         }
     ]
 }
