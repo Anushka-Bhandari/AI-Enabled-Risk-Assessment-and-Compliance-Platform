@@ -11,6 +11,12 @@ Responsibility (and ONLY responsibility):
 Out of scope for this module: committing to the database, sending
 notifications, AI analysis — anything downstream of "list of Alert
 objects".
+
+This platform is multi-university. Every ActivityLog and every Alert
+belongs to exactly one university via `university_id`. All historical
+comparisons performed by this engine are scoped to the university of the
+ActivityLog currently being evaluated, and every Alert created carries
+that same university_id forward.
 """
 
 from __future__ import annotations
@@ -131,6 +137,7 @@ class DetectionEngine:
             metadata.update(extra_metadata)
 
         return Alert(
+            university_id=activity_log.university_id,
             rule_id=rule["rule_id"],
             rule_name=rule["rule_name"],
             category=rule["category"],
@@ -158,20 +165,30 @@ class DetectionEngine:
 
     def _query_history_by_type(
         self,
+        university_id: int,
         user_email: str,
         event_types: Tuple[str, ...],
         before,
         since=None,
     ) -> List[ActivityLog]:
         """All events of the given event_type(s) for a user before `before`
-        (optionally since a lower bound), newest first. Shared by every
-        history-comparison rule (R002-R004, R006, R007, R023)."""
+        (optionally since a lower bound), newest first, scoped to a single
+        university. Shared by every history-comparison rule (R002-R004,
+        R006, R007, R023)."""
 
-        cache_key = ("history_by_type", user_email, event_types, since, before)
+        cache_key = (
+            "history_by_type",
+            university_id,
+            user_email,
+            event_types,
+            since,
+            before,
+        )
 
         def loader():
             query = (
                 self.db.query(ActivityLog)
+                .filter(ActivityLog.university_id == university_id)
                 .filter(ActivityLog.user_email == user_email)
                 .filter(ActivityLog.event_type.in_(event_types))
                 .filter(ActivityLog.timestamp < before)
@@ -184,21 +201,30 @@ class DetectionEngine:
 
     def _query_events_in_window(
         self,
+        university_id: int,
         user_email: str,
         event_types: Tuple[str, ...],
         end,
         window_minutes: int,
     ) -> List[ActivityLog]:
         """All events of the given event_type(s) for a user within
-        `window_minutes` before `end`. Shared by every threshold/spike rule
-        (R001, R009, R013, R014, R017)."""
+        `window_minutes` before `end`, scoped to a single university.
+        Shared by every threshold/spike rule (R001, R009, R013, R014, R017)."""
 
-        cache_key = ("events_window", user_email, event_types, window_minutes, end)
+        cache_key = (
+            "events_window",
+            university_id,
+            user_email,
+            event_types,
+            window_minutes,
+            end,
+        )
 
         def loader():
             start = end - timedelta(minutes=window_minutes)
             return (
                 self.db.query(ActivityLog)
+                .filter(ActivityLog.university_id == university_id)
                 .filter(ActivityLog.user_email == user_email)
                 .filter(ActivityLog.event_type.in_(event_types))
                 .filter(ActivityLog.timestamp >= start)
@@ -240,7 +266,11 @@ class DetectionEngine:
             return None
         config = RULE_LIBRARY["R001"]["config"]
         recent = self._query_events_in_window(
-            log.user_email, ("FAILED_LOGIN",), log.timestamp, config["time_window_minutes"]
+            log.university_id,
+            log.user_email,
+            ("FAILED_LOGIN",),
+            log.timestamp,
+            config["time_window_minutes"],
         )
         if len(recent) >= config["threshold"]:
             return self._create_alert(
@@ -257,7 +287,9 @@ class DetectionEngine:
         if log.event_type not in ("LOGIN", "VPN_LOGIN"):
             return None
         config = RULE_LIBRARY["R002"]["config"]
-        history = self._query_history_by_type(log.user_email, ("LOGIN", "VPN_LOGIN"), log.timestamp)
+        history = self._query_history_by_type(
+            log.university_id, log.user_email, ("LOGIN", "VPN_LOGIN"), log.timestamp
+        )
         previous = history[0] if history else None
         if previous is None or not previous.location or not log.location:
             return None
@@ -294,7 +326,9 @@ class DetectionEngine:
             )
         if log.event_type != "LOGIN" or not log.device:
             return None
-        history = self._query_history_by_type(log.user_email, ("LOGIN",), log.timestamp)
+        history = self._query_history_by_type(
+            log.university_id, log.user_email, ("LOGIN",), log.timestamp
+        )
         known_devices = {h.device for h in history if h.device}
         if log.device not in known_devices:
             return self._create_alert(
@@ -317,7 +351,9 @@ class DetectionEngine:
             )
         if log.event_type != "LOGIN" or not log.ip_address:
             return None
-        history = self._query_history_by_type(log.user_email, ("LOGIN",), log.timestamp)
+        history = self._query_history_by_type(
+            log.university_id, log.user_email, ("LOGIN",), log.timestamp
+        )
         known_ips = {h.ip_address for h in history if h.ip_address}
         if log.ip_address not in known_ips:
             return self._create_alert(
@@ -350,6 +386,7 @@ class DetectionEngine:
             return None
         config = RULE_LIBRARY["R006"]["config"]
         history = self._query_history_by_type(
+            log.university_id,
             log.user_email,
             ("LOGIN",),
             log.timestamp,
@@ -373,7 +410,9 @@ class DetectionEngine:
         if log.event_type != "LOGIN":
             return None
         config = RULE_LIBRARY["R007"]["config"]
-        history = self._query_history_by_type(log.user_email, ("LOGIN",), log.timestamp)
+        history = self._query_history_by_type(
+            log.university_id, log.user_email, ("LOGIN",), log.timestamp
+        )
         if not history:
             return None
         idle_days = (log.timestamp - history[0].timestamp).days
@@ -416,6 +455,7 @@ class DetectionEngine:
             return None
         config = RULE_LIBRARY["R009"]["config"]
         recent = self._query_events_in_window(
+            log.university_id,
             log.user_email,
             ("EMAIL_SENT", "BULK_EMAIL"),
             log.timestamp,
@@ -490,7 +530,11 @@ class DetectionEngine:
             return None
         config = RULE_LIBRARY["R013"]["config"]
         recent = self._query_events_in_window(
-            log.user_email, ("FILE_UPLOAD",), log.timestamp, config["time_window_minutes"]
+            log.university_id,
+            log.user_email,
+            ("FILE_UPLOAD",),
+            log.timestamp,
+            config["time_window_minutes"],
         )
         if len(recent) >= config["upload_threshold"]:
             return self._create_alert(
@@ -508,7 +552,11 @@ class DetectionEngine:
             return None
         config = RULE_LIBRARY["R014"]["config"]
         recent = self._query_events_in_window(
-            log.user_email, ("FILE_DELETE",), log.timestamp, config["time_window_minutes"]
+            log.university_id,
+            log.user_email,
+            ("FILE_DELETE",),
+            log.timestamp,
+            config["time_window_minutes"],
         )
         if len(recent) >= config["deletion_threshold"]:
             return self._create_alert(
@@ -564,6 +612,7 @@ class DetectionEngine:
             return None
         config = RULE_LIBRARY["R017"]["config"]
         recent = self._query_events_in_window(
+            log.university_id,
             log.user_email,
             ("DATABASE_ACCESS", "DATABASE_DOWNLOAD"),
             log.timestamp,
@@ -631,7 +680,7 @@ class DetectionEngine:
             return None
         metadata = self._metadata_for(log)
 
-        if metadata.get("action") != "DISABLED": 
+        if metadata.get("action") != "DISABLED":
             return None
         return self._create_alert(
             log,
@@ -658,7 +707,9 @@ class DetectionEngine:
         # R023 — no lookback config, so history is all-time.
         if log.event_type != "VPN_LOGIN":
             return None
-        history = self._query_history_by_type(log.user_email, ("VPN_LOGIN",), log.timestamp)
+        history = self._query_history_by_type(
+            log.university_id, log.user_email, ("VPN_LOGIN",), log.timestamp
+        )
         known_locations = {h.location for h in history if h.location}
         if log.location and log.location not in known_locations:
             return self._create_alert(

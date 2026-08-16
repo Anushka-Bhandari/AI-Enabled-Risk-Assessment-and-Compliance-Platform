@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from app.services.threat_analyzer import (
     ThreatAnalyzer,
@@ -9,12 +9,24 @@ from app.services.threat_analysis_service import (
     ThreatAnalysisService,
 )
 
+from app.models import Alert, User
+
 
 threat_analysis_bp = Blueprint(
     "threat_analysis",
     __name__,
     url_prefix="/threat-analysis"
 )
+
+def get_current_user():
+    user_id = get_jwt_identity()
+
+    user = User.query.get(user_id)
+
+    if not user:
+        return None
+
+    return user
 
 @threat_analysis_bp.route(
     "/generate/<int:alert_id>",
@@ -24,6 +36,25 @@ threat_analysis_bp = Blueprint(
 def generate_threat_analysis(alert_id):
 
     try:
+
+        user = get_current_user()
+
+        if not user:
+            return jsonify({
+                "success": False,
+                "message": "User not found"
+            }), 404
+
+        alert = Alert.query.filter_by(
+            id=alert_id,
+            university_id=user.university_id
+        ).first()
+
+        if not alert:
+            return jsonify({
+                "success": False,
+                "message": "Alert not found"
+            }), 404
 
         analysis = ThreatAnalyzer(
             alert_id
@@ -65,6 +96,25 @@ def generate_threat_analysis(alert_id):
 def get_threat_analysis(alert_id):
 
     try:
+
+        user = get_current_user()
+
+        if not user:
+            return jsonify({
+                "success": False,
+                "message": "User not found"
+            }), 404
+
+        alert = Alert.query.filter_by(
+            id=alert_id,
+            university_id=user.university_id
+        ).first()
+
+        if not alert:
+            return jsonify({
+                "success": False,
+                "message": "Alert not found"
+            }), 404
 
         analysis = ThreatAnalysisService(
             alert_id

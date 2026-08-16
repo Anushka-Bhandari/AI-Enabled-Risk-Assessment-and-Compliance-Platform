@@ -85,22 +85,20 @@ class ThreatAnalyzer:
                 f"Alert {self.alert_id} not found."
             )
 
-
     def _load_activity_log(self):
-
-        self.activity_log = (
-            ActivityLog.query.filter_by(
-                event_id=self.alert.event_id
-            ).first()
+        """
+        Load the Activity Log associated with the alert.
+        """
+        self.activity_log = db.session.get(
+            ActivityLog,
+            self.alert.activity_log_id
         )
 
         if not self.activity_log:
-
             raise ValueError(
-                f"Activity log not found for event "
-                f"{self.alert.event_id}."
+                f"Activity log {self.alert.activity_log_id} "
+                f"not found for Alert {self.alert.id}."
             )
-
 
     # =====================================================
     # Context Builder
@@ -114,7 +112,9 @@ class ThreatAnalyzer:
 
                 "id": self.alert.id,
 
-                "event_id": self.alert.event_id,
+                "source_event_id": self.alert.source_event_id,
+
+                "university_id": self.alert.university_id,
 
                 "rule_id": self.alert.rule_id,
 
@@ -137,6 +137,8 @@ class ThreatAnalyzer:
             "activity_log": {
 
                 "event_id": self.activity_log.event_id,
+
+                "university_id": self.activity_log.university_id,
 
                 "user_name": self.activity_log.user_name,
 

@@ -25,6 +25,10 @@ REQUIRED_FIELDS = [
 
     "event_id",
 
+    "university_id",
+    "actor_type",
+    "actor_id",
+
     "user_name",
 
     "user_email",
@@ -104,6 +108,10 @@ def normalize_event(event):
 
         "event_id": event["event_id"],
 
+        "university_id": event["university_id"],
+        "actor_type": event["actor_type"].strip(),
+        "actor_id": event["actor_id"],
+
         "user_name": event["user_name"].strip(),
 
         "user_email": event["user_email"].strip().lower(),
@@ -172,6 +180,10 @@ def save_activity_log(normalized_event):
 
         event_id=normalized_event["event_id"],
 
+        university_id=normalized_event["university_id"],
+        actor_type=normalized_event["actor_type"],
+        actor_id=normalized_event["actor_id"],
+
         user_name=normalized_event["user_name"],
 
         user_email=normalized_event["user_email"],
@@ -212,14 +224,26 @@ def save_activity_log(normalized_event):
             "new_event",
             {
                 "event_id": activity_log.event_id,
+
+                "university_id": activity_log.university_id,
+
+                "actor_type": activity_log.actor_type,
+                "actor_id": activity_log.actor_id,
+
                 "user_name": activity_log.user_name,
+                "user_email": activity_log.user_email,
+                "role": activity_log.role,
+                "department": activity_log.department,
+
                 "event_name": activity_log.event_name,
                 "event_type": activity_log.event_type,
+                "resource": activity_log.resource,
+
                 "status": activity_log.status,
-                "department": activity_log.department,
                 "ip_address": activity_log.ip_address,
                 "device": activity_log.device,
                 "location": activity_log.location,
+
                 "timestamp": activity_log.timestamp.isoformat()
             }
         )

@@ -21,7 +21,6 @@ from .event_templates import (
     USB_DEVICES,
     MALWARE_NAMES,
     APPLICATIONS,
-    MONITORED_USERS,
 )
 
 
@@ -45,17 +44,6 @@ def generate_timestamp():
     Return current UTC timestamp.
     """
     return datetime.utcnow().isoformat()
-
-
-# ============================================================
-# RANDOM USER
-# ============================================================
-
-def random_user():
-    """
-    Return one monitored user.
-    """
-    return random.choice(MONITORED_USERS)
 
 
 # ============================================================

@@ -89,6 +89,12 @@ class University(db.Model):
         lazy=True
     )
 
+    activity_logs = db.relationship(
+        "ActivityLog",
+        backref="university",
+        lazy=True
+    )
+
 
 class Assessment(db.Model):
     __tablename__ = "assessments"
@@ -128,7 +134,7 @@ class Assessment(db.Model):
     questionnaire_completed = db.Column(
     db.Boolean,
     default=False
-)
+    )
 
     document_completed = db.Column(
         db.Boolean,
@@ -484,6 +490,23 @@ class ActivityLog(db.Model):
         primary_key=True
     )
 
+    university_id = db.Column(
+        db.Integer,
+        db.ForeignKey("university.id"),
+        nullable=False,
+        index=True
+    )
+
+    actor_type = db.Column(
+        db.String(30),
+        nullable=False
+    )
+
+    actor_id = db.Column(
+        db.Integer,
+        nullable=False
+    )
+
     event_id = db.Column(
         db.String(100),
         unique=True,
@@ -569,6 +592,9 @@ class ActivityLog(db.Model):
         return {
             "id": self.id,
             "event_id": self.event_id,
+            "university_id": self.university_id,
+            "actor_type": self.actor_type,
+            "actor_id": self.actor_id,
             "user_name": self.user_name,
             "user_email": self.user_email,
             "role": self.role,
@@ -591,6 +617,13 @@ class Alert(db.Model):
     id = db.Column(
         db.Integer,
         primary_key=True
+    )
+
+    university_id = db.Column(
+        db.Integer,
+        db.ForeignKey("university.id"),
+        nullable=False,
+        index=True
     )
 
     # ==========================================================
@@ -718,6 +751,7 @@ class Alert(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
+            "university_id": self.university_id,
             "rule_id": self.rule_id,
             "rule_name": self.rule_name,
             "title": self.title,

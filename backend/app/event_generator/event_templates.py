@@ -46,6 +46,40 @@ EVENT_TYPES = {
     "ANTIVIRUS_DISABLED": "Antivirus Disabled",
 
     "AUDIT_LOG_TAMPERING": "Audit Log Tampering",
+
+    # --------------------------------------------------------
+    # University-specific events
+    # --------------------------------------------------------
+
+    "EXAM_RECORD_ACCESS": "Exam Record Access",
+    "EXAM_RECORD_DOWNLOAD": "Exam Record Download",
+
+    "RESULT_ACCESS": "Result Access",
+    "RESULT_MODIFICATION": "Result Modification",
+
+    "STUDENT_RECORD_ACCESS": "Student Record Access",
+    "STUDENT_RECORD_DOWNLOAD": "Student Record Download",
+
+    "ATTENDANCE_ACCESS": "Attendance Access",
+    "ATTENDANCE_MODIFICATION": "Attendance Modification",
+
+    "FACULTY_HR_RECORD_ACCESS": "Faculty HR Record Access",
+
+    "ADMISSION_RECORD_ACCESS": "Admission Record Access",
+
+    "SCHOLARSHIP_RECORD_ACCESS": "Scholarship Record Access",
+
+    "FEE_RECORD_ACCESS": "Fee Record Access",
+
+    "BULK_STUDENT_DATA_EXPORT": "Bulk Student Data Export",
+
+    "ADMINISTRATIVE_DOCUMENT_ACCESS": "Administrative Document Access",
+
+    "SUSPICIOUS_LOGIN": "Suspicious Login",
+
+    "UNAUTHORIZED_ACCESS": "Unauthorized Access",
+
+    "PRIVILEGE_ACTIVITY": "Privilege Activity",
 }
 
 # ============================================================
@@ -94,6 +128,44 @@ EVENT_WEIGHTS = {
     "ANTIVIRUS_DISABLED": 0.2,
 
     "AUDIT_LOG_TAMPERING": 0.1,
+
+    # --------------------------------------------------------
+    # University-specific events
+    # --------------------------------------------------------
+
+    "STUDENT_RECORD_ACCESS": 4,
+
+    "ATTENDANCE_ACCESS": 4,
+
+    "EXAM_RECORD_ACCESS": 3,
+
+    "RESULT_ACCESS": 3,
+
+    "FACULTY_HR_RECORD_ACCESS": 2,
+
+    "ADMISSION_RECORD_ACCESS": 2,
+
+    "FEE_RECORD_ACCESS": 2,
+
+    "ADMINISTRATIVE_DOCUMENT_ACCESS": 2,
+
+    "STUDENT_RECORD_DOWNLOAD": 1.5,
+
+    "EXAM_RECORD_DOWNLOAD": 1.5,
+
+    "SCHOLARSHIP_RECORD_ACCESS": 1.5,
+
+    "RESULT_MODIFICATION": 1,
+
+    "ATTENDANCE_MODIFICATION": 1,
+
+    "BULK_STUDENT_DATA_EXPORT": 0.4,
+
+    "SUSPICIOUS_LOGIN": 0.3,
+
+    "UNAUTHORIZED_ACCESS": 0.2,
+
+    "PRIVILEGE_ACTIVITY": 0.2,
 }
 
 # ============================================================
@@ -125,7 +197,17 @@ RESOURCES = [
     "Admissions Portal",
     "Network Drive",
     "VPN Gateway",
-    "Hostel Management System"
+    "Hostel Management System",
+
+    # --------------------------------------------------------
+    # University-specific resources
+    # --------------------------------------------------------
+
+    "Examination System",
+    "Results Database",
+    "Scholarship System",
+    "Fee Management System",
+    "Administrative Documents"
 ]
 
 # ============================================================
@@ -236,82 +318,4 @@ APPLICATIONS = [
     "PuTTY",
     "PowerShell Script",
     "Unknown Executable"
-]
-
-# ============================================================
-# MONITORED USERS
-# ============================================================
-
-MONITORED_USERS = [
-
-    {
-        "name": "Ananya Sharma",
-        "email": "ananya.sharma@college.edu",
-        "role": "Faculty",
-        "department": "Computer Science"
-    },
-
-    {
-        "name": "Rahul Verma",
-        "email": "rahul.verma@college.edu",
-        "role": "Faculty",
-        "department": "Electronics"
-    },
-
-    {
-        "name": "Priya Singh",
-        "email": "priya.singh@college.edu",
-        "role": "Faculty",
-        "department": "Mechanical"
-    },
-
-    {
-        "name": "Amit Joshi",
-        "email": "amit.joshi@college.edu",
-        "role": "Exam Cell",
-        "department": "Administration"
-    },
-
-    {
-        "name": "Neha Gupta",
-        "email": "neha.gupta@college.edu",
-        "role": "Accounts",
-        "department": "Finance"
-    },
-
-    {
-        "name": "Karan Mehta",
-        "email": "karan.mehta@college.edu",
-        "role": "Lab Assistant",
-        "department": "IT"
-    },
-
-    {
-        "name": "Sakshi Jain",
-        "email": "sakshi.jain@college.edu",
-        "role": "HOD",
-        "department": "Computer Science"
-    },
-
-    {
-        "name": "Rohit Kapoor",
-        "email": "rohit.kapoor@college.edu",
-        "role": "Director",
-        "department": "Administration"
-    },
-
-    {
-        "name": "Nitin Arora",
-        "email": "nitin.arora@college.edu",
-        "role": "Network Engineer",
-        "department": "IT"
-    },
-
-    {
-        "name": "Meera Patel",
-        "email": "meera.patel@college.edu",
-        "role": "Research Coordinator",
-        "department": "Research"
-    }
-
 ]
