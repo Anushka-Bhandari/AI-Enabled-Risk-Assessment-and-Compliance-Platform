@@ -10,6 +10,9 @@ import random
 from .event_templates import (
     EVENT_TYPES,
     EVENT_WEIGHTS,
+    EVENT_RESOURCES,
+    ROLE_EVENT_WEIGHTS,
+    UNIVERSITY_EVENT_RATE,
 )
 
 from .utils import (
@@ -37,6 +40,16 @@ from .utils import (
     antivirus_metadata,
     privilege_metadata,
     audit_log_metadata,
+    exam_record_metadata,
+    exam_result_modify_metadata,
+    student_record_metadata,
+    student_record_modify_metadata,
+    attendance_metadata,
+    attendance_modify_metadata,
+    financial_record_metadata,
+    financial_record_modify_metadata,
+    admission_record_metadata,
+    bulk_data_export_metadata,
     default_metadata,
 )
 
@@ -45,13 +58,25 @@ from .utils import (
 # CHOOSE EVENT TYPE
 # ============================================================
 
-def choose_event_type():
+def choose_event_type(role):
     """
-    Select an event using weighted probabilities.
+    Select an event while keeping university-specific activities
+    consistent with the monitored user's role.
     """
+
+    role_events = ROLE_EVENT_WEIGHTS.get(role)
+
+    if role_events and random.random() < UNIVERSITY_EVENT_RATE:
+        event_names = list(role_events.keys())
+        weights = list(role_events.values())
+
+        return random.choices(
+            event_names,
+            weights=weights,
+            k=1
+        )[0]
 
     event_names = list(EVENT_WEIGHTS.keys())
-
     weights = list(EVENT_WEIGHTS.values())
 
     return random.choices(
@@ -106,8 +131,21 @@ def build_metadata(event_type):
 
         "PRIVILEGE_ESCALATION": privilege_metadata,
 
-        "AUDIT_LOG_TAMPERING": audit_log_metadata
+        "AUDIT_LOG_TAMPERING": audit_log_metadata,
 
+        # University-specific events
+        "EXAM_RECORD_ACCESS": exam_record_metadata,
+        "EXAM_RECORD_DOWNLOAD": exam_record_metadata,
+        "EXAM_RESULT_MODIFY": exam_result_modify_metadata,
+        "STUDENT_RECORD_ACCESS": student_record_metadata,
+        "STUDENT_RECORD_DOWNLOAD": student_record_metadata,
+        "STUDENT_RECORD_MODIFY": student_record_modify_metadata,
+        "ATTENDANCE_ACCESS": attendance_metadata,
+        "ATTENDANCE_MODIFY": attendance_modify_metadata,
+        "FINANCIAL_RECORD_ACCESS": financial_record_metadata,
+        "FINANCIAL_RECORD_MODIFY": financial_record_modify_metadata,
+        "ADMISSION_RECORD_ACCESS": admission_record_metadata,
+        "BULK_DATA_EXPORT": bulk_data_export_metadata,
     }
 
     builder = metadata_builders.get(
@@ -129,7 +167,12 @@ def generate_event():
 
     user = random_user()
 
-    event_type = choose_event_type()
+    event_type = choose_event_type(user["role"])
+
+    resource = EVENT_RESOURCES.get(
+        event_type,
+        random_resource()
+    )
 
     event = {
         "event_id": generate_event_id(),
@@ -148,7 +191,7 @@ def generate_event():
 
         "event_name": EVENT_TYPES[event_type],
 
-        "resource": random_resource(),
+        "resource": resource,
 
         "ip_address": random_ip(),
 

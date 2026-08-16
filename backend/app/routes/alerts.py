@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required
+from app.services.rbac import role_required
 from datetime import datetime
 
 from app import db
@@ -16,7 +16,12 @@ alerts_bp = Blueprint(
 # ==========================================================
 
 @alerts_bp.route("/stats", methods=["GET"])
-@jwt_required()
+@role_required(
+    "SECURITY_OFFICER",
+    "IT_ADMIN",
+    "DIRECTOR",
+    "PRINCIPAL"
+)
 def get_alert_stats():
 
     return jsonify({
@@ -65,7 +70,12 @@ def get_alert_stats():
 # ==========================================================
 
 @alerts_bp.route("", methods=["GET"])
-@jwt_required()
+@role_required(
+    "SECURITY_OFFICER",
+    "IT_ADMIN",
+    "DIRECTOR",
+    "PRINCIPAL"
+)
 def get_all_alerts():
 
     alerts = Alert.query.order_by(
@@ -83,7 +93,12 @@ def get_all_alerts():
 # ==========================================================
 
 @alerts_bp.route("/<int:alert_id>", methods=["GET"])
-@jwt_required()
+@role_required(
+    "SECURITY_OFFICER",
+    "IT_ADMIN",
+    "DIRECTOR",
+    "PRINCIPAL"
+)
 def get_alert(alert_id):
 
     alert = Alert.query.get(alert_id)
@@ -103,7 +118,12 @@ def get_alert(alert_id):
 # ==========================================================
 
 @alerts_bp.route("/<int:alert_id>/status", methods=["PATCH"])
-@jwt_required()
+@role_required(
+    "SECURITY_OFFICER",
+    "IT_ADMIN",
+    "DIRECTOR",
+    "PRINCIPAL"
+)
 def update_alert_status(alert_id):
 
     alert = Alert.query.get(alert_id)
@@ -151,7 +171,12 @@ def update_alert_status(alert_id):
 # ==========================================================
 
 @alerts_bp.route("/recent", methods=["GET"])
-@jwt_required()
+@role_required(
+    "SECURITY_OFFICER",
+    "IT_ADMIN",
+    "DIRECTOR",
+    "PRINCIPAL"
+)
 def get_recent_alerts():
 
     alerts = (

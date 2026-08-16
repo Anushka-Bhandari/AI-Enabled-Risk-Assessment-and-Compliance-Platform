@@ -550,6 +550,94 @@ def file_delete_metadata():
     }
 
 # ============================================================
+# UNIVERSITY-SPECIFIC EVENTS
+# ============================================================
+
+def exam_record_metadata():
+    return {
+        "exam_id": f"EXAM-{random.randint(1000, 9999)}",
+        "record_count": random.randint(1, 50),
+        "access_type": random.choice(["VIEW", "SEARCH"]),
+    }
+
+def exam_result_modify_metadata():
+    fields = ["marks", "grade", "remarks", "attendance_status"]
+    return {
+        "exam_id": f"EXAM-{random.randint(1000, 9999)}",
+        "student_count": random.randint(1, 20),
+        "action": "UPDATE",
+        "fields_changed": random.sample(fields, k=random.randint(1, 2)),
+    }
+
+def student_record_metadata():
+    return {
+        "record_count": random.randint(1, 25),
+        "access_type": random.choice(["VIEW", "SEARCH"]),
+        "record_category": random.choice([
+            "Profile", "Academic", "Contact", "Enrollment"
+        ]),
+    }
+
+def student_record_modify_metadata():
+    return {
+        "record_count": random.randint(1, 10),
+        "action": "UPDATE",
+        "fields_changed": random.sample(
+            ["contact", "department", "enrollment_status", "academic_status"],
+            k=random.randint(1, 2),
+        ),
+    }
+
+def attendance_metadata():
+    return {
+        "class_count": random.randint(1, 8),
+        "student_count": random.randint(5, 80),
+        "semester": random.choice(["I", "II"]),
+    }
+
+def attendance_modify_metadata():
+    return {
+        "class_id": f"CLASS-{random.randint(100, 999)}",
+        "student_count": random.randint(1, 40),
+        "action": random.choice(["MARK", "CORRECT", "OVERRIDE"]),
+    }
+
+def financial_record_metadata():
+    return {
+        "record_count": random.randint(1, 50),
+        "record_type": random.choice(["Fee", "Payment", "Scholarship", "Payroll"]),
+        "access_type": random.choice(["VIEW", "SEARCH"]),
+    }
+
+def financial_record_modify_metadata():
+    return {
+        "record_type": random.choice(["Fee", "Payment", "Scholarship", "Payroll"]),
+        "record_count": random.randint(1, 10),
+        "action": random.choice(["UPDATE", "APPROVE", "CORRECT"]),
+    }
+
+def admission_record_metadata():
+    return {
+        "application_count": random.randint(1, 25),
+        "access_type": random.choice(["VIEW", "SEARCH"]),
+        "admission_cycle": random.choice(["2026-27", "2027-28"]),
+    }
+
+def bulk_data_export_metadata():
+    return {
+        "dataset": random.choice([
+            "Student Records", "Attendance Records", "Results",
+            "Finance Records", "Admissions"
+        ]),
+        "records_exported": random.randint(500, 5000),
+        "export_format": random.choice(["CSV", "XLSX", "JSON"]),
+        "destination": random.choice([
+            "Network Drive", "Local Workstation", "Secure Archive"
+        ]),
+    }
+
+
+# ============================================================
 # DEFAULT
 # ============================================================
 

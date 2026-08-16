@@ -1,7 +1,8 @@
 from collections import defaultdict
 
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import get_jwt_identity
+from app.services.rbac import role_required
 from datetime import datetime, timedelta
 from flask import jsonify
 
@@ -42,7 +43,12 @@ def _serialize_assessment(a: Assessment) -> dict:
 
 
 @dashboard.route("/dashboard", methods=["GET"])
-@jwt_required()
+@role_required(
+    "SECURITY_OFFICER",
+    "IT_ADMIN",
+    "DIRECTOR",
+    "PRINCIPAL"
+)
 def dashboard_page():
     user_id, user = _get_current_user()
     if user_id is None:
@@ -93,7 +99,12 @@ def dashboard_page():
 
 
 @dashboard.route("/dashboard/analytics", methods=["GET"])
-@jwt_required()
+@role_required(
+    "SECURITY_OFFICER",
+    "IT_ADMIN",
+    "DIRECTOR",
+    "PRINCIPAL"
+)
 def get_analytics():
     user_id, user = _get_current_user()
     if user_id is None:
@@ -159,7 +170,12 @@ def get_analytics():
     }), 200
 
 @dashboard.route("/dashboard/recent-assessments", methods=["GET"])
-@jwt_required()
+@role_required(
+    "SECURITY_OFFICER",
+    "IT_ADMIN",
+    "DIRECTOR",
+    "PRINCIPAL"
+)
 def recent_assessments():
 
     user_id, user = _get_current_user()
@@ -183,7 +199,12 @@ def recent_assessments():
 
 
 @dashboard.route("/dashboard/event-activity", methods=["GET"])
-@jwt_required()
+@role_required(
+    "SECURITY_OFFICER",
+    "IT_ADMIN",
+    "DIRECTOR",
+    "PRINCIPAL"
+)
 def event_activity():
 
     # Last 5 hours

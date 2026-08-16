@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from flask_jwt_extended import jwt_required
+from app.services.rbac import role_required
 
 from app.models import ActivityLog
 
@@ -10,7 +10,12 @@ activity_logs_bp = Blueprint(
 )
 
 @activity_logs_bp.route("", methods=["GET"])
-@jwt_required()
+@role_required(
+    "SECURITY_OFFICER",
+    "IT_ADMIN",
+    "DIRECTOR",
+    "PRINCIPAL"
+)
 def get_all_activity_logs():
 
     logs = ActivityLog.query.order_by(
@@ -23,7 +28,12 @@ def get_all_activity_logs():
     ]), 200
 
 @activity_logs_bp.route("/<int:log_id>", methods=["GET"])
-@jwt_required()
+@role_required(
+    "SECURITY_OFFICER",
+    "IT_ADMIN",
+    "DIRECTOR",
+    "PRINCIPAL"
+)
 def get_activity_log(log_id):
 
     log = ActivityLog.query.get(log_id)
@@ -38,7 +48,12 @@ def get_activity_log(log_id):
     ), 200
 
 @activity_logs_bp.route("/recent", methods=["GET"])
-@jwt_required()
+@role_required(
+    "SECURITY_OFFICER",
+    "IT_ADMIN",
+    "DIRECTOR",
+    "PRINCIPAL"
+)
 def recent_activity_logs():
 
     logs = (

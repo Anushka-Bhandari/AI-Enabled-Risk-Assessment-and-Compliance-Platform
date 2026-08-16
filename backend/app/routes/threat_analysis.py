@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from flask_jwt_extended import jwt_required
+from app.services.rbac import role_required
 
 from app.services.threat_analyzer import (
     ThreatAnalyzer,
@@ -20,7 +20,10 @@ threat_analysis_bp = Blueprint(
     "/generate/<int:alert_id>",
     methods=["POST"]
 )
-@jwt_required()
+@role_required(
+    "SECURITY_OFFICER",
+    "IT_ADMIN",
+)
 def generate_threat_analysis(alert_id):
 
     try:
@@ -61,7 +64,12 @@ def generate_threat_analysis(alert_id):
     "/<int:alert_id>",
     methods=["GET"]
 )
-@jwt_required()
+@role_required(
+    "SECURITY_OFFICER",
+    "IT_ADMIN",
+    "DIRECTOR",
+    "PRINCIPAL"
+)
 def get_threat_analysis(alert_id):
 
     try:

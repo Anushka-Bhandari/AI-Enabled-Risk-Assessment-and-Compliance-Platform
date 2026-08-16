@@ -46,6 +46,20 @@ EVENT_TYPES = {
     "ANTIVIRUS_DISABLED": "Antivirus Disabled",
 
     "AUDIT_LOG_TAMPERING": "Audit Log Tampering",
+
+    # University-specific activities
+    "EXAM_RECORD_ACCESS": "Exam Record Access",
+    "EXAM_RECORD_DOWNLOAD": "Exam Record Download",
+    "EXAM_RESULT_MODIFY": "Exam Result Modification",
+    "STUDENT_RECORD_ACCESS": "Student Record Access",
+    "STUDENT_RECORD_DOWNLOAD": "Student Record Download",
+    "STUDENT_RECORD_MODIFY": "Student Record Modification",
+    "ATTENDANCE_ACCESS": "Attendance Record Access",
+    "ATTENDANCE_MODIFY": "Attendance Record Modification",
+    "FINANCIAL_RECORD_ACCESS": "Financial Record Access",
+    "FINANCIAL_RECORD_MODIFY": "Financial Record Modification",
+    "ADMISSION_RECORD_ACCESS": "Admission Record Access",
+    "BULK_DATA_EXPORT": "Bulk University Data Export",
 }
 
 # ============================================================
@@ -94,6 +108,79 @@ EVENT_WEIGHTS = {
     "ANTIVIRUS_DISABLED": 0.2,
 
     "AUDIT_LOG_TAMPERING": 0.1,
+}
+
+# ============================================================
+# UNIVERSITY EVENT GENERATION
+# ============================================================
+
+# Probability that a generated event is university-specific rather than
+# one of the existing generic security events.
+UNIVERSITY_EVENT_RATE = 0.35
+
+# Role-aware weights for university-specific activities. These describe
+# normal activities for the monitored university roles.
+ROLE_EVENT_WEIGHTS = {
+    "Faculty": {
+        "STUDENT_RECORD_ACCESS": 8,
+        "STUDENT_RECORD_DOWNLOAD": 2,
+        "ATTENDANCE_ACCESS": 6,
+        "ATTENDANCE_MODIFY": 3,
+        "EXAM_RECORD_ACCESS": 4,
+    },
+    "Exam Cell": {
+        "EXAM_RECORD_ACCESS": 8,
+        "EXAM_RECORD_DOWNLOAD": 4,
+        "EXAM_RESULT_MODIFY": 5,
+        "STUDENT_RECORD_ACCESS": 3,
+        "BULK_DATA_EXPORT": 1,
+    },
+    "Accounts": {
+        "FINANCIAL_RECORD_ACCESS": 10,
+        "FINANCIAL_RECORD_MODIFY": 4,
+        "BULK_DATA_EXPORT": 1,
+    },
+    "Lab Assistant": {
+        "STUDENT_RECORD_ACCESS": 3,
+        "ATTENDANCE_ACCESS": 2,
+        "BULK_DATA_EXPORT": 1,
+    },
+    "HOD": {
+        "STUDENT_RECORD_ACCESS": 5,
+        "ATTENDANCE_ACCESS": 4,
+        "EXAM_RECORD_ACCESS": 4,
+        "EXAM_RESULT_MODIFY": 1,
+    },
+    "Director": {
+        "STUDENT_RECORD_ACCESS": 3,
+        "EXAM_RECORD_ACCESS": 3,
+        "FINANCIAL_RECORD_ACCESS": 3,
+        "ADMISSION_RECORD_ACCESS": 2,
+        "BULK_DATA_EXPORT": 1,
+    },
+    "Network Engineer": {
+        "BULK_DATA_EXPORT": 1,
+    },
+    "Research Coordinator": {
+        "STUDENT_RECORD_ACCESS": 2,
+        "BULK_DATA_EXPORT": 2,
+    },
+}
+
+# Resources are tied to the activity, rather than selected independently.
+EVENT_RESOURCES = {
+    "EXAM_RECORD_ACCESS": "Examination System",
+    "EXAM_RECORD_DOWNLOAD": "Examination System",
+    "EXAM_RESULT_MODIFY": "Results Database",
+    "STUDENT_RECORD_ACCESS": "Student Database",
+    "STUDENT_RECORD_DOWNLOAD": "Student Database",
+    "STUDENT_RECORD_MODIFY": "Student Database",
+    "ATTENDANCE_ACCESS": "Attendance Portal",
+    "ATTENDANCE_MODIFY": "Attendance Portal",
+    "FINANCIAL_RECORD_ACCESS": "Finance Database",
+    "FINANCIAL_RECORD_MODIFY": "Finance Database",
+    "ADMISSION_RECORD_ACCESS": "Admissions Portal",
+    "BULK_DATA_EXPORT": "University Data Warehouse",
 }
 
 # ============================================================
