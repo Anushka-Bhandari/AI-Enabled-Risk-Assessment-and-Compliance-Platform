@@ -47,19 +47,39 @@ EVENT_TYPES = {
 
     "AUDIT_LOG_TAMPERING": "Audit Log Tampering",
 
-    # University-specific activities
+    # --------------------------------------------------------
+    # University-specific events
+    # --------------------------------------------------------
+
     "EXAM_RECORD_ACCESS": "Exam Record Access",
     "EXAM_RECORD_DOWNLOAD": "Exam Record Download",
-    "EXAM_RESULT_MODIFY": "Exam Result Modification",
+
+    "RESULT_ACCESS": "Result Access",
+    "RESULT_MODIFICATION": "Result Modification",
+
     "STUDENT_RECORD_ACCESS": "Student Record Access",
     "STUDENT_RECORD_DOWNLOAD": "Student Record Download",
-    "STUDENT_RECORD_MODIFY": "Student Record Modification",
-    "ATTENDANCE_ACCESS": "Attendance Record Access",
-    "ATTENDANCE_MODIFY": "Attendance Record Modification",
-    "FINANCIAL_RECORD_ACCESS": "Financial Record Access",
-    "FINANCIAL_RECORD_MODIFY": "Financial Record Modification",
+
+    "ATTENDANCE_ACCESS": "Attendance Access",
+    "ATTENDANCE_MODIFICATION": "Attendance Modification",
+
+    "FACULTY_HR_RECORD_ACCESS": "Faculty HR Record Access",
+
     "ADMISSION_RECORD_ACCESS": "Admission Record Access",
-    "BULK_DATA_EXPORT": "Bulk University Data Export",
+
+    "SCHOLARSHIP_RECORD_ACCESS": "Scholarship Record Access",
+
+    "FEE_RECORD_ACCESS": "Fee Record Access",
+
+    "BULK_STUDENT_DATA_EXPORT": "Bulk Student Data Export",
+
+    "ADMINISTRATIVE_DOCUMENT_ACCESS": "Administrative Document Access",
+
+    "SUSPICIOUS_LOGIN": "Suspicious Login",
+
+    "UNAUTHORIZED_ACCESS": "Unauthorized Access",
+
+    "PRIVILEGE_ACTIVITY": "Privilege Activity",
 }
 
 # ============================================================
@@ -108,79 +128,44 @@ EVENT_WEIGHTS = {
     "ANTIVIRUS_DISABLED": 0.2,
 
     "AUDIT_LOG_TAMPERING": 0.1,
-}
 
-# ============================================================
-# UNIVERSITY EVENT GENERATION
-# ============================================================
+    # --------------------------------------------------------
+    # University-specific events
+    # --------------------------------------------------------
 
-# Probability that a generated event is university-specific rather than
-# one of the existing generic security events.
-UNIVERSITY_EVENT_RATE = 0.35
+    "STUDENT_RECORD_ACCESS": 4,
 
-# Role-aware weights for university-specific activities. These describe
-# normal activities for the monitored university roles.
-ROLE_EVENT_WEIGHTS = {
-    "Faculty": {
-        "STUDENT_RECORD_ACCESS": 8,
-        "STUDENT_RECORD_DOWNLOAD": 2,
-        "ATTENDANCE_ACCESS": 6,
-        "ATTENDANCE_MODIFY": 3,
-        "EXAM_RECORD_ACCESS": 4,
-    },
-    "Exam Cell": {
-        "EXAM_RECORD_ACCESS": 8,
-        "EXAM_RECORD_DOWNLOAD": 4,
-        "EXAM_RESULT_MODIFY": 5,
-        "STUDENT_RECORD_ACCESS": 3,
-        "BULK_DATA_EXPORT": 1,
-    },
-    "Accounts": {
-        "FINANCIAL_RECORD_ACCESS": 10,
-        "FINANCIAL_RECORD_MODIFY": 4,
-        "BULK_DATA_EXPORT": 1,
-    },
-    "Lab Assistant": {
-        "STUDENT_RECORD_ACCESS": 3,
-        "ATTENDANCE_ACCESS": 2,
-        "BULK_DATA_EXPORT": 1,
-    },
-    "HOD": {
-        "STUDENT_RECORD_ACCESS": 5,
-        "ATTENDANCE_ACCESS": 4,
-        "EXAM_RECORD_ACCESS": 4,
-        "EXAM_RESULT_MODIFY": 1,
-    },
-    "Director": {
-        "STUDENT_RECORD_ACCESS": 3,
-        "EXAM_RECORD_ACCESS": 3,
-        "FINANCIAL_RECORD_ACCESS": 3,
-        "ADMISSION_RECORD_ACCESS": 2,
-        "BULK_DATA_EXPORT": 1,
-    },
-    "Network Engineer": {
-        "BULK_DATA_EXPORT": 1,
-    },
-    "Research Coordinator": {
-        "STUDENT_RECORD_ACCESS": 2,
-        "BULK_DATA_EXPORT": 2,
-    },
-}
+    "ATTENDANCE_ACCESS": 4,
 
-# Resources are tied to the activity, rather than selected independently.
-EVENT_RESOURCES = {
-    "EXAM_RECORD_ACCESS": "Examination System",
-    "EXAM_RECORD_DOWNLOAD": "Examination System",
-    "EXAM_RESULT_MODIFY": "Results Database",
-    "STUDENT_RECORD_ACCESS": "Student Database",
-    "STUDENT_RECORD_DOWNLOAD": "Student Database",
-    "STUDENT_RECORD_MODIFY": "Student Database",
-    "ATTENDANCE_ACCESS": "Attendance Portal",
-    "ATTENDANCE_MODIFY": "Attendance Portal",
-    "FINANCIAL_RECORD_ACCESS": "Finance Database",
-    "FINANCIAL_RECORD_MODIFY": "Finance Database",
-    "ADMISSION_RECORD_ACCESS": "Admissions Portal",
-    "BULK_DATA_EXPORT": "University Data Warehouse",
+    "EXAM_RECORD_ACCESS": 3,
+
+    "RESULT_ACCESS": 3,
+
+    "FACULTY_HR_RECORD_ACCESS": 2,
+
+    "ADMISSION_RECORD_ACCESS": 2,
+
+    "FEE_RECORD_ACCESS": 2,
+
+    "ADMINISTRATIVE_DOCUMENT_ACCESS": 2,
+
+    "STUDENT_RECORD_DOWNLOAD": 1.5,
+
+    "EXAM_RECORD_DOWNLOAD": 1.5,
+
+    "SCHOLARSHIP_RECORD_ACCESS": 1.5,
+
+    "RESULT_MODIFICATION": 1,
+
+    "ATTENDANCE_MODIFICATION": 1,
+
+    "BULK_STUDENT_DATA_EXPORT": 0.4,
+
+    "SUSPICIOUS_LOGIN": 0.3,
+
+    "UNAUTHORIZED_ACCESS": 0.2,
+
+    "PRIVILEGE_ACTIVITY": 0.2,
 }
 
 # ============================================================
@@ -212,7 +197,17 @@ RESOURCES = [
     "Admissions Portal",
     "Network Drive",
     "VPN Gateway",
-    "Hostel Management System"
+    "Hostel Management System",
+
+    # --------------------------------------------------------
+    # University-specific resources
+    # --------------------------------------------------------
+
+    "Examination System",
+    "Results Database",
+    "Scholarship System",
+    "Fee Management System",
+    "Administrative Documents"
 ]
 
 # ============================================================
@@ -323,82 +318,4 @@ APPLICATIONS = [
     "PuTTY",
     "PowerShell Script",
     "Unknown Executable"
-]
-
-# ============================================================
-# MONITORED USERS
-# ============================================================
-
-MONITORED_USERS = [
-
-    {
-        "name": "Ananya Sharma",
-        "email": "ananya.sharma@college.edu",
-        "role": "Faculty",
-        "department": "Computer Science"
-    },
-
-    {
-        "name": "Rahul Verma",
-        "email": "rahul.verma@college.edu",
-        "role": "Faculty",
-        "department": "Electronics"
-    },
-
-    {
-        "name": "Priya Singh",
-        "email": "priya.singh@college.edu",
-        "role": "Faculty",
-        "department": "Mechanical"
-    },
-
-    {
-        "name": "Amit Joshi",
-        "email": "amit.joshi@college.edu",
-        "role": "Exam Cell",
-        "department": "Administration"
-    },
-
-    {
-        "name": "Neha Gupta",
-        "email": "neha.gupta@college.edu",
-        "role": "Accounts",
-        "department": "Finance"
-    },
-
-    {
-        "name": "Karan Mehta",
-        "email": "karan.mehta@college.edu",
-        "role": "Lab Assistant",
-        "department": "IT"
-    },
-
-    {
-        "name": "Sakshi Jain",
-        "email": "sakshi.jain@college.edu",
-        "role": "HOD",
-        "department": "Computer Science"
-    },
-
-    {
-        "name": "Rohit Kapoor",
-        "email": "rohit.kapoor@college.edu",
-        "role": "Director",
-        "department": "Administration"
-    },
-
-    {
-        "name": "Nitin Arora",
-        "email": "nitin.arora@college.edu",
-        "role": "Network Engineer",
-        "department": "IT"
-    },
-
-    {
-        "name": "Meera Patel",
-        "email": "meera.patel@college.edu",
-        "role": "Research Coordinator",
-        "department": "Research"
-    }
-
 ]

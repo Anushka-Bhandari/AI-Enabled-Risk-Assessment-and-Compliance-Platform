@@ -6,7 +6,6 @@ from datetime import datetime
 import requests
 
 from config import (
-    MONITORED_USERS,
     EVENT_TYPES,
     EVENT_WEIGHTS,
     RESOURCES,
@@ -20,18 +19,18 @@ from config import (
 # ============================================================
 
 API_URL = "http://127.0.0.1:5000/api/events"
+ACTORS_API_URL = "http://127.0.0.1:5000/api/monitoring/actors"
 
+def get_random_actor():
+    response = requests.get(ACTORS_API_URL, timeout=10)
+    response.raise_for_status()
 
-# ============================================================
-# RANDOM USER
-# ============================================================
+    actors = response.json()
 
-def get_random_user():
+    if not actors:
+        raise RuntimeError("No monitored actors available")
 
-    return random.choice(
-        MONITORED_USERS
-    )
-
+    return random.choice(actors)
 
 # ============================================================
 # RANDOM EVENT
@@ -205,79 +204,38 @@ def generate_metadata(event_key):
 
 def generate_event():
 
-    user = get_random_user()
+    actor = get_random_actor()
 
     event_key = get_random_event()
 
     return {
+        "event_id": str(uuid.uuid4()),
 
-        "event_id":
+        "university_id": actor["university_id"],
+        "actor_type": actor["actor_type"],
+        "actor_id": actor["actor_id"],
 
-        str(
-            uuid.uuid4()
-        ),
+        "user_name": actor["name"],
+        "user_email": actor["email"],
+        "role": actor["role"],
+        "department": actor["department"],
 
-        "user_name":
+        "timestamp": datetime.now().isoformat(),
+    
+        "event_type": event_key,
+        "event_name": EVENT_TYPES[event_key],
+    
+        "resource": random.choice(RESOURCES),
 
-        user["name"],
+        "ip_address": generate_ip(),
 
-        "user_email":
+        "device": random.choice(DEVICES),
 
-        user["email"],
+        "location": random.choice(LOCATIONS),
 
-        "role":
+        "status": generate_status(event_key),
 
-        user["role"],
-
-        "department":
-
-        user["department"],
-
-        "timestamp":
-
-        datetime.now().isoformat(),
-
-        "event_type":
-
-        event_key,
-
-        "event_name":
-
-        EVENT_TYPES[event_key],
-
-        "resource":
-
-        random.choice(
-            RESOURCES
-        ),
-
-        "ip_address":
-
-        generate_ip(),
-
-        "device":
-
-        random.choice(
-            DEVICES
-        ),
-
-        "location":
-
-        random.choice(
-            LOCATIONS
-        ),
-
-        "status":
-
-        generate_status(
-            event_key
-        ),
-
-        "metadata":
-
-        generate_metadata(
-            event_key
-        )
+        "metadata": generate_metadata(event_key)
     }
 
 
