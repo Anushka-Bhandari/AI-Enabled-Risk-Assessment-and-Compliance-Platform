@@ -44,6 +44,7 @@ def create_app():
     from app.routes.events import events
     from app.routes.threat_analysis import threat_analysis_bp
     from app.routes.activity_logs import activity_logs_bp
+    from app.routes.monitoring import monitoring_bp
 
 
     app.register_blueprint(auth)
@@ -59,6 +60,7 @@ def create_app():
     app.register_blueprint(events,url_prefix="/api")
     app.register_blueprint(alerts_bp, url_prefix="/alerts")
     app.register_blueprint(threat_analysis_bp, url_prefix="/threat-analysis")
+    app.register_blueprint( monitoring_bp, url_prefix="/api/monitoring")
 
     app.register_blueprint(
         compliance_results

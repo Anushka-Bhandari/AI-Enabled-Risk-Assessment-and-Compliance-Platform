@@ -1,39 +1,42 @@
 import os
-from urllib import response
 import requests
 
 
 class LLMClient:
-    """
-    Wrapper around Grok (xAI) Chat Completions API.
-    Can be replaced with GPT/Gemini/Claude later without
-    changing the rest of the backend.
-    """
 
     def __init__(self):
-        self.api_key = os.getenv("GROQ_API_KEY")
 
-        if not self.api_key:
+        self.api_keys = [
+            os.getenv("GROQ_API_KEY_1"),
+            os.getenv("GROQ_API_KEY_2"),
+            os.getenv("GROQ_API_KEY_3"),
+        ]
+
+        self.api_keys = [
+            key for key in self.api_keys
+            if key
+        ]
+
+        if not self.api_keys:
             raise ValueError(
-                "GROQ_API_KEY environment variable is not configured."
+                "No Groq API keys configured."
             )
 
-        self.url = "https://api.groq.com/openai/v1/chat/completions"
-
-        self.headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json"
-        }
+        self.url = (
+            "https://api.groq.com/openai/v1/chat/completions"
+        )
 
     def generate(
-        self,
-        system_prompt,
-        user_prompt,
-        model="llama-3.3-70b-versatile"
-    ):
+    self,
+    system_prompt,
+    user_prompt,
+    model="openai/gpt-oss-120b"
+):
+
         payload = {
             "model": model,
             "temperature": 0.2,
+            "max_tokens": 4000,
             "messages": [
                 {
                     "role": "system",
@@ -46,22 +49,59 @@ class LLMClient:
             ]
         }
 
-        response = requests.post(
-            self.url,
-            headers=self.headers,
-            json=payload,
-            timeout=60
-        )
+        last_error = None
 
-        print("Status:", response.status_code)
-        print(response.text)
+        for index, api_key in enumerate(
+            self.api_keys,
+            start=1
+        ):
 
-        response.raise_for_status()
+            try:
 
-        data = response.json()
+                headers = {
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json"
+                }
 
-        return (
-            data["choices"][0]
-            ["message"]
-            ["content"]
-        )
+                print(
+                    f"Trying API Key #{index}"
+                )
+
+                response = requests.post(
+                    self.url,
+                    headers=headers,
+                    json=payload,
+                    timeout=60
+                )
+
+                print(
+                    "Status:",
+                    response.status_code
+                )
+
+                response.raise_for_status()
+
+                data = response.json()
+
+                return data["choices"][0][
+                    "message"
+                ]["content"]
+
+            except Exception as error:
+
+                print(
+                    f"API Key #{index} failed:"
+                )
+                print(error)
+
+                last_error = error
+
+        print("=" * 80)
+        print("SYSTEM PROMPT CHARS:", len(system_prompt))
+        print("USER PROMPT CHARS:", len(user_prompt))
+        print("TOTAL CHARS:", len(system_prompt) + len(user_prompt))
+        print("=" * 80)
+
+        raise last_error
+
+            

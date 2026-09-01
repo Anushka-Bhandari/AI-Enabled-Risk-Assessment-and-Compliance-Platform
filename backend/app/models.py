@@ -874,3 +874,52 @@ class ThreatAnalysis(db.Model):
             "analyzed_at": self.analyzed_at.isoformat() if self.analyzed_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None
         }
+
+class MonitoringControlAnalysis(db.Model):
+    __tablename__ = "monitoring_control_analysis"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    assessment_id = db.Column(
+        db.Integer,
+        db.ForeignKey("assessments.id"),
+        nullable=False
+    )
+
+    control_id = db.Column(
+        db.String(4),
+        nullable=False
+    )
+
+    event_type = db.Column(
+        db.String(100),
+        nullable=False
+    )
+
+    effectiveness = db.Column(
+        db.String(50),
+        nullable=False
+    )
+
+    updated_risk = db.Column(
+        db.String(20),
+        nullable=False
+    )
+
+    reason = db.Column(
+        db.Text,
+        nullable=True
+    )
+
+    recommendation = db.Column(
+        db.Text,
+        nullable=True
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=db.func.current_timestamp()
+    )

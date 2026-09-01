@@ -39,10 +39,19 @@ with open(
 ) as file:
     questionnaire = json.load(file)
 
-CONTROL_TO_QUESTION = {
-    question["control_id"]: str(question["id"])
-    for question in questionnaire["questions"]
-}
+# ==========================================================
+# Map each control to its grouped questionnaire question
+# ==========================================================
+
+CONTROL_TO_QUESTION = {}
+
+for question in questionnaire["questions"]:
+
+    question_id = str(question["id"])
+
+    for control_id in question["control_ids"]:
+
+        CONTROL_TO_QUESTION[control_id] = question_id
 
 
 class ComplianceEngine:
@@ -154,6 +163,28 @@ class ComplianceEngine:
             for answer in records
         }
 
+    def _get_relevant_controls(self):
+
+        relevant_control_ids = set()
+
+        for question_id in self.answers.keys():
+
+            for question in questionnaire["questions"]:
+
+                if str(question["id"]) == str(question_id):
+
+                    relevant_control_ids.update(
+                        question["control_ids"]
+                    )
+
+                    break
+
+        return [
+            control
+            for control in CONTROL_LIBRARY
+            if control["id"] in relevant_control_ids
+        ]
+
     def _load_documents(self):
 
         self.documents = self.assessment.documents
@@ -190,10 +221,16 @@ Document: {document.original_filename}
         if not self.document_text:
             return
 
+        relevant_controls = self._get_relevant_controls()
+
+        print("====================================")
+        print("RELEVANT CONTROLS:", len(relevant_controls))
+        print("====================================")
+
         self.document_analysis = (
             DocumentAnalysisEngine(
                 document_text=self.document_text,
-                controls=CONTROL_LIBRARY,
+                controls=relevant_controls,
             ).run()
         )
 

@@ -62,6 +62,21 @@ def submit_assessment():
 
     answers = data["answers"]
 
+    print("NUMBER OF ANSWERS:", len(answers))
+    print("NUMBER OF VALID QUESTIONS:", len(VALID_QUESTION_IDS))
+
+    missing_ids = VALID_QUESTION_IDS - set(answers.keys())
+    extra_ids = set(answers.keys()) - VALID_QUESTION_IDS
+
+    print("MISSING IDS:", missing_ids)
+    print("EXTRA IDS:", extra_ids)
+
+    if missing_ids:
+        return jsonify({
+            "error": "All questionnaire items must be answered.",
+            "missing_ids": list(missing_ids)
+        }), 400
+
     if not isinstance(answers, dict):
         return jsonify({
             "error": "answers must be a dictionary"
@@ -300,23 +315,59 @@ def upload_documents():
 @jwt_required()
 def update_assessment(assessment_id):
 
-    assessment = Assessment.query.get(
-        assessment_id
-    )
+    assessment_record = Assessment.query.get(assessment_id)
 
-    if not assessment:
+    if not assessment_record:
         return jsonify({
             "error": "Assessment not found"
         }), 404
 
     data = request.get_json()
 
+    if not data or "answers" not in data:
+        return jsonify({
+            "error": "answers are required"
+        }), 400
+
     answers = data["answers"]
 
+    if not isinstance(answers, dict):
+        return jsonify({
+            "error": "answers must be a dictionary"
+        }), 400
+
+    # Check missing questions
+    missing_ids = VALID_QUESTION_IDS - set(answers.keys())
+
+    # Check extra/invalid questions
+    extra_ids = set(answers.keys()) - VALID_QUESTION_IDS
+
+    if missing_ids:
+        return jsonify({
+            "error": "All questionnaire items must be answered.",
+            "missing_ids": list(missing_ids)
+        }), 400
+
+    if extra_ids:
+        return jsonify({
+            "error": "Invalid question IDs.",
+            "extra_ids": list(extra_ids)
+        }), 400
+
+    # Validate answers
+    for question_id, answer in answers.items():
+
+        if answer not in VALID_ANSWERS:
+            return jsonify({
+                "error": f"Invalid answer for question {question_id}"
+            }), 400
+
+    # Delete old answers
     AssessmentAnswer.query.filter_by(
         assessment_id=assessment_id
     ).delete()
 
+    # Insert new answers
     for question_id, answer in answers.items():
 
         db.session.add(
@@ -327,10 +378,24 @@ def update_assessment(assessment_id):
             )
         )
 
-    assessment.questionnaire_completed = True
+    assessment_record.questionnaire_completed = True
+
+    if assessment_record.assessment_mode == "COMBINED":
+
+        if (
+            assessment_record.questionnaire_completed
+            and assessment_record.document_completed
+        ):
+            assessment_record.status = "Completed"
+
+    elif assessment_record.assessment_mode == "QUESTIONNAIRE":
+
+        assessment_record.status = "Completed"
 
     db.session.commit()
 
     return jsonify({
-        "message": "Assessment updated"
-    })
+        "message": "Assessment updated successfully",
+        "assessment_id": assessment_id,
+        "total_questions": len(VALID_QUESTION_IDS)
+    }), 200

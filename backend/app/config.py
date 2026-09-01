@@ -26,8 +26,19 @@ class Config:
     DB_HOST = get_env("DB_HOST")
     DB_PORT = get_env("DB_PORT", "3306")
     DB_NAME = get_env("DB_NAME")
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
-    print("DATABASE_URL =", os.getenv("DATABASE_URL"))
+    DATABASE_URL = os.getenv("DATABASE_URL")
+
+    if DATABASE_URL:
+        SQLALCHEMY_DATABASE_URI = DATABASE_URL
+    else:
+        SQLALCHEMY_DATABASE_URI = (
+            f"mysql+pymysql://{DB_USER}:"
+            f"{quote_plus(DB_PASSWORD)}@"
+            f"{DB_HOST}:{DB_PORT}/"
+            f"{DB_NAME}"
+        )
+
+    print("DB URI =", SQLALCHEMY_DATABASE_URI)
 
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False

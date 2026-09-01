@@ -2,8 +2,6 @@
 
 import json
 from flask import Blueprint, jsonify
-
-
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -15,6 +13,15 @@ QUESTIONNAIRE_PATH = os.path.join(
 
 with open(QUESTIONNAIRE_PATH, "r", encoding="utf-8") as file:
     questionnaire = json.load(file)
+
+    print("====================================")
+    print("QUESTIONNAIRE PATH:", QUESTIONNAIRE_PATH)
+    print("TOTAL QUESTIONS:", len(questionnaire["questions"]))
+    print(
+        "QUESTION IDS:",
+        [q["id"] for q in questionnaire["questions"]]
+    )
+    print("====================================")
 
 questionnaire_bp = Blueprint("questionnaire", __name__)
 
